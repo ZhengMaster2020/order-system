@@ -7,43 +7,37 @@ const login = (params) => {
     data: params
   })
 }
-const index = (params) => {
+
+// 防伪码管理 - 列表
+const securityCodeList = (params) => {
   return fetch({
-    url: '/v2/operate-dept/design-center/index',
+    url: '/securityCode',
     method: 'GET',
     params: params
   })
 }
 
-// 公司所有权
-const getOwnership = (params) => {
-  return new Promise((resolve, reject) => {
-    const data = [
-      { label: '公司所有权', ownership: 'company' },
-      { label: '部门所有权', ownership: 'department' },
-      { label: '我的所有权', ownership: 'self' }
-    ]
-    resolve(data)
+// 防伪码管理 - 添加
+const securityCodeCreate = (params) => {
+  return fetch({
+    url: '/securityCode',
+    method: 'POST',
+    data: params
   })
 }
-// 审核状态
-const getAuditStatus = (parmas) => {
-  return new Promise((resolve, reject) => {
-    const data = [
-      { label: '待直属上级审核', value: 'company' },
-      { label: '直属上级审核不通过', value: 'department' },
-      { label: '待行政审核', value: 'self' },
-      { label: '行政审核不通过', value: 'no' },
-      { label: '待领取', value: 'wait' },
-      { label: '已领取', value: 'already' }
-    ]
-    resolve(data)
+
+// 防伪码查询 - 列表
+const securityCodeQuery = (params) => {
+  return fetch({
+    url: '/securityCodeQuery',
+    method: 'GET',
+    params: params
   })
 }
 
 export default {
   login,
-  index,
-  getOwnership,
-  getAuditStatus
+  securityCodeList,
+  securityCodeCreate,
+  securityCodeQuery
 }

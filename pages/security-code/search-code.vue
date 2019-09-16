@@ -4,7 +4,7 @@
       <Col :sm="24">
         <Form ref="searchData" :model="searchData" class="searchData">
           <FormItem>
-            <Input v-model="searchData.price" placeholder="防伪码" clearable @on-enter="getList('search')"></Input>
+            <Input v-model="searchData.securityCode" placeholder="防伪码" clearable @on-enter="getList('search')"></Input>
           </FormItem>
           <FormItem>
             <Button type="primary" icon="ios-search" @click="getList('search')">查询</Button>
@@ -35,7 +35,7 @@
     data () {
       return {
         searchData: {
-          price: ''
+          securityCode: ''
         },
         listData: {
           columns: [
@@ -69,6 +69,9 @@
         }
       }
     },
+    mounted() {
+      this.getList()
+    },
     methods:{
       selectCheck () {},
       changePage (e) {
@@ -80,7 +83,10 @@
         // this.getList();
       },
       // 查询数据
-      getList () {}
+      getList () {
+        let params = this.searchData
+        // this.$API.securityCodeQuery.then((res) => {})
+      }
     }
   }
 </script>

@@ -15,10 +15,10 @@ let baseUrl = 'https://api-offline.fandow.com'
 if (process.env.NODE_ENV === 'production') {
   console.log('---- production ----')
 } else if (process.env.NODE_ENV === 'test') {
-  baseUrl = 'https://gdttest.wqc.so'
+  baseUrl = 'http://api-tickingbeta.fandow.com'
   console.log('---- test ----')
 } else {
-  baseUrl = 'https://gdttest.wqc.so'
+  baseUrl = 'http://api-tickingbeta.fandow.com'
   console.log('---- develop ----')
 }
 
