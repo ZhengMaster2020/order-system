@@ -49,7 +49,7 @@
       <div style="margin: 10px;overflow: hidden">
         <div class="pages-L">共 {{pageProps.totalCount}} 条</div>
         <div style="float: right;">
-          <Page size="small" :total="pageProps.totalCount" :current="pageProps.currentPage" show-sizer show-elevator @on-change="changePage" @on-page-size-change="changePageSize"></Page>
+          <Page size="small" :total="pageProps.totalCount" :current="pageProps.page" show-sizer show-elevator @on-change="changePage" @on-page-size-change="changePageSize"></Page>
         </div>
       </div>
     </Row>
@@ -103,25 +103,18 @@
             {type: 'selection', width: 60, align: 'center'},
             {key: 'index', type: 'index', title: '序号', width: 65, align: 'center'},
             {key: 'brand', title: '品牌', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'batch_no', title: '生成数量', minWidth: 120, sortable: true, align: 'center'},
-            {key: 'supplier', title: '生成日期', minWidth: 100, sortable: true, align: 'center'},
+            {key: 'generationCount', title: '生成数量', minWidth: 120, sortable: true, align: 'center'},
+            {key: 'createdAt', title: '生成日期', minWidth: 100, sortable: true, align: 'center'},
             {key: 'userName', title: '操作人员', minWidth: 100, sortable: true, align: 'center'},
             { key: 'action', title: '操作', width: 150, align: 'center', slot: 'action' }
           ],
-          data: [
-            {
-              created_by: 'John Brown',
-              batch_no: 18,
-              supplier: 'New York No. 1 Lake Park',
-              suppliers: 'America'
-            }
-          ]
+          data: []
         },
         pageProps: { // 列表分页属性
-          page: 1,
-          perPage: 10,
-          currentPage: 1,
-          totalCount: 0
+             page: 1,
+             perPage: 10,
+             currentPage: 1,
+             totalCount: 0
         }
       }
     },
@@ -136,18 +129,21 @@
       // 確定生成
       confirm () {
         let params = this.generateData
-        this.$API.securityCodeCreate.then((res) => {
-          
+        this.$API.securityCodeCreate(params).then((res) => {
+          console.log(res)
+          this.$Message.info('生成成功')
+          this.generateStatus = false
+          this.getList()
         })
       },
       selectCheck () {},
       changePage (e) {
         this.pageProps.page = e
-        // this.getList();
+        this.getList();
       },
       changePageSize (e) {
         this.pageProps.perPage = e
-        // this.getList();
+        this.getList();
       },
       // 取消生成
       cancel () {
@@ -156,10 +152,18 @@
 
       // 查询数据
       getList () {
-        // let params = this.searchData
-        this.$API.securityCodeList().then((res) => {
-          // this.listData.data = 
+        let params = this.searchData
+        params.page = this.pageProps.page
+        params.perPage = this.pageProps.perPage
+        this.$API.securityCodeList(params).then((res) => {
+          //console.log(res)
+          if(res.code === 0){
+             this.listData.data = res.data.list
+             this.pageProps.totalCount = res.data.count
+          }
         })
+        this.pageProps.page = 1
+        this.pageProps.perPage = 10
       }
     }
   }
