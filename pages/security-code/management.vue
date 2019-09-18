@@ -38,10 +38,9 @@
       </Col>
     </Row>
     <Row class="margin-top-10">
-      <Table :columns="listData.columns" :data="listData.data" size="small" border @on-selection-change="selectCheck" highlight-row :loading="listData.loading">
+      <Table :columns="listData.columns" :data="listData.data" size="small" border @on-selection-change="selectCheck" highlight-row :loading="loading">
         <!-- 操作 -->
         <template slot-scope="{ row }" slot="action">
-          <Poptip confirm title="您确认删除这条内容吗？" @on-ok="handleDelete(row.id)" transfer>
             <Button size="small">重新下载表格</Button>  
           </Poptip>
         </template>
@@ -57,18 +56,19 @@
     <!-- 生成防伪码弹窗 -->
     <Modal
       v-model="generateStatus"
-      title="生成防伪码">
+      title="生成防伪码"
+      @on-cancel="cancel('generateData')">
       <Form ref="generateData" :model="generateData" :rules="generateRule" class="generateData">
-        <FormItem label="品牌：" prop="price" :label-width="90">
-          <Input v-model="generateData.brand" clearable @on-enter="getList('search')"></Input>
+        <FormItem label="品牌：" prop="brand" :label-width="90">
+          <Input v-model="generateData.brand" clearable></Input>
         </FormItem>
-        <FormItem label="生成数量：" prop="mount" :label-width="90">
-          <Input v-model="generateData.generationCount" clearable @on-enter="getList('search')"></Input>
+        <FormItem label="生成数量：" prop="generationCount" :label-width="90">
+          <Input v-model="generateData.generationCount" clearable number></Input>
         </FormItem>
       </Form>    
       <div slot="footer">
-          <Button type="primary" :loading="generateLoading" @click="confirm">生成并下载</Button>
-          <Button type="default" :loading="generateLoading" @click="cancel">取消</Button>
+          <Button type="primary" :loading="generateLoading" @click="confirm('generateData')" :disabled="isdisabled">生成并下载</Button>
+          <Button type="default" :loading="generateLoading" @click="cancel('generateData')">取消</Button>
       </div>
     </Modal>
   </div>  
@@ -79,16 +79,19 @@
       return {
         generateStatus: false,
         generateLoading: false,
+        isdisabled: false,
+        isNo: false,
+        loading: false,
         generateData: {
           brand: '',
           generationCount: ''
         },
         generateRule: {
           brand: [
-            { required: true, message: 'The name cannot be empty', trigger: 'blur' }
+            { required: true, message: '品牌不能为空', trigger: 'blur' }
           ],
           generationCount: [
-            { required: true, message: 'The name cannot be empty', trigger: 'blur' }
+            { required: true, type: 'number', message: '请输入数字', trigger: 'blur' }
           ]
         },
         searchData: {
@@ -125,16 +128,21 @@
       // 生成防伪码
       generateCode () {
         this.generateStatus = true
+        this.isdisabled = false
+        this.generateData.brand = ''
+        this.generateData.generationCount = ''
       },
       // 確定生成
-      confirm () {
+      confirm (required) {
+        this.handleSubmit (required)
         let params = this.generateData
-        this.$API.securityCodeCreate(params).then((res) => {
-          console.log(res)
-          this.$Message.info('生成成功')
-          this.generateStatus = false
-          this.getList()
+        if(this.isNo === false){
+          this.$API.securityCodeCreate(params).then((res) => {
+          if(res.code === 0){
+            console.log(res)
+          }
         })
+        }
       },
       selectCheck () {},
       changePage (e) {
@@ -146,10 +154,25 @@
         this.getList();
       },
       // 取消生成
-      cancel () {
+      cancel (name) {
         this.generateStatus = false
+        this.$refs[name].resetFields();
       },
-
+      // 弹窗校验
+      handleSubmit (name) {
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            this.$Message.success('提交成功');
+            this.isdisabled = true
+            this.generateStatus = false
+            this.getList ()
+          } else {
+             this.$Message.error('请填写信息');
+             this.isNo = true
+             return this.isNo
+             }
+          })
+      },
       // 查询数据
       getList () {
         let params = this.searchData
@@ -157,13 +180,17 @@
         params.perPage = this.pageProps.perPage
         this.$API.securityCodeList(params).then((res) => {
           //console.log(res)
+          this.loading = true
           if(res.code === 0){
              this.listData.data = res.data.list
+             this.pageProps.perPage = res.data.perPage
              this.pageProps.totalCount = res.data.count
           }
+        }).then(() => {
+          this.loading = false
+          this.pageProps.page = 1
         })
-        this.pageProps.page = 1
-        this.pageProps.perPage = 10
+        
       }
     }
   }
