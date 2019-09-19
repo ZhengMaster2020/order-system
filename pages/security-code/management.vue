@@ -38,10 +38,10 @@
       </Col>
     </Row>
     <Row class="margin-top-10">
-      <Table :columns="listData.columns" :data="listData.data" size="small" border @on-selection-change="selectCheck" highlight-row :loading="loading">
+      <Table :columns="listData.columns" :data="listData.data" size="small" border @on-selection-change="selectCheck(e)" highlight-row :loading="loading">
         <!-- 操作 -->
-        <template slot-scope="{ row }" slot="action">
-            <Button size="small">重新下载表格</Button>  
+        <template slot-scope="{ row, index }" slot="action">
+            <Button size="small" :disabled="row.isComputed === 0 || fileSrc[index] == ''"><a :href="fileSrc[index]">下载表格</a></Button>  
           </Poptip>
         </template>
       </Table>
@@ -67,7 +67,7 @@
         </FormItem>
       </Form>    
       <div slot="footer">
-          <Button type="primary" :loading="generateLoading" @click="confirm('generateData')" :disabled="isdisabled">生成并下载</Button>
+          <Button type="primary" :loading="generateLoading" @click="confirm('generateData')" :disabled="isdisabled">生成</Button>
           <Button type="default" :loading="generateLoading" @click="cancel('generateData')">取消</Button>
       </div>
     </Modal>
@@ -82,6 +82,8 @@
         isdisabled: false,
         isNo: false,
         loading: false,
+        isComputed: [],
+        fileSrc: [],
         generateData: {
           brand: '',
           generationCount: ''
@@ -139,7 +141,6 @@
         if(this.isNo === false){
           this.$API.securityCodeCreate(params).then((res) => {
           if(res.code === 0){
-            console.log(res)
           }
         })
         }
@@ -173,11 +174,12 @@
              }
           })
       },
-      // 查询数据
+      // 获取数据
       getList () {
         let params = this.searchData
         params.page = this.pageProps.page
         params.perPage = this.pageProps.perPage
+        this.fileSrc = []
         this.$API.securityCodeList(params).then((res) => {
           //console.log(res)
           this.loading = true
@@ -185,17 +187,29 @@
              this.listData.data = res.data.list
              this.pageProps.perPage = res.data.perPage
              this.pageProps.totalCount = res.data.count
+             Object.keys(res.data.list).map((key) => {
+                let keys = res.data.list[key]
+                this.isComputed.push(keys['isComputed'])
+                // 判断有没有链接，没有为空
+                if(keys['isComputed'] === 0){
+                  this.fileSrc.push('')
+                }
+                if(keys['isComputed'] === 1 && keys['fileItem'].length===0){
+                  this.fileSrc.push('')
+                }
+                Object.keys(keys['fileItem']).map((key) => {
+                    this.fileSrc.push(keys['fileItem'][key]['url'])
+                 })
+                 //console.log(this.fileSrc)
+             })
           }
         }).then(() => {
           this.loading = false
-          this.pageProps.page = 1
         })
-        
       }
     }
   }
 </script>
-
 <style lang="less">
 .code-management {
   .count {

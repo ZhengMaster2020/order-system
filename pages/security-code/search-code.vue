@@ -78,7 +78,7 @@
         params.page = this.pageProps.page
         params.perPage = this.pageProps.perPage
         this.$API.securityCodeQuery(params).then((res) => {
-          console.log(res)
+          //console.log(res)
           if(res.code === 0){
             this.listData.data = res.data.list
             this.pageProps.totalCount = res.data.count
