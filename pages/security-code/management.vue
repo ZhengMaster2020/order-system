@@ -29,7 +29,7 @@
             <Input v-model="searchData.userName" placeholder="操作人员" clearable @on-enter="getList('searchData')"></Input>
           </FormItem>
           <FormItem>
-            <Button type="primary" icon="ios-search" @click="getList('searchData')">查询</Button>
+            <Button type="primary" icon="ios-search" @click="getList('searchData', 'noPage')">查询</Button>
           </FormItem>
           <FormItem style="float:right">
             <Col span="12"><Button type="primary" icon="md-repeat" @click="generateCode">生成防伪码</Button></Col>
@@ -174,11 +174,19 @@
              }
           })
       },
+      // 分页
+      getPage() {
+       
+      },
       // 获取数据
-      getList () {
+      getList (e, noPage) {
         let params = this.searchData
         params.page = this.pageProps.page
         params.perPage = this.pageProps.perPage
+        if (noPage === 'noPage') {
+          delete params.page
+          delete params.perPage
+        }
         this.fileSrc = []
         this.$API.securityCodeList(params).then((res) => {
           //console.log(res)
