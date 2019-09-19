@@ -174,10 +174,6 @@
              }
           })
       },
-      // 分页
-      getPage() {
-       
-      },
       // 获取数据
       getList (e, noPage) {
         let params = this.searchData
