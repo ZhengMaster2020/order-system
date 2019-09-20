@@ -6,7 +6,7 @@ const app = new Koa()
 
 // Import and Set Nuxt.js options
 const config = require('../nuxt.config.js')
-config.dev = !(app.env === 'production')
+config.dev = !(app.env === 'production' || app.env === 'test')
 
 async function start() {
   // Instantiate nuxt.js
@@ -14,7 +14,7 @@ async function start() {
 
   const {
     host = process.env.HOST || '127.0.0.1',
-    port = process.env.PORT || 3000
+  //  port = process.env.PORT || 3000
   } = nuxt.options.server
 
   // Build in development
@@ -31,6 +31,11 @@ async function start() {
     ctx.req.ctx = ctx // This might be useful later on, e.g. in nuxtServerInit or with nuxt-stash
     nuxt.render(ctx.req, ctx.res)
   })
+
+ let port = 30002
+  if (config.dev) {
+    port = 3000
+  }
 
   app.listen(port, host)
   consola.ready({
