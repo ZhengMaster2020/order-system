@@ -14,13 +14,13 @@
       <Col :sm="24">
         <Form ref="searchData" :model="searchData" class="searchData">
           <FormItem label="生成日期" :label-width="80">
-            <DatePicker v-model="searchData.startTime" type="date" placeholder="Select date" style="width: 200px"></DatePicker>
+            <DatePicker v-model="searchData.startTime" type="date" placeholder="开始时间" style="width: 200px"></DatePicker>
           </FormItem>
           <FormItem>
             <span>-</span>
           </FormItem>
           <FormItem>
-            <DatePicker v-model="searchData.endTime" type="date" placeholder="Select date" style="width: 200px"></DatePicker>
+            <DatePicker v-model="searchData.endTime" type="date" placeholder="结束时间" style="width: 200px"></DatePicker>
           </FormItem> 
           <FormItem>
             <Input v-model="searchData.brand" placeholder="品牌" clearable @on-enter="getList('searchData')"></Input>
