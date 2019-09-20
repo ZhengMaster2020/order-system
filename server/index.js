@@ -14,7 +14,7 @@ async function start() {
 
   const {
     host = process.env.HOST || '127.0.0.1',
-    port = process.env.PORT || 3000
+    // port = process.env.PORT || 3000
   } = nuxt.options.server
 
   // Build in development
@@ -24,7 +24,7 @@ async function start() {
   } else {
     await nuxt.ready()
   }
-
+  let port = 30002
   app.use((ctx) => {
     ctx.status = 200
     ctx.respond = false // Bypass Koa's built-in response handling
