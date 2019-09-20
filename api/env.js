@@ -10,7 +10,7 @@
 
 import Cookies from 'js-cookie'
 
-let baseUrl = 'https://api-offline.fandow.com'
+let baseUrl = 'http://api-tickingbeta.fandow.com'
 
 if (process.env.NODE_ENV === 'production') {
   console.log('---- production ----')
