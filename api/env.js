@@ -15,7 +15,7 @@ let baseUrl = 'https://api-offline.fandow.com'
 if (process.env.NODE_ENV === 'production') {
   console.log('---- production ----')
 } else if (process.env.NODE_ENV === 'test') {
-  baseUrl = 'http://api-tickingbeta.fandow.com'
+  baseUrl = 'http://120.27.137.99:18606'
   console.log('---- test ----')
 } else {
   baseUrl = 'http://api-tickingbeta.fandow.com'
