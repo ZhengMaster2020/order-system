@@ -21,7 +21,7 @@
           </FormItem>
           <FormItem>
             <DatePicker v-model="searchData.endTime" type="date" placeholder="结束时间" style="width: 200px"></DatePicker>
-          </FormItem> 
+          </FormItem>
           <FormItem>
             <Input v-model="searchData.brand" placeholder="品牌" clearable @on-enter="getList('searchData')"></Input>
           </FormItem>
@@ -76,6 +76,16 @@
 <script>
   export default {
     data () {
+      // 生成数量校验
+      const validateCountCheck = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('生成数量不能为空'));
+                } else if (value >10000 || value <=0) {
+                    callback(new Error('请输入1~10000的有效数字'));
+                } else {
+                    callback();
+                }
+      };
       return {
         generateStatus: false,
         generateLoading: false,
@@ -93,7 +103,7 @@
             { required: true, message: '品牌不能为空', trigger: 'blur' }
           ],
           generationCount: [
-            { required: true, type: 'number', message: '请输入数字', trigger: 'blur' }
+            { required: true, validator: validateCountCheck, trigger: 'blur' }
           ]
         },
         searchData: {
