@@ -80,8 +80,8 @@
       const validateCountCheck = (rule, value, callback) => {
                 if (value === '') {
                     callback(new Error('生成数量不能为空'));
-                } else if (value >10000 || value <=0) {
-                    callback(new Error('请输入1~10000的有效数字'));
+                } else if (value >1000000 || value <=0) {
+                    callback(new Error('请输入1~1000000的有效数字'));
                 } else {
                     callback();
                 }
