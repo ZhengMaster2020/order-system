@@ -14,13 +14,13 @@
       <Col :sm="24">
         <Form ref="searchData" :model="searchData" class="searchData">
           <FormItem label="生成日期" :label-width="80">
-            <DatePicker v-model="searchData.startTime" type="date" placeholder="开始时间" style="width: 200px"></DatePicker>
+            <DatePicker @on-change="startTimeChange" type="date" placeholder="开始时间" style="width: 200px"></DatePicker>
           </FormItem>
           <FormItem>
             <span>-</span>
           </FormItem>
           <FormItem>
-            <DatePicker v-model="searchData.endTime" type="date" placeholder="结束时间" style="width: 200px"></DatePicker>
+            <DatePicker @on-change="endTimeChange" type="date" placeholder="结束时间" style="width: 200px"></DatePicker>
           </FormItem>
           <FormItem>
             <Input v-model="searchData.brand" placeholder="品牌" clearable @on-enter="getList('searchData')"></Input>
@@ -164,6 +164,12 @@
         this.pageProps.perPage = e
         this.getList();
       },
+      startTimeChange (date) {
+        this.searchData.startTime = date;
+      },
+      endTimeChange (date) {
+        this.searchData.endTime = date + '23:59:59';
+      },
       // 取消生成
       cancel (name) {
         this.generateStatus = false
@@ -200,6 +206,7 @@
           if(res.code === 0){
              this.listData.data = res.data.list
              this.pageProps.perPage = res.data.perPage
+             this.pageProps.page = res.data.page
              this.pageProps.totalCount = res.data.count
              Object.keys(res.data.list).map((key) => {
                 let keys = res.data.list[key]
