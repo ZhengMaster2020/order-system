@@ -120,10 +120,10 @@
           columns: [
             {type: 'selection', width: 60, align: 'center'},
             {key: 'index', type: 'index', title: '序号', width: 65, align: 'center'},
-            {key: 'brand', title: '品牌', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'generationCount', title: '生成数量', minWidth: 120, sortable: true, align: 'center'},
-            {key: 'createdAt', title: '生成日期', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'userName', title: '操作人员', minWidth: 100, sortable: true, align: 'center'},
+            {key: 'brand', title: '品牌', minWidth: 100, align: 'center'},
+            {key: 'generationCount', title: '生成数量', minWidth: 120, align: 'center'},
+            {key: 'createdAt', title: '生成日期', minWidth: 100, align: 'center'},
+            {key: 'userName', title: '操作人员', minWidth: 100, align: 'center'},
             { key: 'action', title: '操作', width: 150, align: 'center', slot: 'action' }
           ],
           data: []

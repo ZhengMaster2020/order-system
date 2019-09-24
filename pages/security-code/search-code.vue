@@ -41,13 +41,13 @@
           columns: [
             {type: 'selection', width: 60, align: 'center'},
             {key: 'index', type: 'index', title: '序号', width: 65, align: 'center'},
-            {key: 'serialCode', title: '序列号', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'securityCode', title: '防伪码', minWidth: 120, sortable: true, align: 'center'},
-            {key: 'securityCodeLink', title: '链接', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'brand', title: '品牌', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'wechatNickname', title: '用户昵称', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'purchaseChannels', title: '购买渠道', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'createdAt', title: '查询时间', minWidth: 100, sortable: true, align: 'center'}
+            {key: 'serialCode', title: '序列号', minWidth: 100, align: 'center'},
+            {key: 'securityCode', title: '防伪码', minWidth: 120, align: 'center'},
+            {key: 'securityCodeLink', title: '链接', minWidth: 100, align: 'center'},
+            {key: 'brand', title: '品牌', minWidth: 100, align: 'center'},
+            {key: 'wechatNickname', title: '用户昵称', minWidth: 100, align: 'center'},
+            {key: 'purchaseChannels', title: '购买渠道', minWidth: 100, align: 'center'},
+            {key: 'createdAt', title: '查询时间', minWidth: 100, align: 'center'}
           ],
           data: []
         },
