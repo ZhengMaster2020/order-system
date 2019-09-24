@@ -11,7 +11,7 @@
 import Cookies from 'js-cookie'
 import Env from './env'
 
-let baseUrl = 'https://api-offline.fandow.com'
+let baseUrl = 'http://120.27.137.99:18606'
 
 if (Env === 'production') {
   console.log('---- production ----')
