@@ -80,9 +80,12 @@
       const validateCountCheck = (rule, value, callback) => {
                 if (value === '') {
                     callback(new Error('生成数量不能为空'));
-                } else if (value >1000000 || value <=0) {
-                    callback(new Error('请输入1~1000000的有效数字'));
-                } else {
+                } else if (value >200000 || value <=0) {
+                    callback(new Error('请输入1~200000的有效数字'));
+                } else if(typeof value === 'string'){
+                    callback(new Error('请输入数字'));
+                }
+                else {
                     callback();
                 }
       };
@@ -164,9 +167,11 @@
         this.pageProps.perPage = e
         this.getList();
       },
+      // 获取开始时间
       startTimeChange (date) {
         this.searchData.startTime = date;
       },
+      // 获取结束时间
       endTimeChange (date) {
         this.searchData.endTime = date + '23:59:59';
       },
