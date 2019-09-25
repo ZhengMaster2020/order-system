@@ -19,9 +19,9 @@ if (Env === 'production') {
   baseUrl = 'http://120.27.137.99:18606'
   console.log('---- test ----')
 } else {
-  baseUrl = 'http://api-tickingbeta.fandow.com'
+  baseUrl = 'http://120.27.137.99:18606'
   console.log('---- develop ----')
 }
-
+//http://api-tickingbeta.fandow.com
 export const SERVER_BASE_URL = baseUrl
 export const JsCookies = Cookies

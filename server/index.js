@@ -24,10 +24,6 @@ async function start() {
   } else {
     await nuxt.ready()
   }
-  let port = 30002
-  if (config.dev) {
-    port = 3000
-  }
   app.use((ctx) => {
     ctx.status = 200
     ctx.respond = false // Bypass Koa's built-in response handling
