@@ -24,7 +24,7 @@
       <div style="margin: 10px;overflow: hidden">
         <div class="pages-L">共 {{pageProps.totalCount}} 条</div>
         <div style="float: right;">
-          <Page size="small" :total="pageProps.totalCount" :current="pageProps.currentPage" show-sizer show-elevator @on-change="changePage" @on-page-size-change="changePageSize"></Page>
+          <Page size="small" :total="pageProps.totalCount" :current="pageProps.page" show-sizer show-elevator @on-change="changePage" @on-page-size-change="changePageSize"></Page>
         </div>
       </div>
     </Row>
@@ -41,25 +41,15 @@
           columns: [
             {type: 'selection', width: 60, align: 'center'},
             {key: 'index', type: 'index', title: '序号', width: 65, align: 'center'},
-            {key: 'created_by', title: '序列号', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'batch_no', title: '防伪码', minWidth: 120, sortable: true, align: 'center'},
-            {key: 'link', title: '链接', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'pinpai', title: '品牌', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'name', title: '用户昵称', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'way', title: '购买渠道', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'time', title: '查询时间', minWidth: 100, sortable: true, align: 'center'}
+            {key: 'serialCode', title: '序列号', minWidth: 100, align: 'center'},
+            {key: 'securityCode', title: '防伪码', minWidth: 120, align: 'center'},
+            {key: 'securityCodeLink', title: '链接', minWidth: 100, align: 'center'},
+            {key: 'brand', title: '品牌', minWidth: 100, align: 'center'},
+            {key: 'wechatNickname', title: '用户昵称', minWidth: 100, align: 'center'},
+            {key: 'purchaseChannels', title: '购买渠道', minWidth: 100, align: 'center'},
+            {key: 'createdAt', title: '查询时间', minWidth: 100, align: 'center'}
           ],
-          data: [
-            {
-              created_by: 'John Brown',
-              batch_no: 18,
-              link: 'New York No. 1 Lake Park',
-              pinpai: 'America',
-              name: 'America',
-              way: 'America',
-              time: 'America',
-            }
-          ]
+          data: []
         },
         pageProps: { // 列表分页属性
           page: 1,
@@ -76,16 +66,26 @@
       selectCheck () {},
       changePage (e) {
         this.pageProps.page = e
-        // this.getList();
+        this.getList();
       },
       changePageSize (e) {
         this.pageProps.perPage = e
-        // this.getList();
+        this.getList();
       },
       // 查询数据
       getList () {
         let params = this.searchData
-        // this.$API.securityCodeQuery.then((res) => {})
+        params.page = this.pageProps.page
+        params.perPage = this.pageProps.perPage
+        this.$API.securityCodeQuery(params).then((res) => {
+          //console.log(res)
+          if(res.code === 0){
+            this.listData.data = res.data.list
+            this.pageProps.totalCount = res.data.count
+          }
+        })
+        this.pageProps.page = 1
+        this.pageProps.perPage = 10
       }
     }
   }

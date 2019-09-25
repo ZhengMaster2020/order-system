@@ -14,14 +14,14 @@
       <Col :sm="24">
         <Form ref="searchData" :model="searchData" class="searchData">
           <FormItem label="生成日期" :label-width="80">
-            <DatePicker v-model="searchData.startTime" type="date" placeholder="Select date" style="width: 200px"></DatePicker>
+            <DatePicker @on-change="startTimeChange" type="date" placeholder="开始时间" style="width: 200px"></DatePicker>
           </FormItem>
           <FormItem>
             <span>-</span>
           </FormItem>
           <FormItem>
-            <DatePicker v-model="searchData.endTime" type="date" placeholder="Select date" style="width: 200px"></DatePicker>
-          </FormItem> 
+            <DatePicker @on-change="endTimeChange" type="date" placeholder="结束时间" style="width: 200px"></DatePicker>
+          </FormItem>
           <FormItem>
             <Input v-model="searchData.brand" placeholder="品牌" clearable @on-enter="getList('searchData')"></Input>
           </FormItem>
@@ -29,7 +29,7 @@
             <Input v-model="searchData.userName" placeholder="操作人员" clearable @on-enter="getList('searchData')"></Input>
           </FormItem>
           <FormItem>
-            <Button type="primary" icon="ios-search" @click="getList('searchData')">查询</Button>
+            <Button type="primary" icon="ios-search" @click="getList('searchData', 'noPage')">查询</Button>
           </FormItem>
           <FormItem style="float:right">
             <Col span="12"><Button type="primary" icon="md-repeat" @click="generateCode">生成防伪码</Button></Col>
@@ -38,18 +38,17 @@
       </Col>
     </Row>
     <Row class="margin-top-10">
-      <Table :columns="listData.columns" :data="listData.data" size="small" border @on-selection-change="selectCheck" highlight-row :loading="listData.loading">
+      <Table :columns="listData.columns" :data="listData.data" size="small" border @on-selection-change="selectCheck(e)" highlight-row :loading="loading">
         <!-- 操作 -->
-        <template slot-scope="{ row }" slot="action">
-          <Poptip confirm title="您确认删除这条内容吗？" @on-ok="handleDelete(row.id)" transfer>
-            <Button size="small">重新下载表格</Button>  
+        <template slot-scope="{ row, index }" slot="action">
+            <Button size="small" :disabled="row.isComputed === 0 || fileSrc[index] == ''"><a :href="fileSrc[index]">下载表格</a></Button>  
           </Poptip>
         </template>
       </Table>
       <div style="margin: 10px;overflow: hidden">
         <div class="pages-L">共 {{pageProps.totalCount}} 条</div>
         <div style="float: right;">
-          <Page size="small" :total="pageProps.totalCount" :current="pageProps.currentPage" show-sizer show-elevator @on-change="changePage" @on-page-size-change="changePageSize"></Page>
+          <Page size="small" :total="pageProps.totalCount" :current="pageProps.page" show-sizer show-elevator @on-change="changePage" @on-page-size-change="changePageSize"></Page>
         </div>
       </div>
     </Row>
@@ -57,18 +56,19 @@
     <!-- 生成防伪码弹窗 -->
     <Modal
       v-model="generateStatus"
-      title="生成防伪码">
+      title="生成防伪码"
+      @on-cancel="cancel('generateData')">
       <Form ref="generateData" :model="generateData" :rules="generateRule" class="generateData">
-        <FormItem label="品牌：" prop="price" :label-width="90">
-          <Input v-model="generateData.brand" clearable @on-enter="getList('search')"></Input>
+        <FormItem label="品牌：" prop="brand" :label-width="90">
+          <Input v-model="generateData.brand" clearable></Input>
         </FormItem>
-        <FormItem label="生成数量：" prop="mount" :label-width="90">
-          <Input v-model="generateData.generationCount" clearable @on-enter="getList('search')"></Input>
+        <FormItem label="生成数量：" prop="generationCount" :label-width="90">
+          <Input v-model="generateData.generationCount" clearable number></Input>
         </FormItem>
       </Form>    
       <div slot="footer">
-          <Button type="primary" :loading="generateLoading" @click="confirm">生成并下载</Button>
-          <Button type="default" :loading="generateLoading" @click="cancel">取消</Button>
+          <Button type="primary" :loading="generateLoading" @click="confirm('generateData')" :disabled="isdisabled">生成</Button>
+          <Button type="default" :loading="generateLoading" @click="cancel('generateData')">取消</Button>
       </div>
     </Modal>
   </div>  
@@ -76,19 +76,37 @@
 <script>
   export default {
     data () {
+      // 生成数量校验
+      const validateCountCheck = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('生成数量不能为空'));
+                } else if (value >200000 || value <=0) {
+                    callback(new Error('请输入1~200000的有效数字'));
+                } else if(typeof value === 'string'){
+                    callback(new Error('请输入数字'));
+                }
+                else {
+                    callback();
+                }
+      };
       return {
         generateStatus: false,
         generateLoading: false,
+        isdisabled: false,
+        isNo: false,
+        loading: false,
+        isComputed: [],
+        fileSrc: [],
         generateData: {
           brand: '',
           generationCount: ''
         },
         generateRule: {
           brand: [
-            { required: true, message: 'The name cannot be empty', trigger: 'blur' }
+            { required: true, message: '品牌不能为空', trigger: 'blur' }
           ],
           generationCount: [
-            { required: true, message: 'The name cannot be empty', trigger: 'blur' }
+            { required: true, validator: validateCountCheck, trigger: 'blur' }
           ]
         },
         searchData: {
@@ -102,26 +120,19 @@
           columns: [
             {type: 'selection', width: 60, align: 'center'},
             {key: 'index', type: 'index', title: '序号', width: 65, align: 'center'},
-            {key: 'brand', title: '品牌', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'batch_no', title: '生成数量', minWidth: 120, sortable: true, align: 'center'},
-            {key: 'supplier', title: '生成日期', minWidth: 100, sortable: true, align: 'center'},
-            {key: 'userName', title: '操作人员', minWidth: 100, sortable: true, align: 'center'},
+            {key: 'brand', title: '品牌', minWidth: 100, align: 'center'},
+            {key: 'generationCount', title: '生成数量', minWidth: 120, align: 'center'},
+            {key: 'createdAt', title: '生成日期', minWidth: 100, align: 'center'},
+            {key: 'userName', title: '操作人员', minWidth: 100, align: 'center'},
             { key: 'action', title: '操作', width: 150, align: 'center', slot: 'action' }
           ],
-          data: [
-            {
-              created_by: 'John Brown',
-              batch_no: 18,
-              supplier: 'New York No. 1 Lake Park',
-              suppliers: 'America'
-            }
-          ]
+          data: []
         },
         pageProps: { // 列表分页属性
-          page: 1,
-          perPage: 10,
-          currentPage: 1,
-          totalCount: 0
+             page: 1,
+             perPage: 10,
+             currentPage: 1,
+             totalCount: 0
         }
       }
     },
@@ -132,39 +143,99 @@
       // 生成防伪码
       generateCode () {
         this.generateStatus = true
+        this.isdisabled = false
+        this.generateData.brand = ''
+        this.generateData.generationCount = ''
       },
       // 確定生成
-      confirm () {
+      confirm (required) {
+        this.handleSubmit (required)
         let params = this.generateData
-        this.$API.securityCodeCreate.then((res) => {
-          
+        if(this.isNo === false){
+          this.$API.securityCodeCreate(params).then((res) => {
+          if(res.code === 0){
+          }
         })
+        }
       },
       selectCheck () {},
       changePage (e) {
         this.pageProps.page = e
-        // this.getList();
+        this.getList();
       },
       changePageSize (e) {
         this.pageProps.perPage = e
-        // this.getList();
+        this.getList();
+      },
+      // 获取开始时间
+      startTimeChange (date) {
+        this.searchData.startTime = date;
+      },
+      // 获取结束时间
+      endTimeChange (date) {
+        this.searchData.endTime = date + '23:59:59';
       },
       // 取消生成
-      cancel () {
+      cancel (name) {
         this.generateStatus = false
+        this.$refs[name].resetFields();
       },
-
-      // 查询数据
-      getList () {
-        // let params = this.searchData
-        this.$API.securityCodeList().then((res) => {
-          // this.listData.data = 
+      // 弹窗校验
+      handleSubmit (name) {
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            this.$Message.success('提交成功');
+            this.isdisabled = true
+            this.generateStatus = false
+            this.getList ()
+          } else {
+             this.$Message.error('请填写信息');
+             this.isNo = true
+             return this.isNo
+             }
+          })
+      },
+      // 获取数据
+      getList (e, noPage) {
+        let params = this.searchData
+        params.page = this.pageProps.page
+        params.perPage = this.pageProps.perPage
+        if (noPage === 'noPage') {
+          delete params.page
+          delete params.perPage
+        }
+        this.fileSrc = []
+        this.$API.securityCodeList(params).then((res) => {
+          //console.log(res)
+          this.loading = true
+          if(res.code === 0){
+             this.listData.data = res.data.list
+             this.pageProps.perPage = res.data.perPage
+             this.pageProps.page = res.data.page
+             this.pageProps.totalCount = res.data.count
+             Object.keys(res.data.list).map((key) => {
+                let keys = res.data.list[key]
+                this.isComputed.push(keys['isComputed'])
+                // 判断有没有链接，没有为空
+                if(keys['isComputed'] === 0){
+                  this.fileSrc.push('')
+                }
+                if(keys['isComputed'] === 1 && keys['fileItem'].length===0){
+                  this.fileSrc.push('')
+                }
+                Object.keys(keys['fileItem']).map((key) => {
+                    this.fileSrc.push(keys['fileItem'][key]['url'])
+                 })
+                 //console.log(this.fileSrc)
+             })
+          }
+        }).then(() => {
+          this.loading = false
         })
       }
     }
   }
 </script>
-
 <style lang="less">
 .code-management {
   .count {
