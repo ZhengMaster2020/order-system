@@ -10,12 +10,16 @@ export default [
     ]
   },
   {
-    path: '/account-management',
+    path: '/anti-channel-conflict',
     icon: 'ios-book',
-    name: '/account-management',
-    title: '账号管理',
+    name: '/anti-channel-conflict',
+    title: '防串货',
     children: [
-      { path: 'account-management/account-management', title: '账号管理', name: 'account-management/account-management' }
+      {
+        path: 'anti-channel-conflict/account-management/account-management',
+        title: '账号管理',
+        name: 'anti-channel-conflict/account-management/account-management'
+      }
     ]
   }
 ]
