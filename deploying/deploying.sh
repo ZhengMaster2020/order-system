@@ -51,7 +51,7 @@ if [ $? -ne 0 ]
    
 deploy(){ # 同步远程主机
      #ssh $leave "cd $release_dir && ls -t | head -1 | xargs -i cp -rf {} $release"
-     rsync -azvtruP --delete ./* $leave:$release
+     rsync -azvtruP --delete ./* $leave:$release 1>/dev/null 2>/dev/null
 #     ssh $leave "cd $release && pm2 restart dingtalk-lark.fandow.com"
    if [ $? -ne 0 ]
    then
