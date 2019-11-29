@@ -10,12 +10,12 @@ export default [
     ]
   },
   {
-    path: '/anti-stock',
+    path: '/anti-channel-conflict',
     icon: 'ios-book',
-    name: '/anti-stock',
+    name: '/anti-channel-conflict',
     title: '防串货',
     children: [
-      { path: 'anti-stock/cooperation', title: '合作商管理', name: 'anti-stock/cooperation' }
+      { path: 'anti-channel-conflict/cooperation', title: '合作商管理', name: 'anti-channel-conflict/cooperation' }
     ]
   }
 ]
