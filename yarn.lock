@@ -2948,6 +2948,13 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
+echarts@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/echarts/-/echarts-4.5.0.tgz#2111960645a345eb819ddac4792a2c065bdff162"
+  integrity sha512-q9M0errodeX/786uPifro76x0elbrUQkbSHh235QzbkaASuvP9AQoMErhGBno4iC/yq6kFDLqgmm3XCPWQGLzA==
+  dependencies:
+    zrender "4.1.2"
+
 editorconfig@^0.15.3:
   version "0.15.3"
   resolved "https://registry.yarnpkg.com/editorconfig/-/editorconfig-0.15.3.tgz#bef84c4e75fb8dcb0ce5cee8efd51c15999befc5"
@@ -8569,3 +8576,8 @@ yargs@^12.0.2:
 ylru@^1.2.0:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/ylru/-/ylru-1.2.1.tgz#f576b63341547989c1de7ba288760923b27fe84f"
+
+zrender@4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/zrender/-/zrender-4.1.2.tgz#8368deff24c7e237cbcbd3a2ff93017905ae43f7"
+  integrity sha512-MJYEo1ZOVesjxYsfcGtPXnUREmh4ACMV08QZLGZ3S7D1xOd96iz3O6nf6pv5PHb5NSHkbizr7ChSIgtAGwncvA==
