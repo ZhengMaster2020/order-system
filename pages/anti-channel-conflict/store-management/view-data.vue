@@ -16,12 +16,14 @@
 </template>
 <script>
 // 引入 ECharts 主模块
+//var echarts = require('echarts')
 var echarts = require('echarts/lib/echarts')
 // 引入柱状图
 require('echarts/lib/chart/line')
 // 引入提示框和标题组件
 require('echarts/lib/component/tooltip')
-//require('echarts/lib/component/title')
+require('echarts/lib/component/title')
+require("echarts/lib/component/legend")
 export default {
   data () {
     return {
@@ -40,7 +42,8 @@ export default {
             }
         },
         legend: {
-            data:['出库量', '进库量']
+            data:['出库量', '进库量'],
+            left: '2%'
         },
         grid: {
             left: '3%',
