@@ -2,18 +2,18 @@
   <div class="code-cooperation">
     <Row :gutter="8" class="search-form">
       <Col>
-        <Input type="text" placeholder="合作商管理" style="width: 150px"></Input>
-        <Input type="text" placeholder="负责人" style="width: 150px"></Input>
-        <Button type="primary">查询</Button>
+        <Input type="text" v-model="select.cooperativeName" clearable  placeholder="合作商名称" style="width: 150px" @on-enter="getList('select')"></Input>
+        <Input type="text" v-model="select.chargePerson"  clearable  placeholder="负责人" style="width: 150px" @on-enter="getList('select')"></Input>
+        <Button type="primary" @click="getList('select')">查询</Button>
         <Button type="primary" style="float:right" @click="addBusiness">新增合作商</Button>
       </Col>
     </Row>
     <Row style="margin-top:5px">
-      <Table border :columns="columns1" :data="data1" size="small">
+      <Table border :columns="listData.partnerColumns" :data="listData.data1" size="small">
         <!-- 操作 -->
         <template slot-scope="{ row }" slot="action">
           <Tooltip placement="top" content="编辑" transfer>
-              <Button type="primary" size="small" @click="partnerEidt">
+              <Button type="primary" size="small" @click="partnerEidt(row.id)">
                   <Icon type="md-create" />
               </Button>
           </Tooltip>
@@ -25,75 +25,160 @@
         </template>
       </Table>
     </Row>
-    <!-- 新增合作商 model-->
+    <div style="margin: 10px;overflow: hidden">
+          <div class="pages-L">共 {{pageProps.count}} 条</div>
+          <div style="float: right;">
+            <Page size="small" :total="pageProps.count" :current="pageProps.pageCount" show-sizer show-elevator @on-change="changePage" @on-page-size-change="changePageSize"></Page>
+          </div>
+        </div>
+    <!-- 新增合作商 model start -->
     <Modal
-        v-model="addmodal"
-        title="新增">
-         <Form ref="addruleBusiness" :label-width="80">
-          <FormItem label="合作商"  :rules="{ required: true, message: '请填写合作商名称', trigger: 'blur' }">
-            <Input  placeholder="合作商名称" style="width:300px"></Input>
+        v-model="cooperationModal"
+        title="新增"
+        @on-cancel="cancelCooperation()"
+        >
+         <Form ref="addData" :model="addData" :label-width="80">
+          <FormItem label="合作商" prop="cooperativeName" :rules="{ required: true, message: '请填写合作商名称', trigger: 'blur' }">
+            <Input  v-model="addData.cooperativeName" :value="addData.cooperativeName" placeholder="合作商名称" style="width:300px"></Input>
           </FormItem>
-          <FormItem label="负责人"  :rules="{ required: true, message: '请填写负责人', trigger: 'blur' }" >
-            <Input  placeholder="负责人"  style="width:300px"></Input>
+          <FormItem label="负责人" prop="chargePerson" :rules="{ required: true, message: '请填写负责人', trigger: 'blur' }" >
+            <Input  v-model="addData.chargePerson" :value="addData.chargePerson" placeholder="负责人"  style="width:300px"></Input>
           </FormItem>
-          <FormItem label="所在地址"  :rules="{ required: true, message: '请填写所在地址', trigger: 'blur' }" >
-            <Input  placeholder="所在地址"  style="width:300px"></Input>
+          <FormItem label="所在地址" prop="cooperativeAddress" :rules="{ required: true, message: '请填写所在地址', trigger: 'blur' }" >
+            <Input v-model="addData.cooperativeAddress" :value="addData.cooperativeAddress" placeholder="所在地址"  style="width:300px"></Input>
           </FormItem>
         </Form>
+        <div slot="footer">
+            <Button type="primary"  :loading="modal_loading" @click="addCooperate()">确定</Button>
+            <Button type="default"  :loading="modal_loading" @click="cancelCooperation()">取消</Button>
+        </div>
     </Modal>
+    <!-- 新增合作商 model end-->
+
   </div>
 </template>
 <script>
 export default {
   data(){
     return {
+      //列表分页属性
+      pageProps:{
+          page: 1,
+          perPage: 10,
+          count: 0,
+          pageCount: 1,
+      },
+      select:{
+        cooperativeName:'',
+        chargePerson:''
+      },
       //模态框增加合作商
-      addmodal: false,
+      cooperationModal: false,
+      modal_loading:false,
+      delCooperate:false,
       //合作商数据
-      columns1: [
-        {title: '合作商名称', key: 'name',align: 'center'},
-        {title: '所在地址',key: 'age',align: 'center'},
-        {title: '负责人',key: 'name',align: 'center'},
-        {
-          title: '收货数据',
-          key: 'address',
-          align: 'center',
-          render: (h, params) => {
-          return h('a', {
-              on: {
-                  click: () => {
-                      this.$router.push({path: 'cooperation-date'});
-                  }
-              }
-          }, params.row.address);
-          }
-        },
-        {title: '操作',key: '',align: 'center',slot: 'action'}
-      ],
-      data1: [
-        {name: 'John Brown',age: 18,address: '查看',date: '2016-10-03', align: 'center'},
-        {name: 'Jim Green',age: 24,address: '查看',date: '2016-10-01', align: 'center'},
-        {name: 'Joe Black',age: 30,address: '查看',date: '2016-10-02', align: 'center'},
-        {name: 'Jon Snow',age: 26,address: '查看',date: '2016-10-04', align: 'center'}
-      ]
+      listData:{
+          partnerColumns: [
+          {title: '合作商名称', key: 'cooperativeName',align: 'center'},
+          {title: '所在地址',key: 'cooperativeAddress',align: 'center'},
+          {title: '负责人',key: 'chargePerson',align: 'center'},
+          {
+            title: '收货数据',
+            key: 'address',
+            align: 'center',
+            render: (h, params) => {
+            return h('a', {
+                on: {
+                    click: () => {
+                        this.$router.push({path: 'cooperation-date'});
+                    }
+                }
+            }, '查看');
+            }
+          },
+          {title: '操作',key: '',align: 'center',slot: 'action'}
+        ],
+        data1: []
+      },
+      addData:{
+        cooperativeName: '',
+        cooperativeAddress: '',
+        chargePerson: ''
+      }
     }
   },
   methods:{
     //新增合作商
     addBusiness () {
-      this.addmodal = true;
+      this.cooperationModal = true;
+      this.addData.cooperativeName = '',
+      this.addData.cooperativeAddress = '',
+      this.addData.chargePerson = ''
     },
     //编辑合作商
-    partnerEidt () {
-      this.addmodal = true;
+    partnerEidt (id) {
+      this.cooperationModal = true;
+      this.$API.CooperationListaDetails({id:id})
+        .then( res =>{
+          this.addData = res.data
+        })
     },
-    //删除合作商列表
+    //获取合作商列表数据
+    getList (name) {
+      let params = this.select;
+      params.page = this.pageProps.page;
+      params.perPage = this.pageProps.perPage;
+      params.cooperativeName = this.select.cooperativeName;
+      params.chargePerson = this.select.chargePerson;
+      this.$API.cooperationList(params)
+        .then((res) => {
+          this.pageProps.count = res.data.count;
+          this.listData.data1 = res.data.data;
+        })
+    },
+    //确认
+    addCooperate () {
+      let data = this.addData;
+      data.cooperativeName = this.addData.cooperativeName;
+      data.cooperativeAddress = this.addData.cooperativeAddress;
+      data.chargePerson = this.addData.cooperativeAddress;
+      if (data.chargePerson == '' || data.cooperativeAddress == '' || data.chargePerson == '') {
+        this.$Message.error('必填项不能为空!');
+      }else {
+        this.$API.addCooperationList(data)
+          .then( res => {
+            console.log(res.data)
+            if (res.data){
+              this.cooperationModal = false;
+              this.$Message.success('添加成功');
+              this.getList();
+            }
+          })
+      }
+    },
+    //取消新增
+    cancelCooperation () {
+      this.cooperationModal = false;
+    },
+     //删除合作商列表
     deleFordataList (id) {
-      console.log(id);
+      this.$API.deleteCooperationList({id:id})
+        .then( res =>{
+          this.$Message.success('删除成功');
+          this.getList();
+      })
+    },
+    changePage (e) {
+      this.pageProps.page = e;
+      this.getList();
+    },
+    changePageSize(e){
+      this.pageProps.perPage = e;
+      this.getList();
     }
   },
   mounted(){
-
+    this.getList();
   }
 }
 </script>
