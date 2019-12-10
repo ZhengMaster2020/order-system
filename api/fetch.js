@@ -30,20 +30,20 @@ export default function fetch(options) {
     )
 
     // http response 拦截器
-    instance.interceptors.response.use(
-      (response) => {
-        return response
-      },
-      (error) => {
-        Notice.error({
-          title: '出错了！',
-          desc: '错误原因 ' + JSON.stringify(error),
-          duration: 0
-        })
-        iView.LoadingBar.error()
-        return Promise.reject(error) // 返回接口返回的错误信息
-      }
-    )
+    // instance.interceptors.response.use(
+    //   (response) => {
+    //     return response
+    //   },
+    //   (error) => {
+    //     Notice.error({
+    //       title: '出错了！',
+    //       desc: '错误原因 ' + JSON.stringify(error),
+    //       duration: 0
+    //     })
+    //     iView.LoadingBar.error()
+    //     return Promise.reject(error) // 返回接口返回的错误信息
+    //   }
+    // )
 
     // 请求处理
     instance(options)
@@ -106,8 +106,8 @@ export default function fetch(options) {
         // 请求失败时,根据业务判断状态
         Notice.error({
           title: '出错了！',
-          desc: '错误原因 ' + JSON.stringify(response),
-          duration: 0
+          desc: '错误原因 ' + JSON.stringify(response.data.msg),
+          duration: 3
         })
         reject(error)
       })

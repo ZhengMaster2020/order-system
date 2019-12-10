@@ -141,17 +141,21 @@ export default {
       let data = this.addData;
       data.cooperativeName = this.addData.cooperativeName;
       data.cooperativeAddress = this.addData.cooperativeAddress;
-      data.chargePerson = this.addData.cooperativeAddress;
+      data.chargePerson = this.addData.chargePerson;
       if (data.chargePerson == '' || data.cooperativeAddress == '' || data.chargePerson == '') {
         this.$Message.error('必填项不能为空!');
       }else {
         this.$API.addCooperationList(data)
           .then( res => {
-            console.log(res.data)
-            if (res.data){
-              this.cooperationModal = false;
-              this.$Message.success('添加成功');
-              this.getList();
+            // console.log(res.data)
+            if(res.code == -1){
+              this.$Message.success(res.msg);
+            }else {
+              if (res.data){
+                this.cooperationModal = false;
+                this.$Message.success('添加成功');
+                this.getList();
+              }
             }
           })
       }
