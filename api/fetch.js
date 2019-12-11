@@ -5,7 +5,7 @@ import iView, { Notice } from 'iview'
 // import { router } from 'vue-router'
 import { SERVER_BASE_URL } from './config'
 
-Cookies.set('authorization', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6Ijg4ZWJiOWQyNzg2OTYyZDNkMzRkNjY4ZDU5Zjk5NjI3YWVkZDhmZjcxNTIwMWVhN2MyZGRlMDA3YWM2ZTZlMjhhMTliYzY4NjJiYWVmMGY1In0.eyJhdWQiOiIyIiwianRpIjoiODhlYmI5ZDI3ODY5NjJkM2QzNGQ2NjhkNTlmOTk2MjdhZWRkOGZmNzE1MjAxZWE3YzJkZGUwMDdhYzZlNmUyOGExOWJjNjg2MmJhZWYwZjUiLCJpYXQiOjE1NzUwODExOTUsIm5iZiI6MTU3NTA4MTE5NSwiZXhwIjoxNTc1Njg1OTk1LCJzdWIiOiJkYWE2YjczYy1lMzRjLTQyOTMtOTRlYy1mM2IzYThjY2MwYmIiLCJzY29wZXMiOltdfQ.Pgt3ReoZmIBE01qimmO0VZs39YGyH6gWFlydZUS8gBMh97_6apj94KiHT6_sloBMAxhtg36-yNcij5o1yZlKIpN3Df43p14vcJ69zOLhpu5Ydtu1enZVFbaiOsQd07KewTJtWC4XuC0Jl35j9aKkMGypI__qyfzlhoTUlK6PVBiPMmxrcAOjtktyTH363fawN6W8_LnjPBzkavddB2aky-LjfuqVH44f00zT_VFA4R16QBA4MpiV5qtGZfYW9GPwQIrOVZoT9zx97tX4Ryr7DWEtA1gewqGPAJh-Ue17LxzHQQ63HLeRFfWxK2Gc_IIA5WpPMBo-yYpGcCfgiAma0Q')
+Cookies.set('authorization', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImE2M2IxNWI1NWZjMDUyOTVjNzNkNzkwYzBhZmUwOGJlM2YyMmJhN2U5ZjgzOWNkNTM1Y2MwZmRmZTdkODE1NjZjNjliY2RhOGE4ZmM1YWVhIn0.eyJhdWQiOiIyIiwianRpIjoiYTYzYjE1YjU1ZmMwNTI5NWM3M2Q3OTBjMGFmZTA4YmUzZjIyYmE3ZTlmODM5Y2Q1MzVjYzBmZGZlN2Q4MTU2NmM2OWJjZGE4YThmYzVhZWEiLCJpYXQiOjE1NzU4NjEyMjMsIm5iZiI6MTU3NTg2MTIyMywiZXhwIjoxNTc2NDY2MDIzLCJzdWIiOiI3NWUyODNhYS0zNDhjLTRlYzgtYjc0Ny1lNjdmNTkyYjA0MmIiLCJzY29wZXMiOltdfQ.M-H_nKqcF4PRR0s2DOxD0Yu4D4wPebAoQYoOjEpt8shd4qDRbJtjdd0KTeiP-jG8ISKFpkWBkw4vURay85vRhI9xCBP4FV2gCtdZHZ3MbX_JpcPXpPumhurftwg548ZPGUiSp21RSEL6F3a1qM4NRtfDQCIm1MnK0o9lQTHMeEYS1rJn8iXMw2l6Sqrolqn5PG68rQX31ovsug80XE2_DAvkfnT6EGQyNvANtka4tLcQcFyqCVrhekQqP5YrEzNFXsCsD8LvYMJtCzAQbV2JIOnw3lFSgexOYiCrooKK06Lh2OvKyDP3UnRx1ckl8Co-Hy89pd4HvHLY1t7AdncBaA')
 
 Vue.use(iView)
 
@@ -35,11 +35,11 @@ export default function fetch(options) {
         return response
       },
       (error) => {
-        Notice.error({
-          title: '出错了！',
-          desc: '错误原因 ' + JSON.stringify(error),
-          duration: 0
-        })
+        // Notice.error({
+        //   title: '出错了！',
+        //   desc: '错误原因 ' + JSON.stringify(error),
+        //   duration: 0
+        // })
         iView.LoadingBar.error()
         return Promise.reject(error) // 返回接口返回的错误信息
       }
@@ -106,8 +106,8 @@ export default function fetch(options) {
         // 请求失败时,根据业务判断状态
         Notice.error({
           title: '出错了！',
-          desc: '错误原因 ' + JSON.stringify(response),
-          duration: 0
+          desc: '错误原因 ' + JSON.stringify(data.msg),
+          duration: 2
         })
         reject(error)
       })
