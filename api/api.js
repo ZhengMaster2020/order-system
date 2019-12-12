@@ -35,9 +35,49 @@ const securityCodeQuery = (params) => {
   })
 }
 
+//防串货 - 合作商管理 - 列表
+const cooperationList = (params) => {
+  return fetch({
+    url: '/cooperative',
+    method: 'GET',
+    params: params
+  })
+}
+
+//防串货 - 合作商管理 - 新增合作商管理
+const addCooperationList = (params) => {
+  return fetch({
+    url: '/cooperative',
+    method: 'POST',
+    data: params
+  })
+}
+
+//防串货 - 合作商管理 - 详情
+const CooperationListaDetails = (params) => {
+  return fetch({
+    url: `/cooperative/${params.id}`,
+    method: 'GET',
+    params: params
+  })
+}
+
+//防串货 - 合作商管理 - 删除
+const deleteCooperationList = (id) => {
+  return fetch({
+    url: `/cooperative/${id.id}`,
+    method: 'DELETE'
+  })
+}
+
+
 export default {
   login,
   securityCodeList,
   securityCodeCreate,
-  securityCodeQuery
+  securityCodeQuery,
+  cooperationList,
+  addCooperationList,
+  CooperationListaDetails,
+  deleteCooperationList
 }
