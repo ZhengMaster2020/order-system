@@ -44,6 +44,15 @@ const cooperationList = (params) => {
   })
 }
 
+//账号管理 - 列表 
+const accountNumberList = (params) => {
+  return fetch({
+    url: '/accountNumber',
+    method: 'GET',
+    params: params
+  })
+}
+
 //加工厂管理 - 列表
 const factoryMenagementList = (params) => {
   return fetch({
@@ -71,6 +80,15 @@ const addFactoryManagement = (params) => {
   })
 }
 
+//账号管理 - 添加 
+const accountNumberAdd = (params) => {
+  return fetch({
+    url: '/accountNumber',
+    method: 'POST',
+    data: params
+  })
+}
+
 //防串货 - 合作商管理 - 详情
 const CooperationListaDetails = (params) => {
   return fetch({
@@ -88,11 +106,28 @@ const deleteCooperationList = (id) => {
   })
 }
 
+//账号管理 - 删除
+const accountNumberDelete = (params) => {
+  return fetch({
+    url: `/accountNumber/${params.id}`,
+    method: 'DELETE'
+  })
+}
+
 //加工厂管理 - 详情
 const detailsFactoryManagement = (params) => {
   return fetch({
     url: `/processingfactory/${params}`,
     method: 'GET',
+    data: params
+  })
+}
+
+//账号管理 - 修改
+const accountNumberEdit = (params) => {
+  return fetch({
+    url: `/accountNumber/${params.id}`,
+    method: 'PATCH',
     data: params
   })
 }
@@ -115,6 +150,24 @@ const deleteFactoryManagement = (params) => {
 }
 
 
+//账号管理 - 详情
+const accountNumberDetail = (params) => {
+  return fetch({
+    url: `/accountNumber/${params.id}`,
+    method: 'GET',
+    params: params
+  })
+}
+
+//账号管理 - 查询
+const accountNumberSearch = (params) => {
+  return fetch({
+    url: `/accountNumber/search`,
+    method: 'GET',
+    params: params
+  })
+}
+
 export default {
   login,
   securityCodeList,
@@ -128,5 +181,11 @@ export default {
   addFactoryManagement,
   editFactoryManagement,
   deleteFactoryManagement,
-  detailsFactoryManagement
+  detailsFactoryManagement,
+  accountNumberList,
+  accountNumberAdd,
+  accountNumberDelete,
+  accountNumberEdit,
+  accountNumberDetail,
+  accountNumberSearch
 }
