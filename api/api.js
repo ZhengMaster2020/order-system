@@ -44,10 +44,28 @@ const cooperationList = (params) => {
   })
 }
 
+//加工厂管理 - 列表
+const factoryMenagementList = (params) => {
+  return fetch({
+    url: '/processingfactory',
+    method: 'GET',
+    params: params
+  })
+}
+
 //防串货 - 合作商管理 - 新增合作商管理
 const addCooperationList = (params) => {
   return fetch({
     url: '/cooperative',
+    method: 'POST',
+    data: params
+  })
+}
+
+//加工厂管理 - 添加
+const addFactoryManagement = (params) => {
+  return fetch({
+    url: '/processingfactory',
     method: 'POST',
     data: params
   })
@@ -70,6 +88,32 @@ const deleteCooperationList = (id) => {
   })
 }
 
+//加工厂管理 - 详情
+const detailsFactoryManagement = (params) => {
+  return fetch({
+    url: `/processingfactory/${params}`,
+    method: 'GET',
+    data: params
+  })
+}
+
+//加工厂管理 - 编辑
+const editFactoryManagement = (params) => {
+  return fetch({
+    url: `/processingfactory/${params.id}`,
+    method: 'PATCH',
+    data: params
+  })
+}
+
+//加工厂管理 - 删除
+const deleteFactoryManagement = (params) => {
+  return fetch({
+    url: `/processingfactory/${params}`,
+    method: 'DELETE'
+  })
+}
+
 
 export default {
   login,
@@ -79,5 +123,10 @@ export default {
   cooperationList,
   addCooperationList,
   CooperationListaDetails,
-  deleteCooperationList
+  deleteCooperationList,
+  factoryMenagementList,
+  addFactoryManagement,
+  editFactoryManagement,
+  deleteFactoryManagement,
+  detailsFactoryManagement
 }
