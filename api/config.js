@@ -11,7 +11,7 @@
 import Cookies from 'js-cookie'
 import Env from './env'
 
-let baseUrl = 'http://api-security.fandow.com'
+let baseUrl = 'api-security.fandow.com'
 
 if (Env === 'production') {
   console.log('---- production ----')
@@ -19,7 +19,7 @@ if (Env === 'production') {
   baseUrl = 'http://120.27.137.99:18606'
   console.log('---- test ----')
 } else {
-  baseUrl = 'http://120.27.137.99:18606'
+  baseUrl = 'http://apibeta.fandow.com/oa/ticking'
   console.log('---- develop ----')
 }
 //http://api-tickingbeta.fandow.com

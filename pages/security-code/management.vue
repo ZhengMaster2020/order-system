@@ -206,7 +206,6 @@
         }
         this.fileSrc = []
         this.$API.securityCodeList(params).then((res) => {
-          //console.log(res)
           this.loading = true
           if(res.code === 0){
              this.listData.data = res.data.list
@@ -220,16 +219,17 @@
                 if(keys['isComputed'] === 0){
                   this.fileSrc.push('')
                 }
+                if(keys['fileItem'] != undefined){
                 if(keys['isComputed'] === 1 && keys['fileItem'].length===0){
                   this.fileSrc.push('')
                 }
                 Object.keys(keys['fileItem']).map((key) => {
                     this.fileSrc.push(keys['fileItem'][key]['url'])
                  })
-                 //console.log(this.fileSrc)
+                }
              })
           }
-        }).then(() => {
+        }).finally(() => {
           this.loading = false
         })
       }
