@@ -78,6 +78,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import router from '~/plugins/router'
 import shrinkableMenu from '~/components/shrinkable-menu/shrinkable-menu.vue'
 // import tagsPageOpened from '~/components/tags-page-opened.vue'
@@ -154,6 +155,7 @@ export default {
         // 退出登录
         this.$store.commit('logout', this)
         this.$store.commit('clearOpenedSubmenu')
+        Cookies.remove('authorization')
         this.$router.push({
           name: 'login'
         })
