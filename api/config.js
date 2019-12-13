@@ -22,6 +22,6 @@ if (Env === 'production') {
   baseUrl = 'http://apibeta.fandow.com/oa/ticking'
   console.log('---- develop ----')
 }
-//http://api-tickingbeta.fandow.com
+// http://api-tickingbeta.fandow.com
 export const SERVER_BASE_URL = baseUrl
 export const JsCookies = Cookies

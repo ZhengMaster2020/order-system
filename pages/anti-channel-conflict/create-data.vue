@@ -14,7 +14,7 @@ h2 {
 </style>
 <template>
   <div>
-    <h2>该页面暂时没有接口</h2>
+    <h2> 该页面暂时没有接口</h2>
     <div id="chart_example"></div>
   </div>
 </template>

@@ -79,7 +79,7 @@ export default function fetch(options) {
         const response = error.response
         const data = response.data
 
-        // 401无效token
+        //  401无效token
         if (data && data.status && data.status === 401) {
           // 退出登录
           Notice.error({
