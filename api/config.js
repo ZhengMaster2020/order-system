@@ -7,21 +7,22 @@
  * imgbaseUrl: 图片所在域名地址
  *
  */
+import ENV from './env'
 
-import Cookies from 'js-cookie'
-import Env from './env'
+let baseUrl = '//api.fandow.com/oa/'
+let fileUrl = '//api.fandow.com/oa/file'
 
-let baseUrl = 'api-security.fandow.com'
-
-if (Env === 'production') {
+if (ENV === 'production') {
   console.log('---- production ----')
-} else if (Env === 'test') {
-  baseUrl = 'http://120.27.137.99:18606'
+} else if (ENV === 'test') {
   console.log('---- test ----')
+  baseUrl = 'http://apibeta.fandow.com/oa/'
+  fileUrl = 'http://apibeta.fandow.com/oa/file'
 } else {
-  baseUrl = 'http://apibeta.fandow.com/oa/ticking'
   console.log('---- develop ----')
+  baseUrl = 'http://apibeta.fandow.com/oa/'
+  fileUrl = 'http://apibeta.fandow.com/oa/file'
 }
-//http://api-tickingbeta.fandow.com
+
 export const SERVER_BASE_URL = baseUrl
-export const JsCookies = Cookies
+export const FILE_BASE_URL = fileUrl
