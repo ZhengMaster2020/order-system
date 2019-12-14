@@ -70,6 +70,7 @@
 
 <script>
 import Cookies from 'js-cookie'
+import { FILE_BASE_URL } from '../api/config';
 export default {
   layout: 'full',
   data() {
@@ -81,7 +82,10 @@ export default {
           { required: true, message: '账号不能为空', trigger: 'blur' }
         ],
         password: [{ required: true, message: '密码不能为空', trigger: 'blur' }]
-      }
+      },
+      client_id: 'af9fc0a207c018fb244e8d3b5c7d815c', // 应用ID
+      client_secret: '1cfdb85d6ca1595dfa72fee59e7e9c67', // 应用Secret
+      grant_type: 'password'
     }
   },
   methods: {
@@ -100,23 +104,30 @@ export default {
           //     Cookies.set('access', 1);
           // }
           const LoginForm = {}
-          LoginForm.LoginForm = this.form
+          LoginForm.username	 = this.form.username
+          LoginForm.password = this.form.password
+          LoginForm.client_id = this.client_id
+          LoginForm.client_secret = this.client_secret
+          LoginForm.grant_type = this.grant_type
           this.$API.login(LoginForm).then((res) => {
-            if (res.code === 200) {
+            if (!res.code) {
               // Cookies.set('user', this.form.username, { expires: 1 })
-              Cookies.set('authorization', res.data, {
+              Cookies.set('authorization', res.access_token, {
                 expires: 1
               })
               // Cookies.set('real_name', res.data.real_name, { expires: 1 })
-              this.$Message.success(res.message)
+              this.$Message.success('登录成功!')
               // this.$store.commit(
               //   'setAvator',
               //   'https://oa.fandow.com/public/img/logo-min.png'
               // )
               this.$router.push({ path: '/' })
             } else {
+              this.$Message.error('账号或者密码错误!')
               this.loading = false
             }
+          }).catch(err => {
+            // console.log(err);
           })
         }
       })
