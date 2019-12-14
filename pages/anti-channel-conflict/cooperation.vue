@@ -101,9 +101,7 @@ export default {
         data1: []
       },
       addData:{
-        cooperativeName: '',
-        cooperativeAddress: '',
-        chargePerson: ''
+        id:''
       }
     }
   },
@@ -111,9 +109,6 @@ export default {
     //新增合作商
     addBusiness () {
       this.cooperationModal = true;
-      this.addData.cooperativeName = '',
-      this.addData.cooperativeAddress = '',
-      this.addData.chargePerson = ''
     },
     //编辑合作商
     partnerEidt (id) {
@@ -122,6 +117,7 @@ export default {
         .then( res =>{
           this.addData = res.data
         })
+        this.addData.id = id
     },
     //获取合作商列表数据
     getList (name) {
@@ -144,20 +140,29 @@ export default {
       data.chargePerson = this.addData.chargePerson;
       if (data.chargePerson == '' || data.cooperativeAddress == '' || data.chargePerson == '') {
         this.$Message.error('必填项不能为空!');
+        return;
+      }
+      if(this.addData.id){
+        data.id = this.addData.id;
+        this.$API.addCooperationListEdit(data)
+          .then( res =>{
+            this.$Message.success('修改成功');
+            this.cooperationModal = false;
+            this.getList();
+          })
       }else {
         this.$API.addCooperationList(data)
-          .then( res => {
-            // console.log(res.data)
-            if(res.code == -1){
-              this.$Message.success(res.msg);
-            }else {
-              if (res.data){
-                this.cooperationModal = false;
-                this.$Message.success('添加成功');
-                this.getList();
-              }
+        .then( res => {
+          if(res.code == -1){
+            this.$Message.success(res.msg);
+          }else {
+            if (res.data){
+              this.cooperationModal = false;
+              this.$Message.success('添加成功');
+              this.getList();
             }
-          })
+          }
+        })
       }
     },
     //取消新增
