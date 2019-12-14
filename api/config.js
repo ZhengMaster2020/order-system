@@ -19,7 +19,8 @@ if (Env === 'production') {
   baseUrl = 'http://120.27.137.99:18606'
   console.log('---- test ----')
 } else {
-  baseUrl = 'http://apibeta.fandow.com/oa/ticking'
+  // baseUrl = 'http://apibeta.fandow.com/oa/ticking'
+  baseUrl = 'http://apibeta.fandow.com/oa/uac'
   console.log('---- develop ----')
 }
 //http://api-tickingbeta.fandow.com

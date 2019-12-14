@@ -2,8 +2,8 @@
   <div class="code-management">
     <Row class="search-form" type="flex" justify="space-between">
         <Col :md="12">
-          <Input v-model="searchData.securityCode" placeholder="加工厂名称" style="width:150px" clearable @on-enter="getList('search')"/>
-          <Input v-model="searchData.securityCode" placeholder="负责人" style="width:150px" clearable @on-enter="getList('search')"/>
+          <Input v-model="searchData.warehouseName" placeholder="加工厂名称" style="width:150px" clearable @on-enter="getList('search')"/>
+          <Input v-model="searchData.personInCharge" placeholder="负责人" style="width:150px" clearable @on-enter="getList('search')"/>
           <Button type="primary" icon="ios-search" @click="getList('search')">查询</Button>
         </Col>
         <Col :md="3" style="textAlign:right">
@@ -28,14 +28,23 @@
     >
       <div style="padding: 0 75px 0 50px">
         <Form ref="addData.data" :model="addData.data" :rules="addDataRule" label-position="right" :label-width="100">
-          <FormItem label="仓库名称：" prop="name">
-            <Input v-model="addData.data.name" clearable/>
+          <FormItem label="仓库名称：" prop="warehouseName">
+            <Input v-model="addData.data.warehouseName" clearable/>
           </FormItem>
-          <FormItem label="负责人：" prop="passwork">
-            <Input v-model="addData.data.passwork" clearable/>
+          <FormItem label="负责人：" prop="personInCharge">
+            <!-- <Input v-model="addData.data.personInCharge" clearable :on-change="personInCharge()"/> -->
+            <Select
+                v-model="addData.data.personInCharge"
+                filterable
+                remote
+                :remote-method="personInCharge"
+                clearable
+                >
+                <Option v-for="(option, index) in userList"  :value="option.username" :key="'user'+option.id">{{option.realName}}</Option>
+            </Select>
           </FormItem>
-          <FormItem label="所在地址：" prop="passworks">
-            <Input v-model="addData.data.passworks" clearable/>
+          <FormItem label="所在地址：" prop="warehouseAddress">
+            <Input v-model="addData.data.warehouseAddress" clearable/>
           </FormItem>
         </Form> 
       </div>   
@@ -54,12 +63,13 @@
           securityCode: '',
           type: ''
         },
+        userList:[],
         listData: {
           columns: [
             {key: 'index', type: 'index', title: '序号', width: 65, align: 'center'},
-            {key: 'serialCode', title: '仓库名称', align: 'center'},
-            {key: 'securityCode', title: '所在地址', align: 'center'},
-            {key: 'securityCodeLink', title: '负责人', maxWidth: 120, align: 'center'},
+            {key: 'warehouseName', title: '仓库名称', align: 'center'},
+            {key: 'warehouseAddress', title: '所在地址', align: 'center'},
+            {key: 'personInCharge', title: '负责人', maxWidth: 120, align: 'center'},
             {
               key: 'securityCodeLink',
               title: '出入库详情',
@@ -111,9 +121,15 @@
                       marginRight: '8px'
                     },
                     on: {
-                      'click': () => {
-                        //this.productId = params.row.id
-                        this.openModal('edit')
+                      'click': (ids) => {
+                        this.addData.modalType = '编辑';
+                        let id = ids = params.row.id;
+                        this.$API.warehouseDetails(id)
+                          .then((res) =>{
+                            this.addData.data = res.data;
+                          })
+                          this.addData.id = ids;
+                        this.openModal('edit');
                       }
                     }
                   })
@@ -126,14 +142,12 @@
                     },
                     on: {
                       'on-ok': () => {
-                          // let param = {
-                          //   id: params.row.id
-                          // }
-                          // this.$API.deleteProduct(param).then((res) => {
-                          //   this.$Message.success('删除成功')   
-                          //   this.getList()                       
-                          // })
-                          alert('sds')
+                          let id = params.row.id;
+                          this.$API.warehouseDelete(id)
+                            .then((res) => {
+                              this.$Message.success('删除成功');
+                          })
+                          this.getList();
                       }
                     }
                   },[
@@ -148,29 +162,30 @@
               }
             }
           ],
-          data: [{serialCode: 'sd'}]
+          data: []
         },
         addData: {
+          id:'',
           loading: false,
           modal: false,
           modalType: '',
           data: {
-            name: '',
-            passwork: '',
-            passworks: '',
-            tel: '',
-            type: '',
+            id: '',
+            personInChargeId:'',
+            warehouseName: '',
+            warehouseAddress: '',
+            personInCharge: ''
           }
         },
         addDataRule: {
-          name: [
-              { required: true, message: '请输入仓库名称', trigger: 'blur' }
+          warehouseName: [
+            { required: true, message: '请输入仓库名称', trigger: 'blur' }
           ],
-          passwork: [
-              { required: true, message: '请输入负责人', trigger: 'blur' }
+          personInCharge: [
+            { required: true, message: '请输入负责人', trigger: 'blur' }
           ],
-          passworks: [
-              { required: true, message: '请输入所在地址', trigger: 'blur' }
+          warehouseAddress: [
+            { required: true, message: '请输入所在地址', trigger: 'blur' }
           ]
         },
         pageProps: { // 列表分页属性
@@ -181,28 +196,28 @@
       }
     },
     mounted() {
-      //this.getList()
+      this.getList()
     },
     methods:{
       changePage (e) {
         this.pageProps.page = e
-        //this.getList();
+        this.getList();
       },
       changePageSize (e) {
         this.pageProps.perPage = e
-        //this.getList();
+        this.getList();
       },
       // 查询数据
       getList () {
         let params = this.searchData
         params.page = this.pageProps.page
         params.perPage = this.pageProps.perPage
-        this.$API.securityCodeQuery(params).then((res) => {
-          //console.log(res)
-          if(res.code === 0){
-            this.listData.data = res.data.list
-            this.pageProps.totalCount = res.data.count
-          }
+        this.$API.warehouseList(params)
+          .then((res) => {
+            if(res.code === 0){
+              this.listData.data = res.data.data;
+              this.pageProps.totalCount = res.data.count;
+            }
         })
         this.pageProps.page = 1
         this.pageProps.perPage = 10
@@ -211,16 +226,39 @@
       handleSubmit (name) {
         this.$refs[name].validate((valid) => {
             if (valid) {
-                this.$Message.success('Success!')
-                addData.modal=false
+              let params = {
+                warehouseName:this.addData.data.warehouseName,
+                warehouseAddress:this.addData.data.warehouseAddress,
+                personInCharge:this.addData.data.personInCharge
+              }
+              if (this.addData.id) {
+                params.personInChargeId = this.addData.data.personInChargeId
+                this.$API.warehouseEdit(params)
+                  .then((res) => {
+                    this.addData.data = res.data.data;
+                    this.$Message.success('编辑成功');
+                    addData.modal = false;
+                    this.getList();
+                  })
+              }else {
+                this.$API.warehouseAddList(params)
+                  .then((res) => {
+                    console.log(res);
+                    this.addData.data = res.data.data;
+                    console.log(res.data.data);
+                    this.$Message.success('添加成功');
+                    addData.modal = false;
+                    this.getList();
+                })
+              }
             } else {
-                this.$Message.error('请填写信息')
+                this.$Message.error('请填写信息');
             }
         })
       },
       // 校验重置
       handleReset (name) {
-        this.$refs[name].resetFields()
+        this.$refs[name].resetFields();
       },
       // 关闭弹窗
       closeModal () {
@@ -231,6 +269,14 @@
       openModal (type) {
         this.addData.modal = true
         this.addData.modalType = type
+      },
+      //远程搜索负责人名称
+      personInCharge  (value) {
+        let username = value;
+        this.$API.warehouseNameSelect({username:username})
+          .then( (res) => {
+            this.userList = res.data.data
+          })
       }
     }
   }
