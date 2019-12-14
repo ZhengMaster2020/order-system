@@ -38,7 +38,7 @@ const securityCodeQuery = (params) => {
 //防串货 - 合作商管理 - 列表
 const cooperationList = (params) => {
   return fetch({
-    url: '/cooperative',
+    url: 'ticking/cooperative',
     method: 'GET',
     params: params
   })
@@ -65,8 +65,17 @@ const factoryMenagementList = (params) => {
 //防串货 - 合作商管理 - 新增合作商管理
 const addCooperationList = (params) => {
   return fetch({
-    url: '/cooperative',
+    url: 'ticking/cooperative',
     method: 'POST',
+    data: params
+  })
+}
+
+//防串货 - 合作商管理 - 编辑
+const addCooperationListEdit = (params) => {
+  return fetch({
+    url: `ticking/cooperative/${params.id}`,
+    method: 'PATCH',
     data: params
   })
 }
@@ -92,7 +101,7 @@ const accountNumberAdd = (params) => {
 //防串货 - 合作商管理 - 详情
 const CooperationListaDetails = (params) => {
   return fetch({
-    url: `/cooperative/${params.id}`,
+    url: `ticking/cooperative/${params.id}`,
     method: 'GET',
     params: params
   })
@@ -101,7 +110,7 @@ const CooperationListaDetails = (params) => {
 //防串货 - 合作商管理 - 删除
 const deleteCooperationList = (id) => {
   return fetch({
-    url: `/cooperative/${id.id}`,
+    url: `ticking/cooperative/${id.id}`,
     method: 'DELETE'
   })
 }
@@ -187,5 +196,6 @@ export default {
   accountNumberDelete,
   accountNumberEdit,
   accountNumberDetail,
-  accountNumberSearch
+  accountNumberSearch,
+  addCooperationListEdit
 }
