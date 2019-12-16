@@ -275,7 +275,8 @@
         let username = value;
         this.$API.warehouseNameSelect({username:username})
           .then( (res) => {
-            this.userList = res.data.data
+            this.userList = res.data.data;
+            
           })
       }
     }
