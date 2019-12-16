@@ -2,7 +2,7 @@ import fetch from './fetch'
 
 const login = (params) => {
   return fetch({
-    url: '/login',
+    url: 'uac/authentication/password-grant',
     method: 'POST',
     data: params
   })
@@ -11,7 +11,7 @@ const login = (params) => {
 // 防伪码管理 - 列表
 const securityCodeList = (params) => {
   return fetch({
-    url: '/securityCode',
+    url: 'ticking/securityCode',
     method: 'GET',
     params: params
   })
@@ -20,7 +20,7 @@ const securityCodeList = (params) => {
 // 防伪码管理 - 添加
 const securityCodeCreate = (params) => {
   return fetch({
-    url: '/securityCode',
+    url: 'ticking/securityCode',
     method: 'POST',
     data: params
   })
@@ -29,7 +29,7 @@ const securityCodeCreate = (params) => {
 // 防伪码查询 - 列表
 const securityCodeQuery = (params) => {
   return fetch({
-    url: '/securityCodeQuery',
+    url: 'ticking/securityCodeQuery',
     method: 'GET',
     params: params
   })
@@ -47,7 +47,7 @@ const cooperationList = (params) => {
 //账号管理 - 列表 
 const accountNumberList = (params) => {
   return fetch({
-    url: '/accountNumber',
+    url: 'ticking/accountNumber',
     method: 'GET',
     params: params
   })
@@ -56,7 +56,7 @@ const accountNumberList = (params) => {
 //加工厂管理 - 列表
 const factoryMenagementList = (params) => {
   return fetch({
-    url: '/processingfactory',
+    url: 'ticking/processingfactory',
     method: 'GET',
     params: params
   })
@@ -83,7 +83,7 @@ const addCooperationListEdit = (params) => {
 //加工厂管理 - 添加
 const addFactoryManagement = (params) => {
   return fetch({
-    url: '/processingfactory',
+    url: 'ticking/processingfactory',
     method: 'POST',
     data: params
   })
@@ -92,7 +92,7 @@ const addFactoryManagement = (params) => {
 //账号管理 - 添加 
 const accountNumberAdd = (params) => {
   return fetch({
-    url: '/accountNumber',
+    url: 'ticking/accountNumber',
     method: 'POST',
     data: params
   })
@@ -118,7 +118,7 @@ const deleteCooperationList = (id) => {
 //账号管理 - 删除
 const accountNumberDelete = (params) => {
   return fetch({
-    url: `/accountNumber/${params.id}`,
+    url: `ticking/accountNumber/${params.id}`,
     method: 'DELETE'
   })
 }
@@ -126,7 +126,7 @@ const accountNumberDelete = (params) => {
 //加工厂管理 - 详情
 const detailsFactoryManagement = (params) => {
   return fetch({
-    url: `/processingfactory/${params}`,
+    url: `ticking/processingfactory/${params}`,
     method: 'GET',
     data: params
   })
@@ -135,7 +135,7 @@ const detailsFactoryManagement = (params) => {
 //账号管理 - 修改
 const accountNumberEdit = (params) => {
   return fetch({
-    url: `/accountNumber/${params.id}`,
+    url: `ticking/accountNumber/${params.id}`,
     method: 'PATCH',
     data: params
   })
@@ -144,7 +144,7 @@ const accountNumberEdit = (params) => {
 //加工厂管理 - 编辑
 const editFactoryManagement = (params) => {
   return fetch({
-    url: `/processingfactory/${params.id}`,
+    url: `ticking/processingfactory/${params.id}`,
     method: 'PATCH',
     data: params
   })
@@ -153,7 +153,7 @@ const editFactoryManagement = (params) => {
 //加工厂管理 - 删除
 const deleteFactoryManagement = (params) => {
   return fetch({
-    url: `/processingfactory/${params}`,
+    url: `ticking/processingfactory/${params}`,
     method: 'DELETE'
   })
 }
@@ -162,7 +162,7 @@ const deleteFactoryManagement = (params) => {
 //账号管理 - 详情
 const accountNumberDetail = (params) => {
   return fetch({
-    url: `/accountNumber/${params.id}`,
+    url: `ticking/accountNumber/${params.id}`,
     method: 'GET',
     params: params
   })
@@ -171,7 +171,7 @@ const accountNumberDetail = (params) => {
 //账号管理 - 查询
 const accountNumberSearch = (params) => {
   return fetch({
-    url: `/accountNumber/search`,
+    url: `ticking/accountNumber/search`,
     method: 'GET',
     params: params
   })
