@@ -101,7 +101,7 @@ export default {
         data1: []
       },
       addData:{
-        id:''
+        id:'',
       }
     }
   },
@@ -158,6 +158,9 @@ export default {
           }else {
             if (res.data){
               this.cooperationModal = false;
+              this.addData.cooperativeName = '';
+              this.addData.chargePerson = '';
+              this.addData.cooperativeAddress = '';
               this.$Message.success('添加成功');
               this.getList();
             }
