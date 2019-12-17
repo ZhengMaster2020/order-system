@@ -13,16 +13,17 @@ let baseUrl = '//api.fandow.com/oa/'
 let fileUrl = '//api.fandow.com/oa/file'
 
 if (ENV === 'production') {
-  console.log('---- production ----')
+    console.log('---- production ----')
 } else if (ENV === 'test') {
-  console.log('---- test ----')
-  baseUrl = 'http://apibeta.fandow.com/oa/'
-  fileUrl = 'http://apibeta.fandow.com/oa/file'
+    // baseUrl = 'http://apibeta.fandow.com/oa/ticking'
+    console.log('---- test ----')
+    baseUrl = 'http://apibeta.fandow.com/oa/'
+    fileUrl = 'http://apibeta.fandow.com/oa/file'
 } else {
-  console.log('---- develop ----')
-  baseUrl = 'http://apibeta.fandow.com/oa/'
-  fileUrl = 'http://apibeta.fandow.com/oa/file'
+    console.log('---- develop ----')
+    baseUrl = 'http://apibeta.fandow.com/oa/'
+    fileUrl = 'http://apibeta.fandow.com/oa/file'
 }
-
+// http://api-tickingbeta.fandow.com
 export const SERVER_BASE_URL = baseUrl
 export const FILE_BASE_URL = fileUrl
