@@ -44,7 +44,7 @@ main(){
              deploy_queen1; # 部署构建流程
              deploy_queen2; # 启动服务
              deploy_queen3; # 脚本核心
-             hell_unlock; # 删除锁
+             shell_unlock; # 删除锁
             ;;
         betadeploy) # 200服务器部署
              source200;
@@ -55,7 +55,7 @@ main(){
              deploy_queen1;
              deploy_queen2;
              deploy_queen3;
-             hell_unlock;
+             shell_unlock;
             ;;
         rollback) # 99回滚
             sourcefunction;
