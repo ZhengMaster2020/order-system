@@ -1,26 +1,23 @@
 #!/bin/bash
-deploy_queen1(){ # 同步远程主机后(保留十个版本)
-         ssh $leave << eeooff
-            cd $release
-           /usr/bin/yarn install
-           /usr/bin/yarn build-env-test
-           /usr/bin/yarn build
-          exit
-eeooff
+deploy_queen1(){ # 构建
+    echo "开始构建"
+   ssh $leave "cd $release && /usr/bin/yarn install && /usr/bin/yarn build-env-test && /usr/bin/yarn build"
+   if [ $? -ne 0 ];
+   then
+     echo "构建失败"
+     exit 123
+   fi
 }
 
 deploy_queen2(){ # 同步远程主句后
-ssh $leave "/usr/sbin/lsof -i tcp:30002"
+  echo "启动项目"
+  ssh $leave "/usr/sbin/lsof -i tcp:30002"
     if [ $? -ne 0 ];
     then
-       ssh $leave "cd $release && /usr/bin/pm2 start npm --name "security-code" -- run starttest"
+       ssh $leave "cd $release && /usr/bin/pm2 start npm --name \"security-code\" -- run starttest"
     else
-       ssh $leave "cd $release && /usr/bin/pm2 delete dingtalk-lark && /usr/bin/pm2 start npm --name "security-code" -- run starttest"
+       ssh $leave "cd $release && /usr/bin/pm2 delete \"security-code\" && /usr/bin/pm2 start npm --name \"security-code\" -- run starttest"
     fi
-#     ssh $leave "/usr/sbin/lsof -i tcp:2323 && if [ $? -eq 0 ]; then /usr/bin/pm2 restart dingtalk-lark; echo '开始npm'; /usr/bin/pm2 start npm --name "dingtalk-lark" -- run start; fi"
-#      ssh $leave "/usr/sbin/lsof -i tcp:2323 && if [ $? -eq 0 ]; then /usr/bin/pm2 delete all; fi"
-#      ssh $leave "cd $release && /usr/sbin/lsof -i tcp:2323 && if [ $? -ne 0 ]; then /usr/bin/pm2 start npm --name "dingtalk-lark" -- run start; /usr/bin/pm2 restart dingtalk-lark; fi"
-#     ssh $leave "/usr/sbin/lsof -i tcp:2323 && if [ $? -ne 0 ]; then /usr/bin/pm2 start npm --name "dingtalk-lark" -- run start; fi"
 }
 
 deploy_queen3(){ 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # shell env 脚本位置等变量
-SHELL_NAME="deploytest.sh"    # 脚本名称
-SHELL_DIR="/test"  # 脚本路径
+SHELL_NAME="securitydeploy.sh"    # 脚本名称
+SHELL_DIR="./deploying"  # 脚本路径
 SHELL_LOG="${SHELL_DIR}/${SHELL_NAME}.log" # 脚本执行日志文件路径
 # 日志日期和时间变量
 LOG_DATE=`date "+%Y-%m-%d"` # 如果执行的话后面执行的时间，此时间是不固定的，这是记录日志使用的时间
@@ -35,33 +35,33 @@ main(){
     DEPLOY_METHOD=$1 # 避免出错误将脚本的第一个参数作为变量
     ROLLBACK_VER=$2
     case $DEPLOY_METHOD in
-        deploy) # 如果第一个参数是deploy就执行以下操作
-             sourcefunction;
+        deploy) # 99测试部署流程
+             sourcefunction; # 生效99环境变量的方法
              shell_lock;# 建立锁
-             npm; # 获取代码
-             if_judge;
-             deploy;   # 同步到服务器
-             deploy_queen1;
-             deploy_queen2; # 部署远程主机后保留十个版本
-             deploy_queen3; # 部署远程主机后保留十个版本
+             npm; # 本地解决依赖
+             deploy_front; # 同步前的复制
+             deploy;  # 同步代码到远程服务器
+             deploy_queen1; # 部署构建流程
+             deploy_queen2; # 启动服务
+             deploy_queen3; # 脚本核心
              hell_unlock; # 删除锁
             ;;
-        betadeploy) # 如果第一个参数是deploy就执行以下操作
+        betadeploy) # 200服务器部署
              source200;
-             shell_lock;# 建立锁
-             npm; # 获取代码
-             if_judge;
-             deploy;   # 同步到服务器
+             shell_lock;
+             npm;
+             deploy_front;
+             deploy;
              deploy_queen1;
-             deploy_queen2; # 部署远程主机后保留十个版本
-             deploy_queen3; # 部署远程主机后保留十个版本
-             hell_unlock; # 删除锁
+             deploy_queen2;
+             deploy_queen3;
+             hell_unlock;
             ;;
-        rollback) # 如果第一个参数是rollback就执行以下操作
+        rollback) # 99回滚
             sourcefunction;
             rollback;
             ;;
-        betarollback) # 如果第一个参数是rollback就执行以下操作
+        betarollback) # 200回滚
             source200;
             rollback;
             ;;
