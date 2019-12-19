@@ -20,12 +20,12 @@ export default [{
                 path: 'anti-channel-conflict/account-management/account-management',
                 title: '账号管理',
                 name: 'anti-channel-conflict/account-management/account-management'
+            },
+            {
+                path: 'anti-channel-conflict/order-management',
+                title: '订单管理',
+                name: 'anti-channel-conflict/order-management'
             }
         ]
-    },
-    {
-        path: 'anti-channel-conflict/order-management',
-        title: '订单管理',
-        name: 'anti-channel-conflict/order-management'
     }
 ]

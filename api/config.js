@@ -15,9 +15,10 @@ let fileUrl = '//api.fandow.com/oa/file'
 if (ENV === 'production') {
     console.log('---- production ----')
 } else if (ENV === 'test') {
-    // baseUrl = 'http://apibeta.fandow.com/oa/ticking'
     console.log('---- test ----')
     baseUrl = 'http://apibeta.fandow.com/oa/'
+        // baseUrl = 'http://apibeta.fandow.com/oa/ticking'
+
     fileUrl = 'http://apibeta.fandow.com/oa/file'
 } else {
     console.log('---- develop ----')

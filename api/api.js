@@ -180,7 +180,7 @@ const accountNumberSearch = (params) => {
 // 防串货 - 订单管理 - 列表
 const orderManagementList = (params) => {
     return fetch({
-        url: '/orderManagement',
+        url: 'ticking/orderManagement',
         method: 'GET',
         params: params
     })
@@ -189,7 +189,7 @@ const orderManagementList = (params) => {
 // 防串货 - 订单管理 - 新增
 const addOrderManagement = (params) => {
     return fetch({
-        url: '/orderManagement',
+        url: 'ticking/orderManagement',
         method: 'POST',
         data: params
     })
@@ -198,7 +198,7 @@ const addOrderManagement = (params) => {
 // 防串货 - 订单管理 - 详情
 const detailsOrderManagement = (params) => {
     return fetch({
-        url: `/orderManagement/${params}`,
+        url: `ticking/orderManagement/${params}`,
         method: 'GET',
         params: params
     })
@@ -206,9 +206,8 @@ const detailsOrderManagement = (params) => {
 
 // 防串货 - 订单管理 - 更新/ 修改
 const editOrderManagement = (params) => {
-    console.log('????????????????????????????????????')
     return fetch({
-        url: `/orderManagement/${params.id}`,
+        url: `ticking/orderManagement/${params.id}`,
         method: 'PATCH',
         data: params
     })
@@ -217,7 +216,7 @@ const editOrderManagement = (params) => {
 // 防串货 - 订单管理 - 删除
 const deleteOrderManagement = (params) => {
     return fetch({
-        url: `/orderManagement/${params}`,
+        url: `ticking/orderManagement/${params}`,
         method: 'DELETE'
     })
 }
@@ -225,7 +224,7 @@ const deleteOrderManagement = (params) => {
 // 防串货 - 订单管理 - 查找
 const searchOrderManagement = (params) => {
     return fetch({
-        url: '/orderManagement/search',
+        url: 'ticking/orderManagement/search',
         method: 'GET',
         params: params
     })
