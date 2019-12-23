@@ -29,6 +29,8 @@ deploy_queen3(){
 rollback(){ # 版本回滚操作
   echo '开始回滚'
   ssh $leave "cd $release_dir && ls -t |awk 'NR==2{print}' | xargs -i ln -snf $release_dir/{} $code_dir/current"
+  ssh $leave "cd $code_dir/current && /usr/bin/yarn install && /usr/bin/yarn build-env-test && /usr/bin/yarn build"
+  deploy_queen2
   if [ $? -ne 0 ]
    then
     echo "回滚失败！"
