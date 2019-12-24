@@ -4,6 +4,7 @@ import Cookies from 'js-cookie'
 import iView, { Notice } from 'iview'
 // import { router } from 'vue-router'
 import { SERVER_BASE_URL } from './config'
+
 Vue.use(iView)
 
 export default function fetch(options) {

@@ -31,7 +31,16 @@ export default [{
               title: '仓库管理',
               name: 'anti-channel-conflict/store-management/store-management'
             },
-            { path: 'anti-channel-conflict/box-code-mangement', title: '箱码管理', name: 'anti-channel-conflict/box-code-mangement' }
+            { path: 'anti-channel-conflict/box-code-mangement', title: '箱码管理', name: 'anti-channel-conflict/box-code-mangement' },
+            {
+              path: 'anti-channel-conflict/logistics-management',
+              title: '物流管理',
+              name: 'anti-channel-conflict/logistics-management',
+              children: [
+                { path: 'anti-channel-conflict/logistics-management/box-code-query', title: '箱码查询', name: 'anti-channel-conflict/logistics-management/box-code-query' },
+                { path: 'anti-channel-conflict/logistics-management/product-code-query', title: '产品码查询', name: 'anti-channel-conflict/logistics-management/product-code-query' }
+              ]
+            }
         ]
     }
 ]

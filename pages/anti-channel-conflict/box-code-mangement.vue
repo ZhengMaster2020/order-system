@@ -166,7 +166,7 @@
           searchData.startAtBegin = this.format(((searchData.time[0].getTime()+'').substr(0,10)), 'yyyy-MM-dd hh:mm:ss')
           searchData.endAtBegin = this.format((searchData.time[1].getTime()+'').substr(0,10), 'yyyy-MM-dd hh:mm:ss')
         } catch (err ) {}
-        this.$API.boxCodeList({
+        this.$API.boxCodeMangementList({
           ...searchData,
           ...this.pageProps
         }).then(res => {

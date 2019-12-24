@@ -35,6 +35,33 @@ const securityCodeQuery = (params) => {
   })
 }
 
+// 物流管理 - 箱码查询
+const boxCodeList = (params) => {
+  return fetch({
+    url: 'ticking/boxCodeQuery',
+    method: 'GET',
+    params: params
+  })
+}
+
+// 物流管理 - 产品码查询 - 列表
+const productCodeList = (params) => {
+  return fetch({
+    url: 'ticking/productCodeQuery',
+    method: 'GET',
+    params: params
+  })
+}
+
+// 物流管理 - 产品码查询 - 查询物流信息
+const productCodeSearch = (params) => {
+  return fetch({
+    url: `ticking/productCodeQuery/${params.id}`,
+    method: 'GET',
+    params: params
+  })
+}
+
 const cooperationList = (params) => {
   return fetch({
     url: 'ticking/cooperative',
@@ -282,7 +309,7 @@ const searchOrderManagement = (params) => {
 }
 
 // 防串货-箱码管理-列表
-const boxCodeList = params => {
+const boxCodeMangementList = params => {
   return fetch({
     url: 'ticking/boxCodes',
     method: 'GET',
@@ -343,7 +370,10 @@ export default {
   warehouseDelete,
   warehouseEdit,
   warehouseNameSelect,
-  boxCodeList,
+  boxCodeMangementList,
   boxCodeCreate,
-  searchOrderNum
+  searchOrderNum,
+  boxCodeList,
+  productCodeList,
+  productCodeSearch
 }
