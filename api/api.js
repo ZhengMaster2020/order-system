@@ -2,7 +2,7 @@ import fetch from './fetch'
 
 const login = (params) => {
   return fetch({
-    url: '/login',
+    url: 'uac/authentication/password-grant',
     method: 'POST',
     data: params
   })
