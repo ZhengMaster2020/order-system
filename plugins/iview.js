@@ -5,5 +5,5 @@ import locale from 'iview/dist/locale/zh-CN' // Change locale, check node_module
 Vue.use(iView, {
   locale,
   transfer: true,
-  size: 'small'
+  size: 'default'
 })
