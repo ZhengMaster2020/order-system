@@ -30,7 +30,8 @@ export default [{
               path: 'anti-channel-conflict/store-management/store-management',
               title: '仓库管理',
               name: 'anti-channel-conflict/store-management/store-management'
-            }
+            },
+            { path: 'anti-channel-conflict/box-code-mangement', title: '箱码管理', name: 'anti-channel-conflict/box-code-mangement' }
         ]
     }
 ]
