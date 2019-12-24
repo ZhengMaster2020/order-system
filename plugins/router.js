@@ -25,6 +25,11 @@ export default [{
                 path: 'anti-channel-conflict/order-management',
                 title: '订单管理',
                 name: 'anti-channel-conflict/order-management'
+            },
+            {
+              path: 'anti-channel-conflict/store-management/store-management',
+              title: '仓库管理',
+              name: 'anti-channel-conflict/store-management/store-management'
             }
         ]
     }

@@ -35,7 +35,6 @@ const securityCodeQuery = (params) => {
     })
 }
 
-//防串货 - 合作商管理 - 列表
 const cooperationList = (params) => {
     return fetch({
         url: 'ticking/cooperative',
@@ -131,6 +130,58 @@ const detailsFactoryManagement = (params) => {
         data: params
     })
 }
+// 防串货 - 仓库管理 - 列表
+const warehouseList = (params) => {
+    return fetch({
+      url: 'ticking/warehouse-management',
+      method: 'GET',
+      params: params
+    })
+  }
+  
+  // 防串货 - 仓库管理 - 添加
+  const warehouseAddList = (params) => {
+    return fetch({
+      url: 'ticking/warehouse-management',
+      method: 'POST',
+      data: params
+    })
+  }
+  
+  // 防串货 - 仓库管理 - 详情
+  const warehouseDetails = (id) => {
+    return fetch({
+      url: `ticking/warehouse-management/${id}`,
+      method: 'GET'
+    })
+  }
+  
+  // 防串货 - 仓库管理 - 删除
+  const warehouseDelete = (params) => {
+    return fetch({
+      url: `ticking/warehouse-management/${params.id}`,
+      method: 'GET',
+      data:params
+    })
+  }
+  
+  // 防串货 - 仓库管理 - 编辑
+  const warehouseEdit = (params) => {
+    return fetch({
+      url: `ticking/warehouse-management/${params.id}`,
+      method: 'PATCH',
+      data:params
+    })
+  }
+  
+  // 防串货 - 仓库管理 - 负责人查询
+  const warehouseNameSelect = (params) => {
+    return fetch({
+      url: 'uac/users',
+      method: 'GET',
+      params:params
+    })
+  }
 
 //账号管理 - 修改
 const accountNumberEdit = (params) => {
@@ -259,5 +310,12 @@ export default {
     editOrderManagement,
     deleteOrderManagement,
     detailsOrderManagement,
-    searchOrderManagement
+    searchOrderManagement,
+    warehouseList,
+    warehouseAddList,
+    warehouseDetails,
+    warehouseDelete,
+    warehouseEdit,
+    warehouseNameSelect
+
 }

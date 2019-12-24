@@ -15,24 +15,27 @@ shell_lock(){
 }
 
 
-hell_unlock(){
+shell_unlock(){
     rm -f deploy.lock
     echo "解锁完成"
 }
 
-npm(){ # composer和前端依赖代码更新依赖
-   echo "下载yarn依赖"
-   /usr/bin/yarn install
-   echo "更新build操作"
-#   /usr/bin/yarn build
-#    /usr/bin/npm run build
+npm(){ # 本地下载依赖
+    echo "下载yarn依赖"
+    /usr/bin/yarn install
+    if [ $? -ne 0 ]
+    then
+      echo "下载依赖出错"
+      shell_unlock
+      exit 123
+    fi
 }
 
 if_judge(){ # 判断上个函数执行结果
      if [ $? -ne 0 ]
      then
         echo "更新有错误"
-        hell_unlock
+        shell_unlock
         exit 123
      fi
 }
@@ -50,14 +53,14 @@ if [ $? -ne 0 ]
 }
    
 deploy(){ # 同步远程主机
-     #ssh $leave "cd $release_dir && ls -t | head -1 | xargs -i cp -rf {} $release"
-     rsync -azvtruP --delete ./* $leave:$release 1>/dev/null 2>/dev/null
-#     ssh $leave "cd $release && pm2 restart dingtalk-lark.fandow.com"
-   if [ $? -ne 0 ]
-   then
-      ssh $leave "rm -rf $release"
-      hell_unlock
-      exit 123
-   fi
-
+  echo "开始同步" 
+  rsync -azvtruP --delete ./* $leave:$release 1> /dev/null
+  if [ $? -ne 0 ];
+  then
+    echo "远程同步失败"
+    ssh $leave "rm -rf $release"
+    shell_unlock
+    exit 123
+  fi
 }
+
