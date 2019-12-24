@@ -2,13 +2,13 @@
   <div class="code-management">
     <Row class="search-form">
       <Col :md="12">
-        <Input v-model="searchData.securityCode" placeholder="箱码" style="width:150px" clearable @on-enter="getList('search')"/>
-        <Input v-model="searchData.securityCode" placeholder="订单编号" style="width:150px" clearable @on-enter="getList('search')"/>
+        <Input v-model="searchData.boxCode" placeholder="箱码" style="width:150px" clearable @on-enter="getList('search')"/>
+        <Input v-model="searchData.orderNumber" placeholder="订单编号" style="width:150px" clearable @on-enter="getList('search')"/>
         <Button type="primary" icon="ios-search" @click="getList('search')">查询</Button>
       </Col>
     </Row>
     <Row class="margin-top-10">
-      <Table :columns="listData.columns" :data="listData.data" size="small" border highlight-row :loading="listData.loading"></Table>
+      <Table :columns="listData.columns" :data="listData.data" size="small" border highlight-row :loading="loadingTable"></Table>
       <div style="margin: 10px;overflow: hidden">
         <div class="pages-L">共 {{pageProps.totalCount}} 条</div>
         <div style="float: right;">
@@ -37,16 +37,17 @@
   export default {
     data () {
       return {
+        loadingTable: false,
         searchData: {
-          securityCode: '',
-          type: ''
+          orderNumber: '',
+          boxCode: ''
         },
         listData: {
           columns: [
             {key: 'index', type: 'index', title: '序号', maxWidth: 120, align: 'center'},
-            {key: 'securityCode', title: '箱码', align: 'center'},
+            {key: 'boxCode', title: '箱码', align: 'center'},
             {
-              key: 'serialCode',
+              key: 'count',
               title: '关联产品（件）',
               align: 'center',
               render: (h, params) => {
@@ -57,14 +58,14 @@
                     },
                     on: {
                       'click': () => {
-                        this.$router.push({path: 'product-code-query'})
+                        //this.$router.push({path: 'product-code-query'})
                       }
                     
                   }
-                }, '12')
+                }, params.row.count)
               }
             },
-            {key: 'securityCode', title: '订单编号', align: 'center'},
+            {key: 'orderNumber', title: '订单编号', align: 'center'},
             {
               key: 'securityCodeLink',
               title: '物流信息',
@@ -79,7 +80,8 @@
                 }, [ h('Button', {
                     props: {
                       type: 'primary',
-                      icon: 'md-search'
+                      icon: 'md-search',
+                      disabled: true
                     },
                     on: {
                       'click': () => {
@@ -91,7 +93,7 @@
               }
             }
           ],
-          data: [{serialCode: 'sd'}]
+          data: []
         },
         logisticsData: {
           modal: false,
@@ -100,7 +102,7 @@
             {key: 'securityCode', title: '类型', maxWidth: 80,align: 'center'},
             {key: 'securityCode', title: '内容', align: 'center'}
           ],
-          data: [{time: '2019-10-20', securityCode: '发货'}]
+          data: []
         },
         pageProps: { // 列表分页属性
           page: 1,
@@ -110,22 +112,35 @@
       }
     },
     mounted() {
-      //this.getList()
+      this.getList()
     },
     methods:{
       changePage (e) {
         this.pageProps.page = e
-        //this.getList();
+        this.getList();
       },
       changePageSize (e) {
         this.pageProps.perPage = e
-        //this.getList();
+        this.getList();
       },
       // 查询数据
-      getList () {
+      getList (type) {
+        if(type == 'search'){
+          this.pageProps.page = 1
+          this.pageProps.perPage = 10
+        }
         let params = this.searchData
         params.page = this.pageProps.page
         params.perPage = this.pageProps.perPage
+        this.loadingTable = true
+        this.$API.boxCodeList(params).then((res) => {
+          if(res.code == 0){
+            this.listData.data = res.data.data
+            this.pageProps.totalCount = res.data.count
+          }
+        }).finally(() => {
+          this.loadingTable = false
+        })
       }
     }
   }
