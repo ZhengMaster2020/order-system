@@ -50,35 +50,39 @@
     </Row>
     <Modal
       v-model="createModal"
-      title="生成箱码">
-      <Form ref="createForm" :model="formData" :rules="rules">
-        <FormItem label="标题：" style="padding-left: 2em;" prop="title">
-          <Input style="width: 70%;" v-model="formData.title" placeholder="箱码标题"></Input>
-        </FormItem>
-        <FormItem label="生成数量：" prop="generationCount">
-          <InputNumber :precision="0" v-model="formData.generationCount" placeholder="箱码数量"></InputNumber>
-        </FormItem>
-        <FormItem label="归属订单：" prop="relation">
-          <RadioGroup v-model="formData.relation">
-            <Radio label="after">后关联</Radio>
-            <Radio label="before">前关联</Radio>
-          </RadioGroup>
-        </FormItem>
-        <FormItem v-if="formData.relation === 'before'" label="　　　　　　">
-          <Select
-            style="width: 70%;"
-            v-model="formData.orderId"
-            filterable
-            remote
-            :remote-method="serachOrder"
-            :loading="searchLoading"
-            placeholder="订单编号">
-            <Option v-for="(option, index) in searchList" :value="option.id" :key="index">{{option.orderNumber}}</Option>
-          </Select>
-        </FormItem>
-      </Form>
-      <div class="footer" style="t: right;" slot="footer">
-        <Button @click="createModal = false">取消</Button>
+      title="生成箱码"
+      @on-cancel="resetModal('createForm')"
+    >
+      <div style="padding: 0 20px 0 50px">
+        <Form ref="createForm" :model="formData" :rules="rules">
+          <FormItem label="标题：" style="padding-left: 2em;" prop="title">
+            <Input style="width: 70%;" v-model="formData.title" placeholder="箱码标题"></Input>
+          </FormItem>
+          <FormItem label="生成数量：" prop="generationCount">
+            <InputNumber :min="0" :precision="0" v-model="formData.generationCount" placeholder="箱码数量"></InputNumber>
+          </FormItem>
+          <FormItem label="归属订单：" prop="relation">
+            <RadioGroup v-model="formData.relation">
+              <Radio label="after">后关联</Radio>
+              <Radio label="before">前关联</Radio>
+            </RadioGroup>
+          </FormItem>
+          <FormItem v-if="formData.relation === 'before'" label="　　　　　　">
+            <Select
+              style="width: 70%;"
+              v-model="formData.orderId"
+              filterable
+              remote
+              :remote-method="serachOrder"
+              :loading="searchLoading"
+              placeholder="订单编号">
+              <Option v-for="(option, index) in searchList" :value="option.id" :key="index">{{option.orderNumber}}</Option>
+            </Select>
+          </FormItem>
+        </Form>
+      </div>
+      <div class="footer" slot="footer">
+        <Button @click="resetModal('createForm')">取消</Button>
         <Button type="primary" @click="submit" :loading="btnLoading">确定</Button>
       </div>
     </Modal>
@@ -225,6 +229,8 @@
               if (this.formData.relation === 'before' && !this.formData.orderId) {
                 this.$Message.warning('前关联必须填写订单')
                 return;
+              } else if(this.formData.relation === 'after'){
+                delete this.formData.orderId
               }
               this.btnLoading = true;
               this.$API.boxCodeCreate(this.formData).then((res) => {
@@ -237,9 +243,11 @@
                     generationCount: 0,
                     relation: 'after',
                     orderId: ''
-                   }
+                  }
                   this.getList();
                 }
+              }).finally(()=>{
+                this.btnLoading = false
               })
           } else {
               this.$Message.warning('请验证表单信息')
@@ -254,6 +262,11 @@
           this.searchLoading = false;
           this.searchList = res.data
         })
+      },
+      // 关闭弹窗
+      resetModal (name) {
+        this.$refs[name].resetFields();
+        this.createModal = false
       }
     }
   }
