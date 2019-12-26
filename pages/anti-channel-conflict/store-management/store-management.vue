@@ -32,8 +32,8 @@
             <Input v-model="addData.data.warehouseName" clearable/>
           </FormItem>
           <FormItem label="负责人：" prop="personInCharge">
-            <!-- <Input v-model="addData.data.personInCharge" clearable :on-change="personInCharge()"/> -->
-            <Select
+            <Input v-model="addData.data.personInCharge" clearable :on-change="personInCharge()"/>
+            <!-- <Select
                 v-model="addData.data.personInCharge"
                 filterable
                 remote
@@ -41,7 +41,7 @@
                 clearable
                 >
                 <Option v-for="(option, index) in userList"  :value="option.username" :key="'user'+option.id">{{option.realName}}</Option>
-            </Select>
+            </Select> -->
           </FormItem>
           <FormItem label="所在地址：" prop="warehouseAddress">
             <Input v-model="addData.data.warehouseAddress" clearable/>
