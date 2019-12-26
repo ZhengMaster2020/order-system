@@ -4,6 +4,7 @@ import Cookies from 'js-cookie'
 import iView, { Notice } from 'iview'
 // import { router } from 'vue-router'
 import { SERVER_BASE_URL } from './config'
+
 Vue.use(iView)
 
 export default function fetch(options) {
@@ -27,20 +28,20 @@ export default function fetch(options) {
     )
 
     // http response 拦截器
-    instance.interceptors.response.use(
-      (response) => {
-        return response
-      },
-      (error) => {
-        Notice.error({
-          title: '出错了！',
-          desc: '错误原因 ' + JSON.stringify(error),
-          duration: 0
-        })
-        iView.LoadingBar.error()
-        return Promise.reject(error) // 返回接口返回的错误信息
-      }
-    )
+    // instance.interceptors.response.use(
+    //   (response) => {
+    //     return response
+    //   },
+    //   (error) => {
+    //     Notice.error({
+    //       title: '出错了！',
+    //       desc: '错误原因 ' + JSON.stringify(error),
+    //       duration: 0
+    //     })
+    //     iView.LoadingBar.error()
+    //     return Promise.reject(error) // 返回接口返回的错误信息
+    //   }
+    // )
 
     // 请求处理
     instance(options)
@@ -74,38 +75,44 @@ export default function fetch(options) {
       .catch((error) => {
         const response = error.response
         const data = response.data
-
+        Notice.error({
+          title: data.msg,
+          desc: '错误代码：' + data.code,
+          duration: 1.5
+        })
+        reject(error)
+        
         // 401无效token
-        if (data && data.status && data.status === 401) {
+        if (data && data.code === 401) {
           // 退出登录
           Notice.error({
             title: '登录信息失效，请重新登录！',
             desc: '错误代码：401'
           })
           setTimeout(() => {
-            // router.push({ path: '/home' })
+            location.href = 'login'
           }, 2000)
           reject(error)
           return false
         }
 
         // 403无权限操作
-        if (data && data.status && data.status === 403) {
+        if (data && data.code === 403) {
           Notice.error({
             title: '您没有权限操作',
-            desc: '错误代码：' + data.status,
-            duration: 0
+            desc: '错误代码：' + data.code,
+            duration: 1.5
           })
           reject(error)
           return false
         }
 
-        // 请求失败时,根据业务判断状态
-        Notice.error({
-          title: '出错了！',
-          desc: '错误原因 ' + JSON.stringify(response),
-          duration: 0
-        })
+        // // 请求失败时,根据业务判断状态
+        // Notice.error({
+        //   title: '出错了！',
+        //   desc: '错误原因 ' + JSON.stringify(response),
+        //   duration: 0
+        // })
         reject(error)
       })
   })
