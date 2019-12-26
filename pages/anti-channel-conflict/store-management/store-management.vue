@@ -27,24 +27,15 @@
       :styles="{top: '50%',marginTop: '-250px'}"
     >
       <div style="padding: 0 75px 0 50px">
-        <Form ref="addData.data" :model="addData.data" :rules="addDataRule" label-position="right" :label-width="100">
+        <Form ref="addData.data" :model="addData" :rules="addDataRule" label-position="right" :label-width="100">
           <FormItem label="仓库名称：" prop="warehouseName">
-            <Input v-model="addData.data.warehouseName" clearable/>
+            <Input v-model="addData.warehouseName" clearable/>
           </FormItem>
           <FormItem label="负责人：" prop="personInCharge">
-            <Input v-model="addData.data.personInCharge" clearable :on-change="personInCharge()"/>
-            <!-- <Select
-                v-model="addData.data.personInCharge"
-                filterable
-                remote
-                :remote-method="personInCharge"
-                clearable
-                >
-                <Option v-for="(option, index) in userList"  :value="option.username" :key="'user'+option.id">{{option.realName}}</Option>
-            </Select> -->
+            <Input v-model="addData.personInCharge" clearable/>
           </FormItem>
           <FormItem label="所在地址：" prop="warehouseAddress">
-            <Input v-model="addData.data.warehouseAddress" clearable/>
+            <Input v-model="addData.warehouseAddress" clearable/>
           </FormItem>
         </Form> 
       </div>   
@@ -169,13 +160,7 @@
           loading: false,
           modal: false,
           modalType: '',
-          data: {
-            id: '',
-            personInChargeId:'',
-            warehouseName: '',
-            warehouseAddress: '',
-            personInCharge: ''
-          }
+          data: {}
         },
         addDataRule: {
           warehouseName: [
@@ -226,18 +211,14 @@
       handleSubmit (name) {
         this.$refs[name].validate((valid) => {
             if (valid) {
-              let params = {
-                warehouseName:this.addData.data.warehouseName,
-                warehouseAddress:this.addData.data.warehouseAddress,
-                personInCharge:this.addData.data.personInCharge
-              }
+              let params = this.addData
+              // return;
               if (this.addData.id) {
-                params.personInChargeId = this.addData.data.personInChargeId
                 this.$API.warehouseEdit(params)
                   .then((res) => {
                     this.addData.data = res.data.data;
                     this.$Message.success('编辑成功');
-                    addData.modal = false;
+                    this.addData.modal = false;
                     this.getList();
                   })
               }else {
@@ -247,7 +228,7 @@
                     this.addData.data = res.data.data;
                     console.log(res.data.data);
                     this.$Message.success('添加成功');
-                    addData.modal = false;
+                    this.addData.modal = false;
                     this.getList();
                 })
               }
@@ -271,14 +252,14 @@
         this.addData.modalType = type
       },
       //远程搜索负责人名称
-      personInCharge  (value) {
-        let username = value;
-        this.$API.warehouseNameSelect({username:username})
-          .then( (res) => {
-            this.userList = res.data.data;
+      // personInCharge  (value) {
+      //   let username = value;
+      //   this.$API.warehouseNameSelect({username:username})
+      //     .then( (res) => {
+      //       this.userList = res.data.data;
             
-          })
-      }
+      //     })
+      // }
     }
   }
 </script>
