@@ -153,13 +153,14 @@
             </Select>
           </template>
         </FormItem>
-        <FormItem label="收货方：" prop="consignee" :label-width="100">
+        <FormItem label="收货方：" prop="consignee" :label-width="100" >
           <template>
             <div v-for="(d, index) in orderData.consignee" :key="index">
               <template>
                 <Row>
-                  <Select v-model="d.consigneeType" clearable style="width:30%">
+                  <Select v-model="d.consigneeType" clearable style="width:30%" @on-change="()=>{clearName(index)}">
                     <Option
+
                       v-for="item in consigneeTypeList"
                       :value="item.value"
                       :key="item.value"
@@ -169,13 +170,14 @@
                     v-if="d.consigneeType=='自定义'"
                     v-model="d.consigneeName"
                     placeholder="输入收货方名称"
+
                     clearable
-                    style="width: 60%"
+                    style="width: 59%"
                   ></Input>
                   <Select
                     v-else
                     @on-change="getAddress(d.consigneeName, d)"
-                    style="width:60%"
+                    style="width:59%"
                     v-model="d.consigneeName"
                     filterable
                     remote
@@ -196,7 +198,7 @@
                   <Button
                     v-if="index > 0"
                     style="background: #F56C6C; width:29px;"
-                    @click="delButton"
+                    @click="delButton(index)"
                   >-</Button>
                 </Row>
               </template>
@@ -276,23 +278,12 @@
             </Select>
           </template>
         </FormItem>
-        <FormItem label="规格：" prop="specification" :label-width="100">
-          <template>
-            <Select v-model="orderData.specification" clearable style="width:100%">
-              <Option
-                v-for="item in specificationList"
-                :value="item.value"
-                :key="item.value"
-              >{{ item.label }}</Option>
-            </Select>
-          </template>
-        </FormItem>
         <FormItem label="收货方：" prop="consignee" :label-width="100">
           <template>
             <div v-for="(d, index) in orderData.consignee" :key="index">
               <template>
                 <Row>
-                  <Select v-model="d.consigneeType" clearable style="width:30%">
+                  <Select v-model="d.consigneeType" clearable style="width:30%"  @on-change="()=>{clearName(index)}">
                     <Option
                       v-for="item in consigneeTypeList"
                       :value="item.value"
@@ -304,7 +295,7 @@
                     v-model="d.consigneeName"
                     placeholder="输入收货方名称"
                     clearable
-                    style="width: 60%"
+                    style="width: 59%"
                   ></Input>
                   <Select
                     v-else
@@ -330,7 +321,7 @@
                   <Button
                     v-if="index > 0"
                     style="background: #F56C6C; width:29px;"
-                    @click="delButton"
+                    @click="delButton(index)"
                   >-</Button>
                 </Row>
               </template>
@@ -369,6 +360,7 @@
   </div>
 </template>
 <script>
+import { jsxClosingElement } from '@babel/types';
 export default {
   data() {
     return {
@@ -568,13 +560,12 @@ export default {
     addButton() {
       this.orderData.consignee.push({});
     },
-    delButton() {
-      this.orderData.consignee.pop({});
+    delButton(index) {
+      this.orderData.consignee.splice(index,1)
     },
 
     //模糊搜索
     remoteMethod1(query, type, listKey) {
-      console.log("搜索", query);
       if (query !== "") {
         this.loading1 = true;
         if (type == "合作商") {
@@ -586,13 +577,10 @@ export default {
         } else if (type == "所属工厂") {
           type = "factory";
         }
-        console.log(type, query);
         if(type == "partner" || type == "warehouse" || type == "product_name" || type == "factory"){
           this.$API
           .searchOrderManagement({ type: type, searchName: query })
           .then(res => {
-            console.log("this is search");
-            console.log(res);
             this.loading1 = false;
             this[listKey] = res;
           });
@@ -605,8 +593,7 @@ export default {
     getAddress(addressName, d) {
       for (var i = 0; i < this.list.length; i++) {
         if (this.list[i].name == addressName) {
-          /* console.log(this.list[i].address) */
-          d.consigneeAddress = this.list[i].address; 
+          d.consigneeAddress = this.list[i].address;
         }
       }
     },
@@ -620,21 +607,22 @@ export default {
       this.orderData.productName = "";
       this.orderData.factory = "";
       this.orderData.specification = "";
-      this.orderData.consignee = [{ consigneeType: "" }];
+      this.orderData.consignee = [
+        {
+          consigneeAddress: "",
+          consigneeName: "",
+          consigneeType: ""
+          }
+        ];
     },
     // 确认添加
     confirmAdd(required) {
-      console.log("this is confirmAdd");
       this.handleSubmit(required);
       this.orderData.info = this.orderData.consignee;
       this.orderData.deletedAt = "未撤单";
       let params = this.orderData;
-      console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-      console.log(params);
       if (this.isNo === false) {
         this.$API.addOrderManagement(params).then(res => {
-          console.log("this is res");
-          console.log(res);
           if (res.code === 0) {
             this.orderAddStatus = false;
             this.$Message.success("提交成功");
@@ -653,13 +641,11 @@ export default {
       this.getList();
     },
 
-    //获取订单信息详情 
+    //获取订单信息详情
     handleEdit(index, row) {
-      console.log(row);
       this.orderEditStatus = true;
       this.$API.detailsOrderManagement(row.id).then(res => {
         if (res.code === 0) {
-          /* console.log(res.data); */
           res.data.orderCount += "";
           this.orderData = res.data;
         }
@@ -668,7 +654,6 @@ export default {
 
     //订单信息编辑 - 确认编辑
     confirmEdit(required) {
-      console.log("confirm edit");
       this.handleSubmit(required);
       this.isdisabled = false;
       let params = {
@@ -681,13 +666,11 @@ export default {
         detailInfo: JSON.parse(JSON.stringify(this.orderData.consignee))
       };
       for (var i = 0; i < params.detailInfo.length; i++) {
-        console.log(params.orderCount, "rewrewqrqwrwrwqr");
         if (params.detailInfo[i].consigneeType == "合作商") {
           params.detailInfo[i].consigneeType = "partner";
         } else if (params.detailInfo[i].consigneeType == "仓库") {
           params.detailInfo[i].consigneeType = "warehouse";
         } else if (params.detailInfo[i].consigneeType == "自定义") {
-          console.log(i);
           params.detailInfo[i].consigneeType = "customize";
         }
       }
@@ -717,11 +700,9 @@ export default {
     },
     //订单信息删除
     handleDelete(index, row) {
-      console.log("this is del");
       //删除对应id的内容
       if (confirm("确实要删除吗？")) {
         this.$API.deleteOrderManagement(row.id).then(res => {
-          console.log("this is deleteOrderManagement");
           if (res.code === undefined || res.code === 0) {
             this.$Message.success("撤单成功!");
             this.getList();
@@ -738,7 +719,6 @@ export default {
     handleSubmit(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          /* this.$Message.success("提交成功"); */
           this.isNo = false;
           this.orderAddStatus = false;
           this.orderEditStatus = false;
@@ -753,10 +733,8 @@ export default {
 
     //查看收货方信息
     handleConsignee(index, row) {
-      console.log("this is handleConsignee");
       this.orderConsigneeStatus = true;
       this.$API.detailsOrderManagement(row.id).then(res => {
-        console.log(res);
         if (res.code === 0) {
           this.conData.consignee = res.data.consignee;
         }
@@ -782,7 +760,6 @@ export default {
         .then(res => {
           this.loading = true;
           if (res.code === 0) {
-            console.log(res.data);
             this.listData.data = res.data.data;
             this.pageProps.perPage = res.data.perPage;
             this.pageProps.page = res.data.page;
@@ -792,7 +769,13 @@ export default {
         .finally(() => {
           this.loading = false;
         });
-    }
+    },
+     clearName(index){
+      this.orderData.consignee[index].consigneeName = ''
+      this.orderData.consignee[index].consigneeAddress = ''
+      this.list = []
+
+      }
   }
 };
 </script>

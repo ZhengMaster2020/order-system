@@ -205,6 +205,14 @@
     mounted() {
       this.getList()
     },
+    watch: {
+      'addData.data.accountType': function(newVal, oldVal){
+      if(!!oldVal){
+        this.addData.data.accountTypeName = ''
+        this.accountList.length = 0
+        }
+      }
+    },
     methods:{
       changePage (e) {
         this.pageProps.page = e
