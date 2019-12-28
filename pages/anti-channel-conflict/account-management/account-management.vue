@@ -43,7 +43,7 @@
             <Input v-model="addData.data.accountTelephone" clearable number/>
           </FormItem>
           <FormItem label="账号类型：" prop="accountType">
-            <Select v-model="addData.data.accountType" placeholder="请选择账号类型，再搜索" @on-change="clearName">
+            <Select v-model="addData.data.accountType" placeholder="请选择账号类型，再搜索">
               <Option v-for="item in typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
           </FormItem>
@@ -207,10 +207,9 @@
     },
     watch: {
       'addData.data.accountType': function(newVal, oldVal){
-      console.log("TCL: oldVal", oldVal)
-      console.log("TCL: newVal", newVal)
       if(!!oldVal){
         this.addData.data.accountTypeName = ''
+        this.accountList.length = 0
         }
       }
     },
@@ -342,11 +341,6 @@
           if(typeAccount!=''){
             return  `${typeAccount}:${name}`
           }
-      },
-      // 类型改变清空名字
-      clearName(e){
-      console.log("TCL: clearName -> e", e)
-        
       }
     }
   }

@@ -35,7 +35,7 @@
     <Row style="padding-top: 20px;">
       <Table :loading="tableLoading" :columns="column" border :data="tableData">
         <template slot='action' slot-scope="{row, index}" >
-          <a v-if="row.fileItems.length" target="_blank" :href="row.fileItems[0].url">下载表格</a>
+          <a v-if="row.fileItems.length" target="_blank" :href="row.fileItems[0].uri">下载表格</a>
           <div v-if="!row.fileItems.length" style="color: #ccc; cursor:no-drop;">下载表格</div>
         </template>
       </Table>
@@ -237,7 +237,6 @@
                 if(res.code === 0) {
                   this.$Message.success('添加成功')
                   this.createModal = false;
-                  this.btnLoading = false;
                   this.formData = {
                     title: '',
                     generationCount: 0,
