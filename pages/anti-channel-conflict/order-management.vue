@@ -109,37 +109,37 @@
           <Input v-model="orderData.productName" clearable></Input>
         </FormItem>-->
         <FormItem label="产品名称：" prop="productName" :label-width="100">
-              <Select
-                style="width:100%"
-                v-model="orderData.productName"
-                filterable
-                remote
-                :remote-method="(query) => { remoteMethod1(query, '产品名称', 'list1') }"
-                :loading="loading1"
-              >
-                <Option
-                  v-for="(option, index) in list1"
-                  :value="option.name"
-                  :key="index"
-                >{{option.name}}</Option>
-              </Select>
+          <Select
+            style="width:100%"
+            v-model="orderData.productName"
+            filterable
+            remote
+            :remote-method="(query) => { remoteMethod1(query, '产品名称', 'list1') }"
+            :loading="loading1"
+          >
+            <Option
+              v-for="(option, index) in list1"
+              :value="option.name"
+              :key="index"
+            >{{option.name}}</Option>
+          </Select>
         </FormItem>
         <FormItem label="所属加工厂" prop="factory" :label-width="100">
           <template>
-              <Select
-                style="width:100%"
-                v-model="orderData.factory"
-                filterable
-                remote
-                :remote-method="(query) => { remoteMethod1(query, '所属工厂', 'list2') }"
-                :loading="loading1"
-              >
-                <Option
-                  v-for="(option, index) in list2"
-                  :value="option.name"
-                  :key="index"
-                >{{option.name}}</Option>
-              </Select>
+            <Select
+              style="width:100%"
+              v-model="orderData.factory"
+              filterable
+              remote
+              :remote-method="(query) => { remoteMethod1(query, '所属工厂', 'list2') }"
+              :loading="loading1"
+            >
+              <Option
+                v-for="(option, index) in list2"
+                :value="option.name"
+                :key="index"
+              >{{option.name}}</Option>
+            </Select>
           </template>
         </FormItem>
         <FormItem label="规格：" prop="specification" :label-width="100">
@@ -153,14 +153,18 @@
             </Select>
           </template>
         </FormItem>
-        <FormItem label="收货方：" prop="consignee" :label-width="100" >
+        <FormItem required :error="errorText" label="收货方：" prop="consignee" :label-width="100">
           <template>
             <div v-for="(d, index) in orderData.consignee" :key="index">
               <template>
                 <Row>
-                  <Select v-model="d.consigneeType" clearable style="width:30%" @on-change="()=>{clearName(index)}">
+                  <Select
+                    v-model="d.consigneeType"
+                    clearable
+                    style="width:30%"
+                    @on-change="()=>{clearName(index)}"
+                  >
                     <Option
-
                       v-for="item in consigneeTypeList"
                       :value="item.value"
                       :key="item.value"
@@ -170,7 +174,6 @@
                     v-if="d.consigneeType=='自定义'"
                     v-model="d.consigneeName"
                     placeholder="输入收货方名称"
-
                     clearable
                     style="width: 59%"
                   ></Input>
@@ -234,37 +237,37 @@
           <Input v-model="orderData.orderCount" clearable></Input>
         </FormItem>
         <FormItem label="产品名称：" prop="productName" :label-width="100">
-              <Select
-                style="width:100%"
-                v-model="orderData.productName"
-                filterable
-                remote
-                :remote-method="(query) => { remoteMethod1(query, '产品名称', 'list1') }"
-                :loading="loading1"
-              >
-                <Option
-                  v-for="(option, index) in list1"
-                  :value="option.name"
-                  :key="index"
-                >{{option.name}}</Option>
-              </Select>
+          <Select
+            style="width:100%"
+            v-model="orderData.productName"
+            filterable
+            remote
+            :remote-method="(query) => { remoteMethod1(query, '产品名称', 'list1') }"
+            :loading="loading1"
+          >
+            <Option
+              v-for="(option, index) in list1"
+              :value="option.name"
+              :key="index"
+            >{{option.name}}</Option>
+          </Select>
         </FormItem>
         <FormItem label="所属加工厂" prop="factory" :label-width="100">
           <template>
-              <Select
-                style="width:100%"
-                v-model="orderData.factory"
-                filterable
-                remote
-                :remote-method="(query) => { remoteMethod1(query, '所属工厂', 'list2') }"
-                :loading="loading1"
-              >
-                <Option
-                  v-for="(option, index) in list2"
-                  :value="option.name"
-                  :key="index"
-                >{{option.name}}</Option>
-              </Select>
+            <Select
+              style="width:100%"
+              v-model="orderData.factory"
+              filterable
+              remote
+              :remote-method="(query) => { remoteMethod1(query, '所属工厂', 'list2') }"
+              :loading="loading1"
+            >
+              <Option
+                v-for="(option, index) in list2"
+                :value="option.name"
+                :key="index"
+              >{{option.name}}</Option>
+            </Select>
           </template>
         </FormItem>
         <FormItem label="规格：" prop="specification" :label-width="100">
@@ -278,12 +281,17 @@
             </Select>
           </template>
         </FormItem>
-        <FormItem label="收货方：" prop="consignee" :label-width="100">
+        <FormItem required :error="errorText" label="收货方：" prop="consignee" :label-width="100">
           <template>
             <div v-for="(d, index) in orderData.consignee" :key="index">
               <template>
                 <Row>
-                  <Select v-model="d.consigneeType" clearable style="width:30%"  @on-change="()=>{clearName(index)}">
+                  <Select
+                    v-model="d.consigneeType"
+                    clearable
+                    style="width:30%"
+                    @on-change="()=>{clearName(index)}"
+                  >
                     <Option
                       v-for="item in consigneeTypeList"
                       :value="item.value"
@@ -360,7 +368,7 @@
   </div>
 </template>
 <script>
-import { jsxClosingElement } from '@babel/types';
+import { jsxClosingElement } from "@babel/types";
 export default {
   data() {
     return {
@@ -427,7 +435,7 @@ export default {
       ],
       OrderRule: {
         productName: [
-          { required: true, message: "产品名称不能为空", trigger: "blur" }
+          { required: true, message: "产品名称不能为空", trigger: "change" }
         ],
         orderNumber: [
           { required: true, message: "订单编号不能为空", trigger: "blur" }
@@ -436,30 +444,33 @@ export default {
           { required: true, message: "产品数量不能为空", trigger: "blur" }
         ],
         factory: [
-          { required: true, message: "加工厂不能为空", trigger: "blur" }
+          { required: true, message: "加工厂不能为空", trigger: "change" }
         ],
         specification: [
-          { required: true, message: "规格不能为空", trigger: "blur" }
-        ],
-        info: [{ required: true, message: "收货方信息不完整", trigger: "blur" }]
+          { required: true, message: "规格不能为空", trigger: "change" }
+        ]/* ,
+        consignee: [{ message: "收货方信息不完整", trigger: "change" }] */
       },
       OrderRule2: {
         productName: [
-          { required: true, message: "产品名称不能为空", trigger: "blur" }
+          { required: true, message: "产品名称不能为空", trigger: "change" }
+        ],
+        orderNumber: [
+          { required: true, message: "订单编号不能为空", trigger: "blur" }
         ],
 
         orderCount: [
           { required: true, message: "产品数量不能为空", trigger: "blur" }
         ],
         factory: [
-          { required: true, message: "加工厂不能为空", trigger: "blur" }
+          { required: true, message: "加工厂不能为空", trigger: "change" }
         ],
         specification: [
-          { required: true, message: "规格不能为空", trigger: "blur" }
-        ],
-        detailInfo: [
-          { required: true, message: "收货方信息填写不完整", trigger: "blur" }
+          { required: true, message: "规格不能为空", trigger: "change" }
         ]
+        /* detailInfo: [
+          { required: true, message: "收货方信息填写不完整", trigger: "change" }
+        ] */
       },
       searchData: {
         orderNumber: "",
@@ -550,7 +561,8 @@ export default {
         perPage: 10,
         currentPage: 1,
         totalCount: 0
-      }
+      },
+      errorText: ""
     };
   },
   mounted() {
@@ -561,7 +573,7 @@ export default {
       this.orderData.consignee.push({});
     },
     delButton(index) {
-      this.orderData.consignee.splice(index,1)
+      this.orderData.consignee.splice(index, 1);
     },
 
     //模糊搜索
@@ -577,13 +589,18 @@ export default {
         } else if (type == "所属工厂") {
           type = "factory";
         }
-        if(type == "partner" || type == "warehouse" || type == "product_name" || type == "factory"){
+        if (
+          type == "partner" ||
+          type == "warehouse" ||
+          type == "product_name" ||
+          type == "factory"
+        ) {
           this.$API
-          .searchOrderManagement({ type: type, searchName: query })
-          .then(res => {
-            this.loading1 = false;
-            this[listKey] = res;
-          });
+            .searchOrderManagement({ type: type, searchName: query })
+            .then(res => {
+              this.loading1 = false;
+              this[listKey] = res;
+            });
         } else {
           this.$Message.error("请选择收货方类型");
         }
@@ -602,24 +619,52 @@ export default {
     addOrder() {
       this.orderAddStatus = true;
       this.isdisabled = false;
-      this.orderData.orderNumber = "";
-      this.orderData.orderCount = "";
-      this.orderData.productName = "";
-      this.orderData.factory = "";
-      this.orderData.specification = "";
-      this.orderData.consignee = [
-        {
-          consigneeAddress: "",
-          consigneeName: "",
-          consigneeType: ""
+      this.orderData = {
+        specification: "",
+        orderNumber: "",
+        orderCount: "",
+        productName: "",
+        factory: "",
+        deletedAt: "",
+        info: [],
+        detailInfo: [],
+        consignee: [
+          {
+            consigneeType: "",
+            consigneeName: "",
+            consigneeAddress: ""
           }
-        ];
+        ]
+      };
+      this.$refs.orderData1.resetFields();
+      console.log(this.orderData.consignee);
     },
     // 确认添加
     confirmAdd(required) {
       this.handleSubmit(required);
+      console.log(this.orderData.consignee);
+
       this.orderData.info = this.orderData.consignee;
       this.orderData.deletedAt = "未撤单";
+      let isError = false
+      for (var i = 0; i < this.orderData.consignee.length; i++) {
+        if (
+          this.orderData.consignee[i].consigneeType == "" ||
+          this.orderData.consignee[i].consigneeName == "" ||
+          this.orderData.consignee[i].consigneeAddress == ""
+        ) {
+          isError = true
+        }
+      }
+      if (isError) {
+        this.isNo = true;
+        this.errorText = "收货方信息不完整";
+        this.orderAddStatus = true;
+      } else {
+        this.isNo = false;
+        this.errorText = "";
+        this.orderAddStatus = false;
+      }
       let params = this.orderData;
       if (this.isNo === false) {
         this.$API.addOrderManagement(params).then(res => {
@@ -656,6 +701,29 @@ export default {
     confirmEdit(required) {
       this.handleSubmit(required);
       this.isdisabled = false;
+
+      let isError = false
+      for (var i = 0; i < this.orderData.consignee.length; i++) {
+        console.log(this.orderData.consignee);
+
+        if (
+          this.orderData.consignee[i].consigneeType == "" ||
+          this.orderData.consignee[i].consigneeName == "" ||
+          this.orderData.consignee[i].consigneeAddress == ""
+        ) {
+          isError = true
+        }
+      }
+      if (isError) {
+        this.isNo = true;
+        this.errorText = "收货方信息不完整";
+        this.orderEditStatus = true;
+      } else {
+        this.isNo = false;
+        this.errorText = "";
+        this.orderEditStatus = false;
+      }
+
       let params = {
         id: this.orderData.id,
         productName: this.orderData.productName,
@@ -666,6 +734,9 @@ export default {
         detailInfo: JSON.parse(JSON.stringify(this.orderData.consignee))
       };
       for (var i = 0; i < params.detailInfo.length; i++) {
+        params.detailInfo[i].order_management_id = this.orderData.id
+        delete params.detailInfo[i].orderManagementId
+        delete params.detailInfo[i].id
         if (params.detailInfo[i].consigneeType == "合作商") {
           params.detailInfo[i].consigneeType = "partner";
         } else if (params.detailInfo[i].consigneeType == "仓库") {
@@ -674,6 +745,8 @@ export default {
           params.detailInfo[i].consigneeType = "customize";
         }
       }
+
+
       if (this.isNo === false) {
         this.$API.editOrderManagement(params).then(res => {
           if (res.code === 0) {
@@ -770,12 +843,11 @@ export default {
           this.loading = false;
         });
     },
-     clearName(index){
-      this.orderData.consignee[index].consigneeName = ''
-      this.orderData.consignee[index].consigneeAddress = ''
-      this.list = []
-
-      }
+    clearName(index) {
+      this.orderData.consignee[index].consigneeName = "";
+      this.orderData.consignee[index].consigneeAddress = "";
+      this.list = [];
+    }
   }
 };
 </script>

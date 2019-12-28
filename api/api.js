@@ -70,7 +70,7 @@ const cooperationList = (params) => {
   })
 }
 
-//账号管理 - 列表 
+//账号管理 - 列表
 const accountNumberList = (params) => {
   return fetch({
     url: 'ticking/accountNumber',
@@ -115,7 +115,7 @@ const addFactoryManagement = (params) => {
   })
 }
 
-//账号管理 - 添加 
+//账号管理 - 添加
 const accountNumberAdd = (params) => {
   return fetch({
     url: 'ticking/accountNumber',
@@ -191,7 +191,7 @@ const warehouseDelete = (params) => {
     data:params
   })
 }
-  
+
 // 防串货 - 仓库管理 - 编辑
 const warehouseEdit = (params) => {
   return fetch({
@@ -277,8 +277,7 @@ const addOrderManagement = (params) => {
 const detailsOrderManagement = (params) => {
   return fetch({
     url: `ticking/orderManagement/${params}`,
-    method: 'GET',
-    params: params
+    method: 'GET'
   })
 }
 
