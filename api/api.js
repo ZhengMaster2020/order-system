@@ -2,7 +2,7 @@ import fetch from './fetch'
 
 const login = (params) => {
   return fetch({
-    url: '/login',
+    url: 'uac/authentication/password-grant',
     method: 'POST',
     data: params
   })
@@ -11,7 +11,7 @@ const login = (params) => {
 // 防伪码管理 - 列表
 const securityCodeList = (params) => {
   return fetch({
-    url: '/securityCode',
+    url: 'ticking/securityCode',
     method: 'GET',
     params: params
   })
@@ -20,7 +20,7 @@ const securityCodeList = (params) => {
 // 防伪码管理 - 添加
 const securityCodeCreate = (params) => {
   return fetch({
-    url: '/securityCode',
+    url: 'ticking/securityCode',
     method: 'POST',
     data: params
   })
@@ -29,7 +29,7 @@ const securityCodeCreate = (params) => {
 // 防伪码查询 - 列表
 const securityCodeQuery = (params) => {
   return fetch({
-    url: '/securityCodeQuery',
+    url: 'ticking/securityCodeQuery',
     method: 'GET',
     params: params
   })
