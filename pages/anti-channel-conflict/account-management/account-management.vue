@@ -43,7 +43,7 @@
             <Input v-model="addData.data.accountTelephone" clearable number/>
           </FormItem>
           <FormItem label="账号类型：" prop="accountType">
-            <Select v-model="addData.data.accountType" placeholder="请选择账号类型，再搜索">
+            <Select v-model="addData.data.accountType" placeholder="请选择账号类型，再搜索" @on-change="clearName">
               <Option v-for="item in typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
           </FormItem>
