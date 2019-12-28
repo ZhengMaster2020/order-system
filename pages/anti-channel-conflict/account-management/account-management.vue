@@ -207,10 +207,9 @@
     },
     watch: {
       'addData.data.accountType': function(newVal, oldVal){
-      console.log("TCL: oldVal", oldVal)
-      console.log("TCL: newVal", newVal)
       if(!!oldVal){
         this.addData.data.accountTypeName = ''
+        this.accountList.length = 0
         }
       }
     },
