@@ -187,7 +187,7 @@ const warehouseDetails = (id) => {
 const warehouseDelete = (params) => {
   return fetch({
     url: `ticking/warehouse-management/${params.id}`,
-    method: 'GET',
+    method: 'DELETE',
     data:params
   })
 }
@@ -200,7 +200,7 @@ const warehouseEdit = (params) => {
     data:params
   })
 }
-  
+
 // 防串货 - 仓库管理 - 负责人查询
 const warehouseNameSelect = (params) => {
   return fetch({
