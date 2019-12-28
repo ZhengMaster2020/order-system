@@ -341,11 +341,6 @@
           if(typeAccount!=''){
             return  `${typeAccount}:${name}`
           }
-      },
-      // 类型改变清空名字
-      clearName(e){
-      console.log("TCL: clearName -> e", e)
-        
       }
     }
   }
