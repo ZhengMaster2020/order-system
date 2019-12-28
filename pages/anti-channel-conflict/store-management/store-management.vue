@@ -21,7 +21,7 @@
     </Row>
     <!-- 新增、编辑仓库弹窗 -->
     <Modal
-      v-model="addData.modal"
+      v-model="addDataModel"
       title="新增"
       @on-cancel="closeModal()"
       :styles="{top: '50%',marginTop: '-250px'}"
@@ -115,12 +115,13 @@
                       'click': (ids) => {
                         this.addData.modalType = '编辑';
                         let id = ids = params.row.id;
+                        // this.addDataModel = true;
                         this.$API.warehouseDetails(id)
                           .then((res) =>{
-                            this.addData.data = res.data;
+                            this.addData = res.data;
                           })
                           this.addData.id = ids;
-                        this.openModal('edit');
+                          this.openModal('edit');
                       }
                     }
                   })
@@ -133,12 +134,13 @@
                     },
                     on: {
                       'on-ok': () => {
-                          let id = params.row.id;
+                          let id = {id:params.row.id};
                           this.$API.warehouseDelete(id)
                             .then((res) => {
                               this.$Message.success('删除成功');
+                              this.getList();
                           })
-                          this.getList();
+                          
                       }
                     }
                   },[
@@ -158,10 +160,10 @@
         addData: {
           id:'',
           loading: false,
-          modal: false,
           modalType: '',
           data: {}
         },
+        addDataModel:false,
         addDataRule: {
           warehouseName: [
             { required: true, message: '请输入仓库名称', trigger: 'blur' }
@@ -212,23 +214,22 @@
         this.$refs[name].validate((valid) => {
             if (valid) {
               let params = this.addData
-              // return;
               if (this.addData.id) {
                 this.$API.warehouseEdit(params)
                   .then((res) => {
-                    this.addData.data = res.data.data;
+                    this.addData = res.data;
                     this.$Message.success('编辑成功');
-                    this.addData.modal = false;
+                    console.log(this.addData)
+                    this.addDataModel = false;
                     this.getList();
                   })
               }else {
                 this.$API.warehouseAddList(params)
                   .then((res) => {
-                    console.log(res);
-                    this.addData.data = res.data.data;
-                    console.log(res.data.data);
+                    this.addData = res.data;
+                    console.log(res.data);
                     this.$Message.success('添加成功');
-                    this.addData.modal = false;
+                    this.addDataModel = false;
                     this.getList();
                 })
               }
@@ -244,13 +245,13 @@
       // 关闭弹窗
       closeModal () {
         this.handleReset('addData.data')
-        this.addData.modal = false
+        this.addDataModel = false
       },
-      // 打开弹出
+      //新增弹窗
       openModal (type) {
-        this.addData.modal = true
-        this.addData.modalType = type
-      },
+        this.addDataModel = true;
+        this.addData.title = type
+      }
       //远程搜索负责人名称
       // personInCharge  (value) {
       //   let username = value;
