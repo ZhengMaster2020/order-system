@@ -65,6 +65,23 @@
         <FormItem label="生成数量：" prop="generationCount" :label-width="90">
           <Input v-model="generateData.generationCount" clearable number></Input>
         </FormItem>
+        <FormItem label="归属订单：" :label-width="90" prop="belong">
+            <RadioGroup v-model="generateData.belong">
+              <Radio label="0">后关联</Radio>
+              <Radio label="1">前关联</Radio>
+            </RadioGroup>
+        </FormItem>
+        <FormItem v-if="generateData.belong === '1'" :label-width="90" label="　　　　　　">
+            <Select
+              v-model="generateData.orderNumber"
+              filterable
+              remote
+              :remote-method="serachOrder"
+              :loading="searchLoading"
+              placeholder="订单编号">
+              <Option v-for="(option, index) in searchList" :value="option.orderNumber" :key="index">{{option.orderNumber}}</Option>
+            </Select>
+          </FormItem>
       </Form>    
       <div slot="footer">
           <Button type="primary" :loading="generateLoading" @click="confirm('generateData')" :disabled="isdisabled">生成</Button>
@@ -99,7 +116,9 @@
         fileSrc: [],
         generateData: {
           brand: '',
-          generationCount: ''
+          generationCount: '',
+          belong: '0',
+          orderNumber: ''
         },
         generateRule: {
           brand: [
@@ -107,6 +126,9 @@
           ],
           generationCount: [
             { required: true, validator: validateCountCheck, trigger: 'blur' }
+          ],
+          belong: [
+            { required: true, message: '请选择归属订单', trigger: 'change' }
           ]
         },
         searchData: {
@@ -133,7 +155,9 @@
              perPage: 10,
              currentPage: 1,
              totalCount: 0
-        }
+        },
+        searchLoading: false,
+        searchList: []
       }
     },
     mounted() {
@@ -144,16 +168,32 @@
       generateCode () {
         this.generateStatus = true
         this.isdisabled = false
-        this.generateData.brand = ''
-        this.generateData.generationCount = ''
+        this.generateData = {
+          brand: '',
+          generationCount: '',
+          belong: '0',
+          orderNumber: ''
+        }
       },
       // 確定生成
       confirm (required) {
         this.handleSubmit (required)
-        let params = this.generateData
+        let params = JSON.parse(JSON.stringify(this.generateData))
+        if (params.belong === '0') {
+          delete params.orderNumber
+        } else {
+          if (!params.orderNumber) {
+            this.$Message.warning('前关联必须填写订单编号')
+            return
+          }
+        }
+        params.belong = Number(params.belong)
+        params.orderNumber = params.orderNumber + ''
         if(this.isNo === false){
           this.$API.securityCodeCreate(params).then((res) => {
           if(res.code === 0){
+            this.$Message.success('提交成功');
+            this.getList ()
           }
         })
         }
@@ -184,10 +224,8 @@
       handleSubmit (name) {
         this.$refs[name].validate((valid) => {
           if (valid) {
-            this.$Message.success('提交成功');
             this.isdisabled = true
             this.generateStatus = false
-            this.getList ()
           } else {
              this.$Message.error('请填写信息');
              this.isNo = true
@@ -231,6 +269,16 @@
           }
         }).finally(() => {
           this.loading = false
+        })
+      },
+      // 模糊搜索订单id
+      serachOrder (query) {
+        this.searchLoading = true
+        this.$API.searchOrderNum({
+          orderNumber: query
+        }).then((res) => {
+          this.searchLoading = false;
+          this.searchList = res.data
         })
       }
     }
