@@ -39,7 +39,7 @@ main(){
              sourcefunction; # 生效99环境变量的方法
              shell_lock;# 建立锁
              npm; # 本地解决依赖
-             deploy_front; # 同步前的复制
+             #deploy_front; # 同步前的复制
              deploy;  # 同步代码到远程服务器
              deploy_queen1; # 部署构建流程
              deploy_queen2; # 启动服务
@@ -50,7 +50,7 @@ main(){
              source200;
              shell_lock;
              npm;
-             deploy_front;
+             #deploy_front;
              deploy;
              deploy_queen1;
              deploy_queen2;
