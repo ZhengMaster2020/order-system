@@ -42,5 +42,14 @@ export default [{
               ]
             }
         ]
-    }
+    },
+    {
+      path: '/notebook',
+      icon: 'ios-book',
+      name: '/notebook',
+      title: '使用手册',
+      children: [
+          { path: 'notebook/notebook', title: '使用手册', name: 'notebook/notebook' }
+      ]
+  }
 ]
