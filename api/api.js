@@ -1,4 +1,5 @@
 import fetch from './fetch'
+import { SERVER_UAC_URL } from './config'
 
 const login = (params) => {
   return fetch({
@@ -7,6 +8,15 @@ const login = (params) => {
     data: params
   })
 }
+
+// 获取用户信息
+const getUserInfo = () => {
+  return fetch({
+    baseURL: SERVER_UAC_URL,
+    url: 'auth/userinfo',
+    method: 'GET',
+  })
+};
 
 // 防伪码管理 - 列表
 const securityCodeList = (params) => {
@@ -336,6 +346,7 @@ const searchOrderNum = params => {
 
 export default {
   login,
+  getUserInfo,
   /* 防伪码 */
   securityCodeList,
   securityCodeCreate,

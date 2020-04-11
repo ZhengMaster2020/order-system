@@ -75,15 +75,9 @@ export default function fetch(options) {
       .catch((error) => {
         const response = error.response
         const data = response.data
-        Notice.error({
-          title: data.msg,
-          desc: '错误代码：' + data.code,
-          duration: 1.5
-        })
-        reject(error)
         
         // 401无效token
-        if (data && data.code === 401) {
+        if (data && response.status === 401) {
           // 退出登录
           Notice.error({
             title: '登录信息失效，请重新登录！',
@@ -97,7 +91,7 @@ export default function fetch(options) {
         }
 
         // 403无权限操作
-        if (data && data.code === 403) {
+        if (data && response.status === 403) {
           Notice.error({
             title: '您没有权限操作',
             desc: '错误代码：' + data.code,
@@ -113,6 +107,11 @@ export default function fetch(options) {
         //   desc: '错误原因 ' + JSON.stringify(response),
         //   duration: 0
         // })
+        Notice.error({
+          title: data.msg,
+          desc: '错误代码：' + data.code,
+          duration: 1.5
+        })
         reject(error)
       })
   })
