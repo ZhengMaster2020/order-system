@@ -401,7 +401,7 @@
             delete search[key]
           } else {
             if (key === 'startTime' || key === 'endTime') {
-              search[key] = this.$format(new Date(search[key]), 'yyyy-MM-dd hh:mm:ss');
+              search[key] = this.$format(new Date(search[key]).getTime() / 1000, 'yyyy-MM-dd hh:mm:ss');
             }
             if (this.selectTab === 'old') {
               if (key === 'securityCode') {
