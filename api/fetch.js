@@ -84,7 +84,7 @@ export default function fetch(options) {
             desc: '错误代码：401'
           })
           setTimeout(() => {
-            location.href = 'login'
+            location.href = '/login'
           }, 2000)
           reject(error)
           return false

@@ -224,7 +224,7 @@
           {key: 'brand', title: '品牌', minWidth: 80, align: 'center'},
           {key: 'purchaseChannels', title: '渠道', minWidth: 100, align: 'center'},
           {key: 'shop', title: '购买店铺', minWidth: 80, align: 'center'},
-          {key: 'scanAt', title: '扫码时间', minWidth: 100, align: 'center'},
+          // {key: 'scanAt', title: '扫码时间', minWidth: 100, align: 'center'},
           {key: 'createdAt', title: '查询日期', minWidth: 100, align: 'center'},
           {key: 'isSucceed', title: '是否成功', minWidth: 70, align: 'center'},
           {key: 'wechatNickname', title: '用户昵称', minWidth: 100, align: 'center'},
