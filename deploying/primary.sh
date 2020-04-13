@@ -16,7 +16,7 @@ deploy_name=security-code.fandow.com
 local_dir=/var/lib/jenkins/workspace/security-code
 
 #需要部署的远程主句
-leave="www@120.27.137.99"
+leave="www@120.26.240.150"
 
 #远程主机的目录
 code_dir=/home/wwwroot/$deploy_name/
