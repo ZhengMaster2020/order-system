@@ -432,9 +432,13 @@
             ...this.exportForm,
             ...this.getSearch()
           }).then(res => {
+            console.log(res)
+            let data = new Blob([res], {
+              type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            })
+            console.log(data)
             this.isExportLoading = false;
             this.isShowExportModal = false;
-            let data = res
             if (typeof window.chrome !== 'undefined') {
               // Chrome version
               var link = document.createElement('a');
@@ -448,7 +452,8 @@
               var file = new File([data], { type: 'application/force-download' });
               window.open(URL.createObjectURL(file));
             }
-          }).catch(() => {
+          }).catch((err) => {
+            console.log(err)
             this.isExportLoading = false;
           })
         })

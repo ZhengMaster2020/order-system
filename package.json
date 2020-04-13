@@ -6,6 +6,7 @@
     "private": true,
     "scripts": {
         "dev": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
+        "out": "nuxt --hostname 0.0.0.0 --port 3336",
         "build-env": "cross-env NODE_ENV=production node server/build.env.js",
         "build-env-test": "cross-env NODE_ENV=test node server/build.env.js",
         "build": "nuxt build",

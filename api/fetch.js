@@ -100,23 +100,7 @@ export default function fetch(options) {
           reject(error)
           return false
         }
-        
-        // 错误代码
-        if (response.code === -1 && response.msg) {
-          Notice.error({
-            title: response.msg,
-            desc: '错误代码：' + response.code,
-            duration: 4
-          })
-          reject(error)
-          return false
-        }
-        // // 请求失败时,根据业务判断状态
-        // Notice.error({
-        //   title: '出错了！',
-        //   desc: '错误原因 ' + JSON.stringify(response),
-        //   duration: 0
-        // })
+
         Notice.error({
           title: data.msg,
           desc: '错误代码：' + data.code,

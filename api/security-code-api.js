@@ -40,8 +40,8 @@ const exportSecurityList = (params) => {
   return fetch({
     url: `traceability/securityCodeQuery/export/${params.type}`,
     method: 'GET',
-    params,
-    responseType: 'blob'
+    params
+    // responseType: 'blob'
   })
 }
 
