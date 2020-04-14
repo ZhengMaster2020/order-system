@@ -27,10 +27,10 @@
             <Input placeholder="需求编号" @on-enter="getList('search')" clearable v-model="search[selectTab].masterId"></Input>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="2">
-            <DatePicker type="date" @on-change="getList('search')" clearable placeholder="查询时间起" v-model="search[selectTab].startTime"></DatePicker>
+            <DatePicker type="datetime" @on-change="getList('search')" clearable placeholder="查询时间起" v-model="search[selectTab].startTime"></DatePicker>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="2">
-            <DatePicker type="date" @on-change="getList('search')" clearable placeholder="查询时间止" v-model="search[selectTab].endTime"></DatePicker>
+            <DatePicker type="datetime" @on-change="getList('search')" clearable placeholder="查询时间止" v-model="search[selectTab].endTime"></DatePicker>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="2">
             <Button type="primary" @click="getList('search')">搜索</Button>
@@ -432,11 +432,9 @@
             ...this.exportForm,
             ...this.getSearch()
           }).then(res => {
-            console.log(res)
             let data = new Blob([res], {
               type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             })
-            console.log(data)
             this.isExportLoading = false;
             this.isShowExportModal = false;
             if (typeof window.chrome !== 'undefined') {
@@ -453,7 +451,6 @@
               window.open(URL.createObjectURL(file));
             }
           }).catch((err) => {
-            console.log(err)
             this.isExportLoading = false;
           })
         })
