@@ -26,10 +26,10 @@
           <Col :xs="24" :sm="12" :md="6" :lg="2" v-if="selectTab === 'new'">
             <Input placeholder="需求编号" @on-enter="getList('search')" clearable v-model="search[selectTab].masterId"></Input>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="2">
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
             <DatePicker type="datetime" @on-change="getList('search')" clearable placeholder="查询时间起" v-model="search[selectTab].startTime"></DatePicker>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="2">
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
             <DatePicker type="datetime" @on-change="getList('search')" clearable placeholder="查询时间止" v-model="search[selectTab].endTime"></DatePicker>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="2">
@@ -225,7 +225,7 @@
           {key: 'purchaseChannels', title: '渠道', minWidth: 100, align: 'center'},
           {key: 'shop', title: '购买店铺', minWidth: 80, align: 'center'},
           // {key: 'scanAt', title: '扫码时间', minWidth: 100, align: 'center'},
-          {key: 'createdAt', title: '查询日期', minWidth: 100, align: 'center'},
+          {key: 'createdAt', title: '查询日期', minWidth: 120, align: 'center'},
           {key: 'isSucceed', title: '是否成功', minWidth: 70, align: 'center'},
           {key: 'wechatNickname', title: '用户昵称', minWidth: 100, align: 'center'},
           {key: 'securityCodeLink', title: '链接', minWidth: 160, align: 'center'},
@@ -239,7 +239,7 @@
           {key: 'brand', title: '品牌', minWidth: 80, align: 'center'},
           {key: 'purchaseChannels', title: '渠道', minWidth: 100, align: 'center'},
           {key: 'shop', title: '购买店铺', minWidth: 80, align: 'center'},
-          {key: 'createdAt', title: '查询日期', minWidth: 100, align: 'center'},
+          {key: 'createdAt', title: '查询日期', minWidth: 120, align: 'center'},
           {key: 'isSucceed', title: '是否成功', minWidth: 65, align: 'center'},
           {key: 'ipLocation', title: 'IP地址', minWidth: 80, align: 'center'}
         ],
