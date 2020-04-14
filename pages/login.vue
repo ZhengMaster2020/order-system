@@ -116,18 +116,25 @@ export default {
                 expires: 1
               })
               // Cookies.set('real_name', res.data.real_name, { expires: 1 })
-              this.$Message.success('登录成功!')
+              this.$API.getUserInfo().then((res) => {
+                if (res.code === 0) {
+                  this.$Message.success('登录成功!')
+                  res.data.nowLoginAt = this.$format(new Date().getTime() / 1000, 'yyyy-MM-dd hh:mm:ss')
+                  res.data.lastVisitAt = this.$format(res.data.lastVisitAt, 'yyyy-MM-dd hh:mm:ss')
+                  window.localStorage.setItem('userInfo', JSON.stringify(res.data))
+                  this.$router.push({path: '/'})
+                }
+              })
               // this.$store.commit(
               //   'setAvator',
               //   'https://oa.fandow.com/public/img/logo-min.png'
               // )
-              this.$router.push({ path: '/' })
             } else {
               this.$Message.error('账号或者密码错误!')
               this.loading = false
             }
           }).catch(err => {
-            // console.log(err);
+            console.log(err);
           })
         }
       })
