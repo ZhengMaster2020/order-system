@@ -74,30 +74,38 @@ export default function fetch(options) {
       })
       .catch((error) => {
         const response = error.response
-        const data = response.data
-        Notice.error({
-          title: data.msg,
-          desc: '错误代码：' + data.code,
-          duration: 1.5
-        })
-        reject(error)
-        
+        let data = response.data
+        // responseType = blob 时错误信息转回json
+        if (data.__proto__ === Blob.prototype) {
+          var reader = new FileReader();
+          reader.readAsText(data, 'utf-8');
+          reader.onload = function () {
+            data = JSON.parse(reader.result);
+            Notice.error({
+              title: data.msg,
+              desc: '错误代码：' + data.code,
+              duration: 1.5
+            })
+            reject(error)
+          }
+          return;
+        }
         // 401无效token
-        if (data && data.code === 401) {
+        if (data && response.status === 401) {
           // 退出登录
           Notice.error({
             title: '登录信息失效，请重新登录！',
             desc: '错误代码：401'
           })
           setTimeout(() => {
-            location.href = 'login'
+            location.href = '/login'
           }, 2000)
           reject(error)
           return false
         }
 
         // 403无权限操作
-        if (data && data.code === 403) {
+        if (data && response.status === 403) {
           Notice.error({
             title: '您没有权限操作',
             desc: '错误代码：' + data.code,
@@ -107,12 +115,11 @@ export default function fetch(options) {
           return false
         }
 
-        // // 请求失败时,根据业务判断状态
-        // Notice.error({
-        //   title: '出错了！',
-        //   desc: '错误原因 ' + JSON.stringify(response),
-        //   duration: 0
-        // })
+        Notice.error({
+          title: data.msg,
+          desc: '错误代码：' + data.code,
+          duration: 1.5
+        })
         reject(error)
       })
   })

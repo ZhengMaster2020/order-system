@@ -36,7 +36,8 @@ module.exports = {
       src: '@/plugins/calendar',
       ssr: false
     },
-    '@/plugins/api'
+    '@/plugins/api',
+    '@/plugins/format',
   ],
   /*
    ** Nuxt.js modules

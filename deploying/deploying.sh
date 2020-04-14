@@ -54,7 +54,7 @@ if [ $? -ne 0 ]
    
 deploy(){ # 同步远程主机
   echo "开始同步" 
-  rsync -azvtruP --delete ./* $leave:$release 1> /dev/null
+  rsync -azvtrP --delete ./* $leave:$release 1> /dev/null
   if [ $? -ne 0 ];
   then
     echo "远程同步失败"
