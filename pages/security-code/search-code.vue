@@ -432,23 +432,20 @@
             ...this.exportForm,
             ...this.getSearch()
           }).then(res => {
-            let data = new Blob([res], {
-              type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            })
+            // let data = new Blob([res], {
+            //   type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            // })
+            let data = res
             this.isExportLoading = false;
             this.isShowExportModal = false;
-            if (typeof window.chrome !== 'undefined') {
-              // Chrome version
-              var link = document.createElement('a');
-              link.href = window.URL.createObjectURL(data);
-              link.click();
-            } else if (typeof window.navigator.msSaveBlob !== 'undefined') {
+            if (typeof window.navigator.msSaveBlob !== 'undefined') {
               // IE version
               window.navigator.msSaveBlob(data);
             } else {
               // Firefox version
-              var file = new File([data], { type: 'application/force-download' });
-              window.open(URL.createObjectURL(file));
+              var link = document.createElement('a');
+              link.href = window.URL.createObjectURL(data);
+              link.click();
             }
           }).catch((err) => {
             this.isExportLoading = false;

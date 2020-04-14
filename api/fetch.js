@@ -74,8 +74,22 @@ export default function fetch(options) {
       })
       .catch((error) => {
         const response = error.response
-        const data = response.data
-        
+        let data = response.data
+        // responseType = blob 时错误信息转回json
+        if (data.__proto__ === Blob.prototype) {
+          var reader = new FileReader();
+          reader.readAsText(data, 'utf-8');
+          reader.onload = function () {
+            data = JSON.parse(reader.result);
+            Notice.error({
+              title: data.msg,
+              desc: '错误代码：' + data.code,
+              duration: 1.5
+            })
+            reject(error)
+          }
+          return;
+        }
         // 401无效token
         if (data && response.status === 401) {
           // 退出登录
