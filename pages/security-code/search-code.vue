@@ -219,17 +219,18 @@
           {type: 'index', title: '序号', minWidth: 65, align: 'center'},
           {key: 'serialCode', title: '序列号', minWidth: 100, align: 'center'},
           {key: 'securityCode', title: '防伪码', minWidth: 100, align: 'center'},
-          {key: 'productionDate', title: '编码生成日期', minWidth: 130, align: 'center'},
-          {key: 'masterId', title: '需求编号', minWidth: 100, align: 'center'},
           {key: 'brand', title: '品牌', minWidth: 80, align: 'center'},
           {key: 'purchaseChannels', title: '渠道', minWidth: 100, align: 'center'},
           {key: 'shop', title: '购买店铺', minWidth: 80, align: 'center'},
           // {key: 'scanAt', title: '扫码时间', minWidth: 100, align: 'center'},
           {key: 'createdAt', title: '查询日期', minWidth: 130, align: 'center'},
           {key: 'isSucceed', title: '是否成功', minWidth: 70, align: 'center'},
+          {key: 'isOneDay', title: '是否24小时内查询', minWidth: 70, align: 'center'},
           {key: 'wechatNickname', title: '用户昵称', minWidth: 100, align: 'center'},
           {key: 'securityCodeLink', title: '链接', minWidth: 160, align: 'center'},
-          {key: 'ipLocation', title: 'IP地址', minWidth: 100, align: 'center'}
+          {key: 'ipLocation', title: 'IP地址', minWidth: 100, align: 'center'},
+          {key: 'productionDate', title: '编码生成日期', minWidth: 130, align: 'center'},
+          {key: 'masterId', title: '需求编号', minWidth: 100, align: 'center'},
         ],
         oldColumn: [ // 旧防伪码表头
           // {type: 'selection', width: 60, align: 'center'},
@@ -313,15 +314,11 @@
       },
       // 显示导出弹窗
       showExportModal () {
-        // let key = this.selectTab === 'new' ? 'selectNewList' : 'selectOldList'
-        // if (this[key].length === 0) {
-        //   this.$Message.warning('请选择一项进行导出')
-        //   return;
-        // }
-        // if (this[key].length > 1) {
-        //   this.$Message.warning('只能选择一项进行导出')
-        //   return;
-        // }
+        if (this.isTableLoading) return;
+        if (this[this.selectTab + 'PageProps'].count > 4200) {
+          this.$Message.warning('导出不能大于4200条，请重新选择条件')
+          return;
+        }
         this.userData = JSON.parse(window.localStorage.getItem('userInfo'))
         this.exportListPageProps = {
           page: 1,
