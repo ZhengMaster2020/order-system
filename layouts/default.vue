@@ -48,7 +48,7 @@
             <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
               <Dropdown transfer trigger="click" @on-click="handleClickUserDropdown">
                 <a href="javascript:void(0)">
-                  <span class="main-user-name">{{ userName }}</span>
+                  <span class="main-user-name">{{ userInfo.realName }}</span>
                   <Icon type="md-arrow-dropdown" />
                 </a>
                 <DropdownMenu slot="list">
@@ -108,7 +108,8 @@ export default {
       isFullScreen: false,
       openedSubmenuArr: [],
       menuList: [],
-      beforePush: true
+      beforePush: true,
+      userInfo:{}
     }
   },
   computed: {
@@ -136,6 +137,10 @@ export default {
     //   this.$nuxt.$loading.start()
     //   setTimeout(() => this.$nuxt.$loading.finish(), 600)
     // })
+    this.$API.getUserInfo()
+      .then((res) => {
+        this.userInfo = res.data;
+      })
   },
   methods: {
     toggleClick() {
