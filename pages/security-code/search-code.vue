@@ -544,7 +544,7 @@
     justify-content: space-between;
     align-items: center;
   }
-  /deep/ thead .ivu-table-cell-with-selection{
-    display: none;
-  }
+  // /deep/ thead .ivu-table-cell-with-selection{
+  //   display: none;
+  // }
 </style>
