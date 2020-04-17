@@ -296,6 +296,7 @@
           pageProps.page = 1;
           pageProps.perPage = 10;
           selectList = []
+          this.selectTab === 'new' ? this.selectNewList = [] : this.selectOldList = []
         }
         this.isTableLoading = true;
         // 用于判断请求时是否改变了分页、每页显示数量、新旧列表
@@ -307,9 +308,7 @@
             this.isTableLoading = false;
             if (res.code === 0) {
               if (pageProps.page !== page || pageProps.prePage !== prePage || this.selectTab !== selectTab) return;
-              console.log(selectList)
               if (selectList.length && selectList[page] && selectList[page].length) {
-                console.log(res.data.data, selectList[page])
                 // 选中数组中该页有数据  赋值checked
                 res.data.data.forEach(item => {
                   if (selectList[page].find(it => it.id === item.id)) {
@@ -343,6 +342,7 @@
             })
           }
         })
+        console.log(exportSelectIdList.length, 'exportSelectIdList.length')
         if (!exportSelectIdList.length) {
           let isCanExport = true;
           for (let key in this.search[this.selectTab]) {
@@ -354,6 +354,7 @@
             this.$Message.warning('请筛选条件后导出')
             return;
           }
+          console.log(this[this.selectTab + 'PageProps'].count, "this[this.selectTab + 'PageProps'].count")
           if (this[this.selectTab + 'PageProps'].count > EXPORT_MAX) {
             this.$Message.warning('数据量过大，请联系管理员')
             return;
