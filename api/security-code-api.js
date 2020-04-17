@@ -35,12 +35,22 @@ const getSecurityExportKey = () => {
   })
 }
 
-// 防伪码查询-导出查询记录
-const exportSecurityList = (params) => {
+// 防伪码查询-新版防伪码导出查询记录
+const exportNewSecurityList = (params) => {
   return fetch({
-    url: `traceability/securityCodeQuery/export/${params.type}`,
-    method: 'GET',
-    params,
+    url: `traceability/securityCodeQuery/export/new`,
+    method: 'POST',
+    data: params,
+    responseType: 'blob'
+  })
+}
+
+// 防伪码查询-旧版防伪码导出查询记录
+const exportOldSecurityList = (params) => {
+  return fetch({
+    url: `traceability/securityCodeQuery/export/old`,
+    method: 'POST',
+    data: params,
     responseType: 'blob'
   })
 }
@@ -50,5 +60,6 @@ export default {
   getSecurityHistoryOldList,
   getSecurityExportList,
   getSecurityExportKey,
-  exportSecurityList
+  exportNewSecurityList,
+  exportOldSecurityList
 }

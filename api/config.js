@@ -11,7 +11,7 @@ import ENV from './env'
 
 let baseUrl = '//api.fandow.com/oa/'
 let fileUrl = '//api.fandow.com/oa/file'
-let UAC_URL = 'http://api.fandow.com/oa/uac'
+let UAC_URL = '//api.fandow.com/oa/uac'
 
 if (ENV === 'production') {
   console.log('---- production ----')
