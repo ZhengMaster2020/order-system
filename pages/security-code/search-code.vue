@@ -51,6 +51,7 @@
               ref="newTable"
               :data="newData"
               :loading="isTableLoading"
+              @on-selection-change="(list) => { changeSelect(list, 'selectNewList') }"
               border></Table>
               <!-- @on-selection-change="(list) => { changeSelect(list, 'selectNewList') }" -->
             <div class="foot-page">
@@ -72,8 +73,8 @@
               ref="oldTable"
               :data="oldData"
               :loading="isTableLoading"
+              @on-selection-change="(list) => { changeSelect(list, 'selectOldList')}"
               border></Table>
-              <!-- @on-selection-change="(list) => { changeSelect(list, 'selectOldList') }" -->
             <div class="foot-page">
               共{{oldPageProps.count}}条
               <Page transfer
@@ -117,12 +118,12 @@
             </Col>
             <Col span="5">
               <FormItem :label="index === 0 ? '导出反馈':''">
-                <Input readonly :value="item.ext.exportFeedback"></Input>
+                <Input v-if ="item.ext" readonly :value="item.ext.exportFeedback"></Input>
               </FormItem>
             </Col>
             <Col span="7">
               <FormItem :label="index === 0 ? '备注':''">
-                <Input readonly :value="item.ext.remark"></Input>
+                <Input v-if ="item.ext" readonly :value="item.ext.remark"></Input>
               </FormItem>
             </Col>
           </Row>
@@ -174,6 +175,7 @@
 </template>
 
 <script>
+  const EXPORT_MAX = 10; // 导出最大数量
   export default {
     created () {
       this.getList();
@@ -215,7 +217,7 @@
           perPage:  10
         },
         newColumn: [ // 新防伪码表头
-          // {type: 'selection', width: 60, align: 'center'},
+          {type: 'selection', width: 60, align: 'center'},
           {type: 'index', title: '序号', minWidth: 65, align: 'center'},
           {key: 'serialCode', title: '序列号', minWidth: 100, align: 'center'},
           {key: 'securityCode', title: '防伪码', minWidth: 100, align: 'center'},
@@ -233,7 +235,7 @@
           {key: 'masterId', title: '需求编号', minWidth: 100, align: 'center'},
         ],
         oldColumn: [ // 旧防伪码表头
-          // {type: 'selection', width: 60, align: 'center'},
+          {type: 'selection', width: 60, align: 'center'},
           {type: 'index', title: '序号', minWidth: 65, align: 'center'},
           {key: 'securityCode', title: '防伪码', minWidth: 100, align: 'center'},
           {key: 'productionDate', title: '编码生成日期', minWidth: 130, align: 'center'},
@@ -263,9 +265,10 @@
           verifyCode: [{ required: true, message: '秘钥不能为空', trigger: 'blur' }]
         }, // 导出规则
         exportLoading: false, // 导出中
-        // selectNewList: [], // 新列表选中
-        // selectOldList: [], // 旧列表选中
-        userData: {}
+        selectNewList: [], // 新列表选中
+        selectOldList: [], // 旧列表选中
+        userData: {},
+        exportSelectIdList: [] // 导出选中信息
       }
     },
     methods: {
@@ -274,30 +277,46 @@
         let search = this.getSearch()
         let tableDataKey = null
         let apiKey = null
+        let selectList = null
         switch (this.selectTab) {
           case 'new':
             pageProps = this.newPageProps
             tableDataKey = 'newData'
             apiKey = 'getSecurityHistoryNewList'
-            // this.selectNewList = []
+            selectList = this.selectNewList
             break;
           case 'old':
             pageProps = this.oldPageProps
             tableDataKey = 'oldData'
             apiKey = 'getSecurityHistoryOldList'
-            // this.selectOldList = []
+            selectList = this.selectOldList
             break;
         }
         if (type === 'search') {
           pageProps.page = 1;
           pageProps.perPage = 10;
+          selectList = []
         }
         this.isTableLoading = true;
-        
+        // 用于判断请求时是否改变了分页、每页显示数量、新旧列表
+        let page = pageProps.page
+        let prePage = pageProps.prePage
+        let selectTab = this.selectTab
         this.$API[apiKey]({...pageProps, ...search})
           .then(res => {
             this.isTableLoading = false;
             if (res.code === 0) {
+              if (pageProps.page !== page || pageProps.prePage !== prePage || this.selectTab !== selectTab) return;
+              console.log(selectList)
+              if (selectList.length && selectList[page] && selectList[page].length) {
+                console.log(res.data.data, selectList[page])
+                // 选中数组中该页有数据  赋值checked
+                res.data.data.forEach(item => {
+                  if (selectList[page].find(it => it.id === item.id)) {
+                    item._checked = true
+                  }
+                })
+              }
               pageProps.count = res.data.count
               this[tableDataKey] = res.data.data
             }
@@ -315,20 +334,37 @@
       // 显示导出弹窗
       showExportModal () {
         if (this.isTableLoading) return;
-        let isCanExport = true;
-        for (let key in this.search[this.selectTab]) {
-          if (this.search[this.selectTab][key]) {
-            isCanExport = false;
+        let selectList = this.selectTab === 'new' ? this.selectNewList : this.selectOldList
+        let exportSelectIdList = [] // 导出数组(id)
+        if (!selectList.length) {
+          let isCanExport = true;
+          for (let key in this.search[this.selectTab]) {
+            if (this.search[this.selectTab][key]) {
+              isCanExport = false;
+            }
+          }
+          if (isCanExport) {
+            this.$Message.warning('请筛选条件后导出')
+            return;
+          }
+          if (this[this.selectTab + 'PageProps'].count > EXPORT_MAX) {
+            this.$Message.warning('数据量过大，请联系管理员')
+            return;
+          }
+        } else {
+          selectList.forEach(items => {
+            if (items) {
+              items.forEach(item => {
+                exportSelectIdList.push(item.id)
+              })
+            }
+          })
+          if (exportSelectIdList.length > EXPORT_MAX) {
+            this.$Message.warning('数据量过大，请联系管理员')
+            return;
           }
         }
-        if (isCanExport) {
-          this.$Message.warning('请筛选条件后导出')
-          return;
-        }
-        if (this[this.selectTab + 'PageProps'].count > 10) {
-          this.$Message.warning('数据量过大，请联系管理员')
-          return;
-        }
+        this.exportSelectIdList = exportSelectIdList
         this.userData = JSON.parse(window.localStorage.getItem('userInfo'))
         this.exportListPageProps = {
           page: 1,
@@ -363,13 +399,12 @@
         this.getExportList();
       },
       // // 改变选中
-      // changeSelect (list, key) {
-      //   this[key] = JSON.parse(JSON.stringify(list))
-      // },
+      changeSelect (list, key) {
+        let pageProps = this[this.selectTab + 'PageProps']
+        this[key][pageProps.page] = JSON.parse(JSON.stringify(list))
+      },
       // 查询导出记录
       getExportList () {
-        // let key = this.selectTab === 'new' ? 'selectNewList' : 'selectOldList'
-        // let id = this[key][0].id;
         this.exportListLoading = true;
         this.$API.getSecurityExportList({
           type: this.selectTab,
@@ -428,36 +463,39 @@
       },
       // 导出
       exportData () {
-        this.$refs.exportForm.validate((valid) => {
-          if (!valid) {
-            this.$Message.warning('请验证表单');
-            return;
-          }
-          this.isExportLoading = true;
-          this.$API.exportSecurityList({
-            type: this.selectTab,
-            ...this.exportForm,
-            ...this.getSearch()
-          }).then(res => {
-            // let data = new Blob([res], {
-            //   type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            // })
-            let data = res
-            this.isExportLoading = false;
-            this.isShowExportModal = false;
-            if (typeof window.navigator.msSaveBlob !== 'undefined') {
-              // IE version
-              window.navigator.msSaveBlob(data);
-            } else {
-              // Firefox version
-              var link = document.createElement('a');
-              link.href = window.URL.createObjectURL(data);
-              link.click();
+          this.$refs.exportForm.validate((valid) => {
+            if (!valid) {
+              this.$Message.warning('请验证表单');
+              return;
             }
-          }).catch((err) => {
-            this.isExportLoading = false;
+            let apiName = this.selectTab === 'new' ? 'exportNewSecurityList' : 'exportOldSecurityList'
+            this.isExportLoading = true;
+            let postData = {
+              ...this.exportForm,
+              ...this.getSearch()
+            }
+            if (this.exportSelectIdList.length) {
+              // 勾选导出时传check和id数组
+              postData.id = this.exportSelectIdList;
+              postData.check = 1
+            }
+            this.$API[apiName](postData).then(res => {
+              let data = res
+              this.isExportLoading = false;
+              this.isShowExportModal = false;
+              if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                // IE version
+                window.navigator.msSaveBlob(data);
+              } else {
+                // Firefox version
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(data);
+                link.click();
+              }
+            }).catch((err) => {
+              this.isExportLoading = false;
+            })
           })
-        })
       }
     }
   }
