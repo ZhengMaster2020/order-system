@@ -175,7 +175,7 @@
 </template>
 
 <script>
-  const EXPORT_MAX = 10; // 导出最大数量
+  const EXPORT_MAX = 4200; // 导出最大数量
   export default {
     created () {
       this.getList();
