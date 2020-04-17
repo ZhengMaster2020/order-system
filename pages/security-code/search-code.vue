@@ -336,7 +336,14 @@
         if (this.isTableLoading) return;
         let selectList = this.selectTab === 'new' ? this.selectNewList : this.selectOldList
         let exportSelectIdList = [] // 导出数组(id)
-        if (!selectList.length) {
+        selectList.forEach(items => {
+          if (items) {
+            items.forEach(item => {
+              exportSelectIdList.push(item.id)
+            })
+          }
+        })
+        if (!exportSelectIdList.length) {
           let isCanExport = true;
           for (let key in this.search[this.selectTab]) {
             if (this.search[this.selectTab][key]) {
@@ -352,13 +359,6 @@
             return;
           }
         } else {
-          selectList.forEach(items => {
-            if (items) {
-              items.forEach(item => {
-                exportSelectIdList.push(item.id)
-              })
-            }
-          })
           if (exportSelectIdList.length > EXPORT_MAX) {
             this.$Message.warning('数据量过大，请联系管理员')
             return;
@@ -463,39 +463,39 @@
       },
       // 导出
       exportData () {
-          this.$refs.exportForm.validate((valid) => {
-            if (!valid) {
-              this.$Message.warning('请验证表单');
-              return;
+        this.$refs.exportForm.validate((valid) => {
+          if (!valid) {
+            this.$Message.warning('请验证表单');
+            return;
+          }
+          let apiName = this.selectTab === 'new' ? 'exportNewSecurityList' : 'exportOldSecurityList'
+          this.isExportLoading = true;
+          let postData = {
+            ...this.exportForm,
+            ...this.getSearch()
+          }
+          if (this.exportSelectIdList.length) {
+            // 勾选导出时传check和id数组
+            postData.id = this.exportSelectIdList;
+            postData.check = 1
+          }
+          this.$API[apiName](postData).then(res => {
+            let data = res
+            this.isExportLoading = false;
+            this.isShowExportModal = false;
+            if (typeof window.navigator.msSaveBlob !== 'undefined') {
+              // IE version
+              window.navigator.msSaveBlob(data);
+            } else {
+              // Firefox version
+              var link = document.createElement('a');
+              link.href = window.URL.createObjectURL(data);
+              link.click();
             }
-            let apiName = this.selectTab === 'new' ? 'exportNewSecurityList' : 'exportOldSecurityList'
-            this.isExportLoading = true;
-            let postData = {
-              ...this.exportForm,
-              ...this.getSearch()
-            }
-            if (this.exportSelectIdList.length) {
-              // 勾选导出时传check和id数组
-              postData.id = this.exportSelectIdList;
-              postData.check = 1
-            }
-            this.$API[apiName](postData).then(res => {
-              let data = res
-              this.isExportLoading = false;
-              this.isShowExportModal = false;
-              if (typeof window.navigator.msSaveBlob !== 'undefined') {
-                // IE version
-                window.navigator.msSaveBlob(data);
-              } else {
-                // Firefox version
-                var link = document.createElement('a');
-                link.href = window.URL.createObjectURL(data);
-                link.click();
-              }
-            }).catch((err) => {
-              this.isExportLoading = false;
-            })
+          }).catch((err) => {
+            this.isExportLoading = false;
           })
+        })
       }
     }
   }
