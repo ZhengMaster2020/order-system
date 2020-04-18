@@ -315,8 +315,18 @@
       // 显示导出弹窗
       showExportModal () {
         if (this.isTableLoading) return;
-        if (this[this.selectTab + 'PageProps'].count > 4200) {
-          this.$Message.warning('导出不能大于4200条，请重新选择条件')
+        let isCanExport = true;
+        for (let key in this.search[this.selectTab]) {
+          if (this.search[this.selectTab][key]) {
+            isCanExport = false;
+          }
+        }
+        if (isCanExport) {
+          this.$Message.warning('请筛选条件后到处')
+          return;
+        }
+        if (this[this.selectTab + 'PageProps'].count > 10) {
+          this.$Message.warning('数据量过大，请联系管理员')
           return;
         }
         this.userData = JSON.parse(window.localStorage.getItem('userInfo'))
