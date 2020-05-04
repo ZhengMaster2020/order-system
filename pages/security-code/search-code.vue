@@ -306,7 +306,7 @@
         this.$API[apiKey]({...pageProps, ...search})
           .then(res => {
             this.isTableLoading = false;
-            if (res.code === 0) {
+            if (res.code === 0 && res.data.data) {
               if (pageProps.page !== page || pageProps.prePage !== prePage || this.selectTab !== selectTab) return;
               if (selectList.length && selectList[page] && selectList[page].length) {
                 // 选中数组中该页有数据  赋值checked
