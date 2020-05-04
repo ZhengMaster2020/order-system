@@ -22,6 +22,7 @@ if (ENV === 'production') {
   UAC_URL = 'http://kongtest.fandow.com/oa/uac'
 } else {
   console.log('---- develop ----')
+  // baseUrl = 'http://kongtest.fandow.com/oa/'
   baseUrl = 'http://kongtest.fandow.com/oa/'
   fileUrl = 'http://apibeta.fandow.com/oa/file'
   UAC_URL = 'http://kongtest.fandow.com/oa/uac'

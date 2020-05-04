@@ -9,6 +9,15 @@ export default [
       { path: 'security-code/search-code', title: '防伪码查询', name: 'security-code/search-code' }
     ]
   },
+  {
+    path: '/production-plan-management',
+    icon: 'ios-book',
+    name: '/production-plan-list',
+    title: '生产计划管理',
+    children: [
+      { path: 'production-plan-management/production-plan-list', title: '生产计划列表', name: 'production-plan-management/production-plan-list' }
+    ]
+  },
   // {
   //   path: '/anti-channel-conflict',
   //   icon: 'ios-book',
