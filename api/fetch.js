@@ -68,15 +68,11 @@ export default function fetch(options) {
 
         if (data.code >= 1) {
           let content = JSON.stringify(data.data)
-          let title = data.message
+          let title = data.subMsg || data.message
           data.data = data.data || []
-          if (data.data.length === 0) {
-            content = data.message
-            title = ''
-          }
           Notice.warning({
-            title: title,
-            desc: 'code: ' + data.code + '</br>' + content
+            title: 'code: ' + data.code,
+            desc: title
           })
         }
 
@@ -94,21 +90,21 @@ export default function fetch(options) {
           reader.onload = function () {
             data = JSON.parse(reader.result);
             Notice.error({
-              title: data.subMsg || data.msg,
-              desc: '错误代码：' + data.code,
+              title: '错误代码：' + data.code,
+              desc: data.subMsg || data.msg,
               duration: 1.5
             })
             reject(error)
           }
           return;
         }
-        
+
         // 401无效token
         if (data && response.status === 401) {
           // 退出登录
           Notice.error({
-            title: '登录信息失效，请重新登录！',
-            desc: '错误代码：401'
+            title: '错误代码：401',
+            desc: '登录信息失效，请重新登录！'
           })
           setTimeout(() => {
             location.href = '/login'
@@ -120,8 +116,8 @@ export default function fetch(options) {
         // 403无权限操作
         if (data && response.status === 403) {
           Notice.error({
-            title: '您没有权限操作',
-            desc: '错误代码：' + data.code,
+            title: '错误代码：' + data.code,
+            desc: '您没有权限操作',
             duration: 1.5
           })
           reject(error)
@@ -129,8 +125,8 @@ export default function fetch(options) {
         }
 
         Notice.error({
-          title: data.subMsg || data.msg,
-          desc: '错误代码：' + data.code,
+          title: '错误代码：' + data.code,
+          desc: data.subMsg || data.msg,
           duration: 1.5
         })
         reject(error)

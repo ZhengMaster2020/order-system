@@ -425,13 +425,16 @@
         this.$API.getSecurityExportKey()
           .then(res => {
             if (res.code === 0) {
-              if (res.data && res.data.indexOf('失败') > -1) {
-                this.$Message.error(res.data)
-              } else if (res.data && res.data.indexOf('有效期') > -1) {
-                this.$Message.warning(res.data)
-              } else {
-                this.$Message.success(res.data)
+              if (res.data.phone) {
+                this.$Message.success('验证码已发送至' + res.data.phone)
               }
+              // if (res.data && res.data.indexOf('失败') > -1) {
+              //   this.$Message.error(res.data)
+              // } else if (res.data && res.data.indexOf('有效期') > -1) {
+              //   this.$Message.warning(res.data)
+              // } else {
+              //   this.$Message.success(res.data)
+              // }
             }
           })
       },
