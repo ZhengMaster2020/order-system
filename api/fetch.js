@@ -46,14 +46,6 @@ export default function fetch(options) {
     // 请求处理
     instance(options)
       .then((res) => {
-        // 请求成功时,根据业务判断状态
-        /*  if (code === port_code.success) {
-                 resolve({code, msg, data})
-                 return false
-                 } else if (code === port_code.unlogin) {
-                 setUserInfo(null)
-                 router.replace({name: "login"})
-                 } */
         const data = res.data
 
         // responseType = blob 时错误信息转回json
@@ -61,22 +53,13 @@ export default function fetch(options) {
           var reader = new FileReader();
           reader.readAsText(data, 'utf-8');
           reader.onload = function () {
-            resolve(JSON.parse(reader.result))
+            res.data = JSON.parse(reader.result)
+            toSuccess(res, resolve, reject)
           }
-          return;
+        } else {
+          toSuccess(res, resolve, reject)
         }
 
-        if (data.code >= 1) {
-          let content = JSON.stringify(data.data)
-          let title = data.subMsg || data.message
-          data.data = data.data || []
-          Notice.warning({
-            title: 'code: ' + data.code,
-            desc: title
-          })
-        }
-
-        resolve(data)
         return false
       })
       .catch((error) => {
@@ -132,4 +115,27 @@ export default function fetch(options) {
         reject(error)
       })
   })
+}
+
+// 成功返回
+function toSuccess (res, resolve, reject) {
+  let data = res.data
+  if (res.status === 202) {
+    Notice.error({
+      title: '错误代码：' + data.code,
+      desc: data.subMsg || data.msg,
+      duration: 3
+    })
+    reject(data);
+    return;
+  }
+  if (data.code >= 1) {
+    let title = data.subMsg || data.message
+    data.data = data.data || []
+    Notice.warning({
+      title: 'code: ' + data.code,
+      desc: title
+    })
+  }
+  resolve(data)
 }
