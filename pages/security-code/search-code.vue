@@ -481,17 +481,21 @@
             postData.check = 1
           }
           this.$API[apiName](postData).then(res => {
-            let data = res
             this.isExportLoading = false;
-            this.isShowExportModal = false;
-            if (typeof window.navigator.msSaveBlob !== 'undefined') {
-              // IE version
-              window.navigator.msSaveBlob(data);
+            if (res.code === 0) {
+              let data = res
+              this.isShowExportModal = false;
+              if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                // IE version
+                window.navigator.msSaveBlob(data);
+              } else {
+                // Firefox version
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(data);
+                link.click();
+              }
             } else {
-              // Firefox version
-              var link = document.createElement('a');
-              link.href = window.URL.createObjectURL(data);
-              link.click();
+              this.$Message.error(res.subMsg)
             }
           }).catch((err) => {
             this.isExportLoading = false;

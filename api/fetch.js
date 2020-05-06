@@ -55,6 +55,17 @@ export default function fetch(options) {
                  router.replace({name: "login"})
                  } */
         const data = res.data
+
+        // responseType = blob 时错误信息转回json
+        if (data.__proto__ === Blob.prototype) {
+          var reader = new FileReader();
+          reader.readAsText(data, 'utf-8');
+          reader.onload = function () {
+            resolve(JSON.parse(reader.result))
+          }
+          return;
+        }
+
         if (data.code >= 1) {
           let content = JSON.stringify(data.data)
           let title = data.message
@@ -75,6 +86,7 @@ export default function fetch(options) {
       .catch((error) => {
         const response = error.response
         let data = response.data
+
         // responseType = blob 时错误信息转回json
         if (data.__proto__ === Blob.prototype) {
           var reader = new FileReader();
@@ -82,7 +94,7 @@ export default function fetch(options) {
           reader.onload = function () {
             data = JSON.parse(reader.result);
             Notice.error({
-              title: data.msg,
+              title: data.subMsg || data.msg,
               desc: '错误代码：' + data.code,
               duration: 1.5
             })
@@ -90,6 +102,7 @@ export default function fetch(options) {
           }
           return;
         }
+        
         // 401无效token
         if (data && response.status === 401) {
           // 退出登录
@@ -116,7 +129,7 @@ export default function fetch(options) {
         }
 
         Notice.error({
-          title: data.msg,
+          title: data.subMsg || data.msg,
           desc: '错误代码：' + data.code,
           duration: 1.5
         })
