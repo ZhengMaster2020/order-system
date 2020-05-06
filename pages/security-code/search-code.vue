@@ -426,7 +426,7 @@
           .then(res => {
             if (res.code === 0) {
               if (res.data.phone) {
-                this.$Message.success('验证码已发送至' + res.data.phone)
+                this.$Message.success('验证码已发送至' + res.data.phone + ',请注意查收!')
               }
               // if (res.data && res.data.indexOf('失败') > -1) {
               //   this.$Message.error(res.data)
