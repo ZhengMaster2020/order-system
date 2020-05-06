@@ -55,7 +55,7 @@
             </Upload>
         </div>
       </Form>
-
+      <Spin size="large" fix v-if="spinShow"></Spin>
     </Card>
   </div>
 </template>
@@ -68,6 +68,7 @@
       return {
         applicant: '',
         submintLodaing: false,
+        spinShow: false,
         fileUploadURL: `${ SERVER_BASE_URL }traceability/traceability/upload`,
         fileUploadHeaders: {
           Authorization: Cookies.get('authorization')
@@ -89,7 +90,7 @@
           brand: [{ required: true, message: '必填项', trigger: 'change' }],
           isFillPlan: [{ required: true, message: '必填项', trigger: 'change' }],
           quarter: [{ required: true, message: '必填项', trigger: 'change' }],
-          year: [{ required: true, type: 'number', message: '必填项', trigger: 'change' }],
+          year: [{ required: true, message: '必填项', trigger: 'change' }],
           generationCount: [{ required: true, type: 'number', message: '必填项', trigger: 'blur' }],
           planName: [{ required: true, message: '必填项', trigger: 'change' }],
         },
@@ -124,6 +125,20 @@
             if(this.form.fileItems.length <= 0 ) return this.$Message.error('请上传计划文件')
             // return console.log(this.form)
             this.submintLodaing = true
+            if(this.id){
+              let param = {
+                id: this.id,
+                params: this.form
+              }
+              this.$API.editProductionPlan(param).then(res => {
+                if(res.code === 0){
+                  this.$Message.success(res.msg)
+                  this.$router.push('/production-plan-management/production-plan-list')
+                }
+              }).finally(() => {
+                this.submintLodaing = false
+              })
+            }
             this.$API.addProductionPlan(this.form).then(res => {
               if(res.code === 0){
                 this.$Message.success(res.msg)
@@ -149,14 +164,14 @@
       getLastFiveYear(){
         let currentYear = new Date().getFullYear()
         this.lastFiveYears.push({
-          label: currentYear,
-          value: currentYear
+          label: currentYear + '',
+          value: currentYear + ''
         })
-        for(let i = 4; i > 0; i--){
-          currentYear--
+        for(let i = 0; i < 4; i++){
+          currentYear++
           this.lastFiveYears.push({
-            label: currentYear,
-            value: currentYear
+            label: currentYear + '',
+            value: currentYear + ''
           })
         }
       },
@@ -168,14 +183,33 @@
             this.form.nextId = res.data.list.filter(users => users.realName === this.form.nextBy)[0].id
           }
         })
+      },
+      // 获取计划详情
+      getProductionPlanDetail(id) {
+        this.spinShow = true
+        this.$API.getProductionPlanDetail({id}).then(res => {
+          if(res.code === 0){
+            let data = res.data
+            for(let key in this.form) {
+                if(data[key]){
+                  this.form[key] = data[key]
+                }
+            }
+          }
+        }).finally(() => {
+          this.spinShow = false
+        })
       }
     },
     mounted() {
       let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
-      this.id = this.$route.params.id
+      this.id = this.$route.query.id
       this.applicant = userInfo.realName
       this.getNextByUser()
       this.getLastFiveYear()
+      if(this.id){
+        this.getProductionPlanDetail(this.id)
+      }
     }
   }
 </script>

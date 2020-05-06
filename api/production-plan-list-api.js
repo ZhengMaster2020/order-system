@@ -34,10 +34,59 @@ const getPlanStatusDetail = ({id}) => {
   })
 };
 
+// 生产计划 - 经理审核
+const managerReview = (params) => {
+  return fetch({
+    url: `traceability/productionPlan/audit/${params.id}`,
+    method: 'POST',
+    data: params
+  })
+};
+
+// 生产计划 - 执行生成计划
+const executeProductionPlan = ({params, id}) => {
+  return fetch({
+    url: `traceability/productionBatch/${id}`,
+    method: 'POST',
+    data: params
+  })
+};
+
+// 生产计划 - 执行完毕
+const finishedProductionPlan = ({params, id}) => {
+  return fetch({
+    url: `traceability/productionPlan/finished/${id}`,
+    method: 'POST',
+    data: params
+  })
+};
+
+// 生产计划 - 删除计划
+const delProductionPlan = ({id}) => {
+  return fetch({
+    url: `traceability/productionPlan/${id}`,
+    method: 'DELETE',
+  })
+};
+
+// 生产计划 - 修改计划
+const editProductionPlan = ({params, id}) => {
+  return fetch({
+    url: `traceability/productionPlan/${id}`,
+    method: 'PATCH',
+    data: params
+  })
+};
+
 
 export default {
   getProductionPlan,
   addProductionPlan,
   getProductionPlanDetail,
-  getPlanStatusDetail
+  getPlanStatusDetail,
+  managerReview,
+  executeProductionPlan,
+  finishedProductionPlan,
+  delProductionPlan,
+  editProductionPlan
 }
