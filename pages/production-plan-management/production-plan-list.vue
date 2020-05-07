@@ -408,6 +408,13 @@
                   on: {
                     click: () => {
                       // TODO: 跳转生产批次
+                      this.$router.push({
+                        path: '/production-plan-management/production-prenatal-batch-list',
+                        query: {
+                          generationCount: row.planNumber,
+                          planName: row.planName,
+                        }
+                      })
                     }
                   }
                 }, row.realNum)

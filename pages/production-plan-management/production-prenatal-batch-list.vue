@@ -1,0 +1,292 @@
+<template>
+  <div>
+    <Card>
+      <!--      Form-->
+      <Form ref="searchForm" :model="searchForm" inline>
+        <Row type="flex" justify="space-between">
+          <Col>
+            <FormItem>
+              <Input v-model="searchForm.createdBy" placeholder="创建人" class="width-120" />
+            </FormItem>
+            <FormItem>
+              <DatePicker type="datetime"
+                          format="yyyy-MM-dd HH:mm:ss"
+                          placeholder="创建时间"
+                          class="width-120" @on-change="dateChange" />
+            </FormItem>
+            <FormItem>
+              <Input v-model="searchForm.planNumber" placeholder="下单编号" class="width-120" />
+            </FormItem>
+            <FormItem>
+              <Input v-model="searchForm.batchNumber" placeholder="生产批次号" class="width-120" />
+            </FormItem>
+            <FormItem>
+              <FormItem prop="name">
+                <Select v-model="searchForm.brand" clearable placeholder="品牌" class="width-120">
+                  <Option v-for="brand in brandList" :key="brand.label" :value="brand.label">{{brand.value}}</Option>
+                </Select>
+              </FormItem>
+            </FormItem>
+            <FormItem>
+              <Input v-model="searchForm.planName" placeholder="所属计划名称" class="width-120" />
+            </FormItem>
+            <FormItem>
+              <Input v-model="searchForm.supplier" placeholder="生成供应商" class="width-120" />
+            </FormItem>
+            <FormItem>
+              <Select clearable placeholder="是否导出" style="width: 100px" v-model="searchForm.processStatus">
+                <Option value="notExported">未导出</Option>
+                <Option value="exported">已导出</Option>
+              </Select>
+            </FormItem>
+            <FormItem>
+              <Select clearable placeholder="是否撤销" style="width: 100px" v-model="searchForm.produceStatus">
+                <Option value="unrevoked">未撤销</Option>
+                <Option value="revoked">已撤销</Option>
+              </Select>
+            </FormItem>
+          </Col>
+          <Col>
+            <FormItem>
+              <Button type="primary" @click="search">搜索</Button>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <FormItem>
+              <Button type="primary" @click="cancelProduction">撤销生产</Button>
+            </FormItem>
+            <FormItem>
+              <Button type="primary" @click="exportList">导表处理</Button>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+
+      <!--      Tabs-->
+      <Tabs v-model="currentTab">
+        <TabPane label="计划列表" name="prenatalBatch">
+
+          <!--          Table-->
+          <Table border
+                 :columns="prenatalBatch.columns"
+                 :data="prenatalBatch.data"
+                 @on-selection-change="selection => { selectionChange(selection) }"
+                 :loading="tableLoading" />
+
+          <!--          Page-->
+          <div class="foot-page">
+            共{{prenatalBatch.pageProps.total}}条
+            <Page transfer
+                  :total="prenatalBatch.pageProps.total"
+                  :page-size="prenatalBatch.pageProps.perPage"
+                  size="small"
+                  show-elevator
+                  show-sizer
+                  @on-change="(page) => { changePage(page, 'prenatalBatch') }"
+                  @on-page-size-change="(size) => { changePageSize(size, 'prenatalBatch') }" />
+          </div>
+        </TabPane>
+      </Tabs>
+    </Card>
+  </div>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        tableLoading: false,
+        currentTab: 'prenatalBatch',
+        searchForm: {
+          createdBy: '',
+          createdAt: '',
+          batchNumber: '',
+          brand: '',
+          planName: '',
+          planNumber: '',
+          supplier: '',
+          processStatus: '',
+          produceStatus: ''
+        },
+        brandList: [
+          {value: 'WIS', label: 'WIS'},
+          {value: '柏菲娜', label: 'BOOFINA'},
+          {value: 'IRY', label: 'IRY'},
+          {value: 'MVE', label: 'MVE'},
+          {value: '魔渍', label: 'MOZI'},
+          {value: 'KONO', label: 'KONO'},
+          {value: '墨雪', label: 'MOXUE'},
+        ],
+        attrs: { href: 'javascript:void(0)' },
+        prenatalBatch: {
+          columns: [
+            { type: 'selection', width: 60, align: 'center' },
+            { title: '序号', type: 'index', width: 70, align: 'center' },
+            { title: '批号创建人', key: 'created_by', align: 'center', minWidth: 100 },
+            { title: '创建时间', key: 'created_at', align: 'center', minWidth: 100, render: (h, {row}) => h('span', {}, this.$format(row.created_at, 'yyyy-MM-dd hh:mm:ss')) },
+            { title: '所属计划名称', key: 'plan_name', align: 'center', minWidth: 110 },
+            { title: '品牌', key: 'brand', align: 'center', minWidth: 80, render: (h, {row}) => h('span', {}, this.getBrand(row.brand)) },
+            { title: '生产批次号', key: 'batch_number', align: 'center', minWidth: 100 },
+            { title: '生产数量', key: 'num', align: 'center', minWidth: 100 },
+            { title: '入库数量', key: 'quantity_inbound', align: 'center', minWidth: 100, render: (h, {row}) => h('a', { attrs: { href: 'javascript:void(0)' } }, row.quantity_inbound) },
+            { title: '已出库数量', key: 'quantity_shipped', align: 'center', minWidth: 100, render: (h, {row}) => h('a', { attrs: { href: 'javascript:void(0)' } }, row.quantity_shipped) },
+            { title: '生产状态', key: 'produce_status', align: 'center', minWidth: 100,  render: (h, {row}) => {
+                h('span', {
+                  style: {
+                    color: row.produce_status === 'revoked'? 'red' : ''
+                  }
+                }, this.getProduceStatus(row.produce_status))
+              } },
+            { title: '激活状态', key: 'process_status', align: 'center', minWidth: 100,  render: (h, {row}) => h('span', {}, row.process_status === 'disabled' ? '未激活' : '已激活') },
+            { title: '下单编号', key: 'supplier_order_number', align: 'center', minWidth: 100 },
+            { title: '生产供应商', key: 'supplier', align: 'center', minWidth: 100 },
+            { title: '生产类型', key: 'produce_type', align: 'center', minWidth: 100,  render: (h, {row}) => h('span', {}, row.produce_type === 'prenatal' ? '产前样' : '大货样') },
+            { title: '标类型', key: 'mark_type', align: 'center', minWidth: 100,  render: (h, {row}) => h('span', {}, row.mark_type === 'P' ? '平标' : '卷标') },
+          ],
+          data: [
+            {
+              name: 'John Brown',
+              age: 18,
+              address: 'New York No. 1 Lake Park',
+              date: '2016-10-03'
+            },
+            {
+              name: 'Jim Green',
+              age: 24,
+              address: 'London No. 1 Lake Park',
+              date: '2016-10-01'
+            },
+            {
+              name: 'Joe Black',
+              age: 30,
+              address: 'Sydney No. 1 Lake Park',
+              date: '2016-10-02'
+            },
+            {
+              name: 'Jon Snow',
+              age: 26,
+              address: 'Ottawa No. 2 Lake Park',
+              date: '2016-10-04'
+            }
+          ],
+          selection: [],
+          pageProps: {
+            page: 1,
+            total: 0,
+            perPage:  10
+          },
+        }
+      }
+    },
+    mounted() {
+      let {planNumber, planName} = this.$route.query
+      this.planNumber = planNumber
+      // this.planName = planName
+      this.searchForm.planName = planName
+      this.getProductionBatch()
+      console.log({planNumber, planName})
+    },
+    methods: {
+      // Form 操作
+      search() {
+        this.getProductionBatch()
+      },
+      cancelProduction() {
+        // let firstId = this.prenatalBatch.selection[0].plan_id
+        // let iSsamePlan = this.prenatalBatch.selection.every(items => items.plan_id === firstId)
+        // if(!iSsamePlan) return this.$Message.error('批量操作需是同一生产计划号')
+
+      },
+      exportList() {
+        let firstId = this.prenatalBatch.selection[0].plan_id
+        let iSsamePlan = this.prenatalBatch.selection.every(items => items.plan_id === firstId)
+        if(!iSsamePlan) return this.$Message.error('批量操作需是同一生产计划号')
+        alert('yes')
+      },
+      // table 选项操作
+      selectionChange(selection) {
+        this.prenatalBatch.selection = selection
+      },
+      dateChange(date) {
+        console.log(date)
+        this.searchForm.createdAt = date
+      },
+      // 改变当前分页
+      changePage (page, key) {
+        this[key].page = page;
+        // this.getList();
+      },
+      // 改变分页size
+      changePageSize (pageSize, key) {
+        this[key].perPage = pageSize;
+        // this.getList();
+      },
+      // 计划列表参数
+      planListParams(currentTab, form) {
+        let {page, perPage} = this[currentTab].pageProps
+        let params = {}
+        for (let key in form) {
+          if (form[key]) {
+            params[key] = form[key]
+          }
+        }
+        params.page = page
+        params.perPage = perPage
+        return params
+      },
+      getProductionBatch() {
+        let currentTab = this.currentTab
+        let params = this.planListParams(currentTab, this.searchForm)
+        this.tableLoading = true
+        this.$API.getProductionBatch(params).then(res => {
+          if(res.code === 0){
+            let {list, count, page, perPage} = res.data
+            this[currentTab].data = list
+            this[currentTab].pageProps.page = page
+            this[currentTab].pageProps.perPage = perPage
+            this[currentTab].pageProps.total = count
+          }
+        }).finally(() => {
+          this.tableLoading = false
+        })
+      },
+      // 筛选品牌
+      getBrand(val){
+        let brands = {
+          WIS: 'WIS',
+          BOOFINA: '柏菲娜',
+          IRY: 'IRY',
+          MVE: 'MVE',
+          MOZI: '魔渍',
+          KONO: 'KONO',
+          MOXUE: '墨雪'
+        }
+        return brands[val]
+      },
+      // 筛选生产状态
+      getProduceStatus(val){
+        let produceStatus = {
+          generating: '生成中',
+          generated: '已生成',
+          revoked: '已撤销'
+        }
+        return produceStatus[val]
+      }
+    }
+  }
+</script>
+
+<style scoped>
+  .width-120 {
+    width: 120px;
+  }
+  .foot-page {
+    padding: 10px;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
