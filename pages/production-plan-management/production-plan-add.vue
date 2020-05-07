@@ -15,7 +15,7 @@
           </Select>
         </FormItem>
         <FormItem label="计划数量" prop="generationCount">
-          <InputNumber :min="1" class="width-200" v-model="form.generationCount"/>
+          <InputNumber :min="1" :precision='0' class="width-200" v-model="form.generationCount"/>
         </FormItem>
         <FormItem label="计划年份" prop="year">
           <Select v-model="form.year" clearable placeholder="计划年份" class="width-200">
@@ -42,17 +42,26 @@
         <FormItem label="备注">
           <Input style="width: 420px" v-model="form.remark"/>
         </FormItem>
-        <div>
-          <div class="necessary margin-bottom-10">计划文件</div>
+        <div style="position: relative">
+          <div class="necessary margin-bottom-10 font-size-12">计划文件</div>
             <Upload
-            multiple
+            ref="upload"
             :action="fileUploadURL"
             :headers="fileUploadHeaders"
+            :max-size="15360"
+            :default-file-list="form.fileItems"
+            :before-upload="beforeUpload"
             :on-success="onsuccess"
+            :on-remove="onremove"
             :on-error="onerror"
+            :on-exceeded-size="onOverMaxSize"
             >
               <Button icon="ios-cloud-upload-outline">Upload files</Button>
             </Upload>
+          <Button icon="ios-cloud-download-outline"
+                  @click="downloadFlies"
+                  v-show="form.fileItems.length"
+          style="position: absolute; left: 129px; top: 27px">下载</Button>
         </div>
       </Form>
       <Spin size="large" fix v-if="spinShow"></Spin>
@@ -69,6 +78,7 @@
         applicant: '',
         submintLodaing: false,
         spinShow: false,
+        fileUrl: '',
         fileUploadURL: `${ SERVER_BASE_URL }traceability/traceability/upload`,
         fileUploadHeaders: {
           Authorization: Cookies.get('authorization')
@@ -132,16 +142,17 @@
               }
               this.$API.editProductionPlan(param).then(res => {
                 if(res.code === 0){
-                  this.$Message.success(res.msg)
+                  this.$Message.success('编辑成功')
                   this.$router.push('/production-plan-management/production-plan-list')
                 }
               }).finally(() => {
                 this.submintLodaing = false
               })
+              return
             }
             this.$API.addProductionPlan(this.form).then(res => {
               if(res.code === 0){
-                this.$Message.success(res.msg)
+                this.$Message.success('添加成功')
                 this.$router.push('/production-plan-management/production-plan-list')
               }
             }).finally(() => {
@@ -150,8 +161,16 @@
           }
         })
       },
+      beforeUpload() {
+        const check = this.form.fileItems.length < 1;
+        if (!check) {
+          this.$Message.warning('只能上传一个文件');
+        }
+        return check;
+      },
       onsuccess( response) {
         if(response.code === 0){
+          this.$Message.success(response.msg)
           this.form.fileItems.push(response.data.fileUploadVo)
         }else {
           this.$Message.error('上传有误')
@@ -160,7 +179,24 @@
       onerror( error ) {
         this.$Message.error('上传失败')
       },
-      // 获取前五年
+      onOverMaxSize(){
+        this.$Message.warning('上传文件最大15m')
+      },
+      onremove(file, fileList){
+        // console.log(file)
+        // console.log(fileList,'fileList')
+        this.form.fileItems = []
+      },
+      downloadFlies(){
+        this.$Message.success('开始下载');
+        let a = document.createElement('a');
+        a.download = this.form.fileItems[0].name;
+        // a.href = SERVER_BASE_URL + fileUrl;
+        a.href = this.form.fileItems[0].url;
+        // window.open(this.form.fileItems[0].url)
+        a.click();
+      },
+      // 获取后五年
       getLastFiveYear(){
         let currentYear = new Date().getFullYear()
         this.lastFiveYears.push({
@@ -190,6 +226,9 @@
         this.$API.getProductionPlanDetail({id}).then(res => {
           if(res.code === 0){
             let data = res.data
+            let year = data.planNumber.match(/\d{4}/g)[0]
+            this.form.year = year
+            this.applicant = data.createdBy
             for(let key in this.form) {
                 if(data[key]){
                   this.form[key] = data[key]
@@ -217,6 +256,9 @@
 <style scoped>
 .width-200 {
   width: 200px;
+}
+.font-size-12 {
+  font-size: 12px;
 }
 .necessary:before {
   content: '*';

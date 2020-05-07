@@ -66,7 +66,7 @@
         <Row v-for="(batchData, index) in baseicData.form" :key="index">
           <Col span="4">
             <FormItem :prop="'form.' + index + '.produceType'" :rules='rules.produceType'>
-              <Select v-model="batchData.produceType" clearable class="width-195">
+              <Select v-model="batchData.produceType" class="width-195" @on-change="(val) => {markTypeChange(val, index)}">
                 <Option value="prenatal">产前样</Option>
                 <Option value="goods">大货样</Option>
               </Select>
@@ -74,13 +74,21 @@
           </Col>
           <Col span="4">
             <FormItem :prop="'form.' + index + '.num'" :rules='rules.num'>
-              <InputNumber :min="0" :max="realNum" class="width-195" v-model="batchData.num" @on-change="(val) => {numchange(val, index)}"/>
+              <InputNumber :min="1"
+                           :max="batchData.remainingQuantity"
+                           :precision='0'
+                           :formatter="value => `${value}`.replace(/\B(?=(?:\d{3})+\b)/g, ',')"
+                           :parser="value => value.replace(/\$\s?|(,*)/g, '')"
+                           class="width-195" v-model="batchData.num"
+                           @on-change="(val) => {numChange(val, index)}"/>
             </FormItem>
           </Col>
 
           <Col span="4">
             <FormItem :prop="'form.' + index + '.markType'" :rules='rules.markType'>
-              <Select v-model="batchData.markType" clearable class="width-195">
+              <Select v-model="batchData.markType" clearable
+                      class="width-195"
+                      >
                 <Option value="P">平标</Option>
                 <Option value="J">卷标</Option>
               </Select>
@@ -125,8 +133,9 @@
             {
               planId: '',
               produceType: '',
-              num: 0,
+              num: 1,
               markType: '',
+              remainingQuantity: 0,
             }
           ],
         },
@@ -146,9 +155,11 @@
       submit() {
         this.$refs.form.validate(val => {
           if (val) {
+            let remainingQuantity = this.baseicData.remainingQuantity
+            // console.log(this.baseicData.form)
             this.baseicData.form.map(batchDatas => {
               batchDatas.planId = this.planId
-              batchDatas.remainingQuantity = this.baseicData.remainingQuantity
+              batchDatas.remainingQuantity = remainingQuantity
             })
             // console.log(this.baseicData.form)
             let param = {
@@ -167,46 +178,86 @@
         })
       },
       addBatchData(){
+        if(this.baseicData.remainingQuantity <= 0) return
+        let total = this.getTotalNum(this.baseicData.form)
         this.baseicData.form.push({
           planId: '',
           produceType: '',
           num: 0,
+          remainingQuantity: this.realNum - total <= 0 ? 0 : this.realNum - total,
           markType: '',
         })
       },
       delBatchData(index){
-        if(this.baseicData.form.length <= 1) return
         this.baseicData.form.splice(index, 1)
         let total = this.getTotalNum(this.baseicData.form)
         this.baseicData.remainingQuantity = this.realNum - total
       },
       getTotalNum(arr){
         let totalNum = 0
-        arr.forEach(items => {
-          totalNum += items.num
-        })
+        arr.forEach(items => totalNum += items.num )
         return totalNum
       },
-      numchange(val, index){
-        // console.log(val, index)
+      numChange(val, index){
         let total = this.getTotalNum(this.baseicData.form)
-        this.baseicData.remainingQuantity = this.realNum - total
+        let prenatalMax = 10000
+        let goodsMax = 1000000
+        let remainNum = this.realNum - total <= 0 ? 0 : this.realNum - total
+        this.baseicData.remainingQuantity = remainNum
+        this.baseicData.form.map((items, indx) => {
+          if(items.produceType === 'prenatal'){
+            items.remainingQuantity = (remainNum + items.num) >= prenatalMax ? prenatalMax : (remainNum + items.num)
+          }else if(items.produceType === 'goods'){
+            items.remainingQuantity = (remainNum + items.num) >= goodsMax ? goodsMax : (remainNum + items.num)
+          }else {
+            items.remainingQuantity = remainNum + items.num
+          }
+
+          if(index === indx){
+            items.num = val > remainNum + items.num ? remainNum + items.num : val
+          }
+        })
+      },
+      markTypeChange(markType, index) {
+        let prenatalMax = 10000
+        let goodsMax = 1000000
+        let data = this.baseicData.form[index]
+          if(data.produceType === 'prenatal'){
+            data.remainingQuantity = data.num >= prenatalMax ? prenatalMax : data.num
+            data.num = data.num >= prenatalMax ? prenatalMax : data.num
+          }else if(data.produceType === 'goods'){
+            data.remainingQuantity = data.num >= goodsMax ? goodsMax : data.num
+            data.num = data.num >= goodsMax ? goodsMax : data.num
+          }
+          let diff = data.num - prenatalMax
+        let total = this.getTotalNum(this.baseicData.form)
+        let remainNum = this.realNum - total <= 0 ? 0 : this.realNum - total
+        this.baseicData.remainingQuantity = remainNum
+        this.baseicData.form.map((items, indx) => {
+          if(index !== indx){
+            if(diff < 0){
+              items.remainingQuantity += diff
+            }
+          }
+        })
       },
       // 计划详情
       getProductionPlanDetail(id) {
         this.$API.getProductionPlanDetail({id}).then(res => {
           if(res.code === 0){
             let data = res.data
-            // this.realNum = data.realNum
-            this.realNum = 100
+            this.realNum = parseInt(data.generationCount * 1.1 - data.realNum)
+            // this.realNum = 100
             for(let key in this.baseicData) {
               if(key !== 'form'){
                 if(data[key]){
                   this.baseicData[key] = data[key]
                   this.baseicData.opinion = data.ext.opinion
                   this.baseicData.planStatus = data.ext.planStatus
-                  // this.baseicData.remainingQuantity = data.realNum
-                  this.baseicData.remainingQuantity = 100
+                  this.baseicData.remainingQuantity = this.realNum
+                  this.baseicData.form[0].remainingQuantity = this.realNum
+                  // this.baseicData.remainingQuantity = 100
+                  // this.baseicData.form[0].remainingQuantity = 100
                 }
               }
             }

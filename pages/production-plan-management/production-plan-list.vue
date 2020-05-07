@@ -160,7 +160,7 @@
       </div>
     </Modal>
 
-    <!-- TODO: 权限判断 执行完毕  -->
+    <!-- TODO: 超出计划数量10%需要补Q 执行完毕  -->
     <Modal
     v-model="finishedModal.modal"
     title="执行完毕"
@@ -228,7 +228,7 @@
     <!-- TODO: 权限判断 状态详情 -->
     <Modal
     v-model="statusDetailModal.modal"
-    title="计划审核"
+    title="状态详情"
     width="1000">
       <Form inline>
         <div class="title">
@@ -308,13 +308,13 @@
           <span class="line"></span>
         </div>
         <FormItem label="执行人">
-          <Input class="width-180" v-model="statusDetailModal.form.managerReview.createdBy" readonly/>
+          <Input class="width-180" v-model="statusDetailModal.form.finished.createdBy" readonly/>
         </FormItem>
         <FormItem label="实际执行数量">
-          <Input class="width-180" v-model="statusDetailModal.form.managerReview.realNum" readonly/>
+          <Input class="width-180" v-model="statusDetailModal.form.finished.realNum" readonly/>
         </FormItem>
         <FormItem label="关闭意见">
-          <Input style="width: 200px" v-model="statusDetailModal.form.managerReview.opinion" readonly/>
+          <Input style="width: 200px" v-model="statusDetailModal.form.finished.opinion" readonly/>
         </FormItem>
       </Form>
       <Spin size="large" fix v-if="spinShow"></Spin>
@@ -388,7 +388,12 @@
             },
             {title: '季度', key: 'quarter', align: 'center'},
             {title: '计划编号', key: 'planNumber', align: 'center'},
-            {title: '是否补Q计划', key: 'isFillPlan', align: 'center'},
+            {
+              title: '是否补Q计划',
+              key: 'isFillPlan',
+              align: 'center',
+              render: (h, {row}) => h('span', {}, row.isFillPlan === 'yes' ? '是' : '否')
+              },
             {title: '品牌', key: 'brand', align: 'center'},
             {title: '计划数量', key: 'generationCount', align: 'center'},
             {
@@ -408,7 +413,12 @@
                 }, row.realNum)
               }
             },
-            {title: '创建时间', key: 'createdAt', align: 'center'},
+            {
+              title: '创建时间',
+              key: 'createdAt',
+              align: 'center',
+              render: (h, {row}) => h('span', {}, row.createdAt.substr(0, 10))
+            },
             {title: '申请人', key: 'createdBy', align: 'center'},
             {title: '备注', key: 'remark', align: 'center'},
             {title: '操作', key: 'action', align: 'center', slot: 'action', width: 130},
@@ -476,7 +486,7 @@
               quarter: '',
               isFillPlan: '',
               planName: '',
-              fileItems: '',
+              fileItems: [],
             },
             managerReview: {
               createdBy: '',
@@ -500,8 +510,9 @@
         }
       }
     },
-    created() {
+    mounted() {
       this.getPlanList()
+      this.userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
 
     },
     methods: {
@@ -521,9 +532,10 @@
         })
       },
       editPlan(row) {
-        let {id, planStatus} = row
+        let {id, planStatus, createdBy} = row
         let conditions = ['overrule', 'pendingManagerReview']
         if(!conditions.includes(planStatus)) return this.$Message.error('此状态下无法编辑')
+        if(createdBy !== this.userInfo.realName) return this.$Message.error('非本人无法编辑')
         this.$router.push({
           path: '/production-plan-management/production-plan-add',
           query: { id },
@@ -548,8 +560,7 @@
         this.reviewModal.modal = true
         let {id, planStatus} = this.planList.selection[0]
         if(planStatus != 'pendingManagerReview') return this.$Message.error('已审核')
-        let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
-        this.reviewModal.reivewer = userInfo.realName
+        this.reviewModal.reivewer = this.userInfo.realName
         this.reviewModal.form.id = id
         this.spinShow = true
         // 计划详情
@@ -692,6 +703,7 @@
       getPlanStatusDetail(id) {
         // this.statusDetailModal.form base managerReview situation finished
         this.spinShow = true
+        this.resetStatusDetail()
         this.$API.getPlanStatusDetail({id}).then(res => {
           if (res.code === 0) {
             let {detail, situation, log} = res.data
@@ -714,7 +726,7 @@
                   this.statusDetailModal.form[items.title].realNum = items.ext.realNum
                 }
                 if (items.ext.planStatus) {
-                  this.statusDetailModal.form[items.title].planStatus = items.ext.planStatus
+                  this.statusDetailModal.form[items.title].planStatus = this.getPlanStatus(items.ext.planStatus)
                 }
               })
             }
@@ -733,6 +745,36 @@
           finished: '执行完毕',
         }
        return statusObj[val]
+      },
+      // 请空状态详情
+      resetStatusDetail(){
+        this.statusDetailModal.form = {
+          base: {
+            createdBy: '',
+              createdAt: '',
+              planNumber: '',
+              brand: '',
+              generationCount: '',
+              quarter: '',
+              isFillPlan: '',
+              planName: '',
+              fileItems: [],
+          },
+          managerReview: {
+            createdBy: '',
+              planStatus: '',
+              opinion: '',
+          },
+          situation: {
+            batchNum: '',
+              batchCount: '',
+          },
+          finished: {
+            createdBy: '',
+              realNum: '',
+              opinion: '',
+          },
+        }
       }
     }
   }
@@ -771,7 +813,13 @@
       border-top: 1px solid #e9ebed;
     }
   }
-
+  /deep/ .ivu-modal-header {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  /deep/ .ivu-modal-body {
+    padding-top: 0;
+  }
   .modal-footer {
     text-align: right;
     position: relative;
