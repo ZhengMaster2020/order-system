@@ -129,7 +129,10 @@
         </FormItem>
         <FormItem label="计划文件">
           <div style="padding-top: 33px">
-            <a href="javascript:;" v-for="(file, index) in reviewModal.data.fileItems" :key="index">{{file.name}}</a>
+            <a href="javascript:;"
+               v-for="(file, index) in reviewModal.data.fileItems"
+               :key="index"
+               @click="downloadFlies(file)">{{file.name}}</a>
           </div>
         </FormItem>
 
@@ -198,7 +201,10 @@
         </FormItem>
         <FormItem label="计划文件">
           <div style="padding-top: 33px">
-            <a href="javascript:;" v-for="(file, index) in finishedModal.data.fileItems" :key="index">{{file.name}}</a>
+            <a href="javascript:;"
+               v-for="(file, index) in finishedModal.data.fileItems"
+               :key="index"
+               @click="downloadFlies(file)">{{file.name}}</a>
           </div>
         </FormItem>
 
@@ -263,7 +269,9 @@
         </FormItem>
         <FormItem label="计划文件">
           <div style="padding-top: 33px">
-            <a href="javascript:;" v-for="(file, index) in statusDetailModal.form.base.fileItems" :key="index">{{file.name}}</a>
+            <a href="javascript:;"
+               v-for="(file, index) in statusDetailModal.form.base.fileItems"
+               :key="index" @click="downloadFlies(file)">{{file.name}}</a>
           </div>
 
         </FormItem>
@@ -297,7 +305,7 @@
         <FormItem>
           <div style="padding-top: 33px">
             <!-- TODO: 跳转批次记录列表页-->
-            <a href="javascript:;">查看批次记录</a>
+            <a href="javascript:;" @click="toPrenatalBatchList">查看批次记录</a>
           </div>
         </FormItem>
 
@@ -380,6 +388,7 @@
                   on: {
                     click: () => {
                       this.statusDetailModal.modal = true
+                      this.statusDetailModal.planStatus = ['executing', 'finished'].includes(row.planStatus)
                       this.getPlanStatusDetail(row.id)
                     }
                   }
@@ -408,9 +417,12 @@
                   on: {
                     click: () => {
                       // TODO: 跳转生产批次
+                      let isCheck = ['executing', 'finished'].includes(row.planStatus)
+                      let text = this.getPlanStatus(row.planStatus)
+                      if(!isCheck) return this.$Message.warning(`${text} 没有批次记录`)
                       this.$router.push({
-                        path: '/production-plan-management/production-prenatal-batch-list',
-                        query: {
+                        name: 'production-plan-management/production-prenatal-batch-list',
+                        params: {
                           generationCount: row.planNumber,
                           planName: row.planName,
                         }
@@ -483,6 +495,7 @@
         },
         statusDetailModal: {
           modal: false,
+          planStatus: true,
           form: {
             base: {
               createdBy: '',
@@ -662,6 +675,24 @@
           }
         })
       },
+
+      toPrenatalBatchList(){
+        if(!this.statusDetailModal.planstatus) return
+        $router.push({
+          name: 'production-plan-management/production-prenatal-batch-list',
+          params: {
+            generationCount: this.statusDetailModal.form.base.planNumber,
+            planName: this.statusDetailModal.form.base.planName,
+          }
+        })
+      },
+      downloadFlies(file){
+        this.$Message.success('开始下载');
+        let a = document.createElement('a');
+        a.download = file.name;
+        a.href = file.url;
+        a.click();
+      },
       // table 选项操作
       selectionChange(selection) {
         this.planList.selection = selection
@@ -669,12 +700,12 @@
       // 改变当前分页
       changePage(page, key) {
         this[key].page = page;
-        // this.getList();
+        this.getPlanList();
       },
       // 改变分页size
       changePageSize(pageSize, key) {
         this[key].perPage = pageSize;
-        // this.getList();
+        this.getPlanList();
       },
       // 计划列表参数
       planListParams(currentTab, form) {

@@ -15,7 +15,12 @@
           </Select>
         </FormItem>
         <FormItem label="计划数量" prop="generationCount">
-          <InputNumber :min="1" :precision='0' class="width-200" v-model="form.generationCount"/>
+          <InputNumber :min="1"
+                       :precision='0'
+                       :formatter="value => `${value}`.replace(/\B(?=(?:\d{3})+\b)/g, ',')"
+                       :parser="value => value.replace(/\$\s?|(,*)/g, '')"
+                       class="width-200"
+                       v-model="form.generationCount"/>
         </FormItem>
         <FormItem label="计划年份" prop="year">
           <Select v-model="form.year" clearable placeholder="计划年份" class="width-200">
