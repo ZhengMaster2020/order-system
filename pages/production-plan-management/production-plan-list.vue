@@ -63,13 +63,14 @@
                  @on-selection-change="selection => { selectionChange(selection) }"
                  :loading="tableLoading">
             <template slot-scope="{ row, index }" slot="action">
-              <Tooltip placement="top" content="编辑" transfer>
-                <Button type="primary" size="small" @click="editPlan(row)">
+<!--              <Tooltip placement="top" content="编辑" transfer>-->
+                <Button type="primary" size="small" @click="editPlan(row)"
+                        :disabled="row.createdBy !== userInfo.realName || !['overrule', 'pendingManagerReview'].includes(row.planStatus)">
                   <Icon type="md-create"/>
                 </Button>
-              </Tooltip>
+<!--              </Tooltip>-->
               <Poptip confirm title="您确认删除这条内容吗？" @on-ok="delPlan(row)" transfer>
-                <Button size="small">
+                <Button size="small" :disabled="row.createdBy !== userInfo.realName || !['overrule', 'pendingManagerReview'].includes(row.planStatus)">
                   <Icon type="md-trash"/>
                 </Button>
               </Poptip>
@@ -339,6 +340,7 @@
       return {
         spinShow: false,
         currentTab: 'planList',
+        userInfo: '',
         quarterList: [
           {value: 'Q1', label: 'Q1'},
           {value: 'Q2', label: 'Q2'},
@@ -542,8 +544,8 @@
       },
       delPlan(row){
         let {id, planStatus} = row
-        let conditions = ['overrule', 'pendingManagerReview']
-        if(!conditions.includes(planStatus)) return this.$Message.error('待审核和驳回状态下才可删除计划')
+        // let conditions = ['overrule', 'pendingManagerReview']
+        // if(!conditions.includes(planStatus)) return this.$Message.error('待审核和驳回状态下才可删除计划')
         this.$API.delProductionPlan({id}).then(res => {
           if(res.code === 0 ){
             this.$Message.success(res.msg)
@@ -553,9 +555,9 @@
       },
       editPlan(row) {
         let {id, planStatus, createdBy} = row
-        let conditions = ['overrule', 'pendingManagerReview']
-        if(!conditions.includes(planStatus)) return this.$Message.error('待审核和驳回时状态下才可编辑')
-        if(createdBy !== this.userInfo.realName) return this.$Message.error('非本人无法编辑')
+        // let conditions = ['overrule', 'pendingManagerReview']
+        // if(!conditions.includes(planStatus)) return this.$Message.error('待审核和驳回时状态下才可编辑')
+        // if(createdBy !== this.userInfo.realName) return this.$Message.error('非本人无法编辑')
         this.$router.push({
           path: '/production-plan-management/production-plan-add',
           query: { id },
