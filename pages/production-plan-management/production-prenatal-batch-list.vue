@@ -108,7 +108,7 @@
         </FormItem>
         <FormItem label="慕可代码" prop="mkCode">
           <!--          <Input class="width-180" v-model="exportModal.form.mkCode" readonly/>-->
-          <Select v-model="exportModal.form.mkCode" class="width-180" @on-change="getSupplierInfo">
+          <Select v-model="exportModal.form.mkCode" :not-found-text="exportModal.notFoundText" class="width-180" @on-change="getSupplierInfo">
             <Option v-for="code in mkCodeList" :key="code.label" :value="code.label">{{code.value}}</Option>
           </Select>
         </FormItem>
@@ -349,6 +349,7 @@
           generateQuantity: 0,
           planName: '',
           brand: '',
+          notFoundText: '无匹配数据',
           form: {
             ids: [],
             supplierOrderNumber: '',
@@ -521,6 +522,7 @@
         let supplierOrderNumber = this.exportModal.form.supplierOrderNumber
         if (!supplierOrderNumber) return
         params.order_no = supplierOrderNumber
+        this.exportModal.notFoundText = '加载中...'
         let token = Cookies.get('authorization')
         Cookies.set('authorization', 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X', { expires: 1 })
         this.$API.getOrderPacking(params).then(res => {
