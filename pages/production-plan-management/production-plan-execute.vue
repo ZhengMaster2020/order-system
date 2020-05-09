@@ -86,7 +86,7 @@
 
           <Col span="4">
             <FormItem :prop="'form.' + index + '.markType'" :rules='rules.markType'>
-              <Select v-model="batchData.markType" clearable
+              <Select v-model="batchData.markType"
                       class="width-195"
                       >
                 <Option value="P">平标</Option>

@@ -91,7 +91,7 @@
       </Tabs>
     </Card>
 
-    <!-- TODO: 权限判断 经理审核  -->
+    <!-- 经理审核  -->
     <Modal
     v-model="reviewModal.modal"
     title="计划审核"
@@ -158,12 +158,12 @@
       </Form>
       <Spin size="large" fix v-if="spinShow"></Spin>
       <div class="modal-footer" slot="footer">
-        <Button type="default">取消</Button>
+        <Button type="default" @click="reviewModal.modal = false">取消</Button>
         <Button type="primary" @click="submit('reviewModal', 'reviewForm')">确认</Button>
       </div>
     </Modal>
 
-    <!-- TODO: 超出计划数量10%需要补Q 执行完毕  -->
+    <!-- 执行完毕  -->
     <Modal
     v-model="finishedModal.modal"
     title="执行完毕"
@@ -231,7 +231,7 @@
       </div>
     </Modal>
 
-    <!-- TODO: 权限判断 状态详情 -->
+    <!-- 状态详情 -->
     <Modal
     v-model="statusDetailModal.modal"
     title="状态详情"
@@ -387,8 +387,9 @@
                   },
                   on: {
                     click: () => {
+                      let isCheck = ['executing', 'finished'].includes(row.planStatus)
                       this.statusDetailModal.modal = true
-                      this.statusDetailModal.planStatus = ['executing', 'finished'].includes(row.planStatus)
+                      this.statusDetailModal.planStatus = isCheck
                       this.getPlanStatusDetail(row.id)
                     }
                   }
@@ -418,8 +419,7 @@
                     click: () => {
                       // TODO: 跳转生产批次
                       let isCheck = ['executing', 'finished'].includes(row.planStatus)
-                      let text = this.getPlanStatus(row.planStatus)
-                      if(!isCheck) return this.$Message.warning(`${text} 没有批次记录`)
+                      if(!isCheck) return this.$Message.warning(`执行中和执行完毕状态下才有批次记录`)
                       this.$router.push({
                         name: 'production-plan-management/production-prenatal-batch-list',
                         params: {
@@ -495,7 +495,7 @@
         },
         statusDetailModal: {
           modal: false,
-          planStatus: true,
+          planStatus: false,
           form: {
             base: {
               createdBy: '',
@@ -543,7 +543,7 @@
       delPlan(row){
         let {id, planStatus} = row
         let conditions = ['overrule', 'pendingManagerReview']
-        if(!conditions.includes(planStatus)) return this.$Message.error('此状态下无法删除计划')
+        if(!conditions.includes(planStatus)) return this.$Message.error('待审核和驳回状态下才可删除计划')
         this.$API.delProductionPlan({id}).then(res => {
           if(res.code === 0 ){
             this.$Message.success(res.msg)
@@ -554,7 +554,7 @@
       editPlan(row) {
         let {id, planStatus, createdBy} = row
         let conditions = ['overrule', 'pendingManagerReview']
-        if(!conditions.includes(planStatus)) return this.$Message.error('此状态下无法编辑')
+        if(!conditions.includes(planStatus)) return this.$Message.error('待审核和驳回时状态下才可编辑')
         if(createdBy !== this.userInfo.realName) return this.$Message.error('非本人无法编辑')
         this.$router.push({
           path: '/production-plan-management/production-plan-add',
@@ -677,8 +677,8 @@
       },
 
       toPrenatalBatchList(){
-        if(!this.statusDetailModal.planstatus) return
-        $router.push({
+        if(!this.statusDetailModal.planStatus) return this.$Message.warning('执行中和执行完毕状态下才有批次记录')
+        this.$router.push({
           name: 'production-plan-management/production-prenatal-batch-list',
           params: {
             generationCount: this.statusDetailModal.form.base.planNumber,
@@ -699,12 +699,12 @@
       },
       // 改变当前分页
       changePage(page, key) {
-        this[key].page = page;
+        this[key].pageProps.page = page;
         this.getPlanList();
       },
       // 改变分页size
-      changePageSize(pageSize, key) {
-        this[key].perPage = pageSize;
+      changePageSize(perPage, key) {
+        this[key].pageProps.perPage = perPage;
         this.getPlanList();
       },
       // 计划列表参数

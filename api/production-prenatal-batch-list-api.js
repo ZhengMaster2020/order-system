@@ -20,6 +20,15 @@ const getProductionBatchExportDetail = (params) => {
   })
 }
 
+// 生产批次 - 导表
+const getProductionBatchExport = (params) => {
+  return fetch({
+    url: `traceability/productionBatch/exportHandle`,
+    method: 'POST',
+    data: params
+  })
+}
+
 // 生产批次 - 采购系统供应商相关信息
 const getOrderPacking = (params) => {
   return fetch({
@@ -38,9 +47,20 @@ const getProductionBatchCountNum = ({orderNumber}) => {
   })
 };
 
+// 生产批次 - 撤销生产
+const delProductionBatch = ({params, id}) => {
+  return fetch({
+    url: `traceability/productionBatch/revoke/${id}`,
+    method: 'DELETE',
+    params: params,
+  })
+};
+
 export default {
   getProductionBatch,
   getProductionBatchExportDetail,
   getOrderPacking,
-  getProductionBatchCountNum
+  getProductionBatchCountNum,
+  getProductionBatchExport,
+  delProductionBatch
 }
