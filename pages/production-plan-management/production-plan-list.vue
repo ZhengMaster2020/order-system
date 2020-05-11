@@ -130,10 +130,9 @@
         </FormItem>
         <FormItem label="计划文件">
           <div style="padding-top: 33px">
-            <a href="javascript:;"
+            <a :href="file.url" :download="file.name" class="download-link"
                v-for="(file, index) in reviewModal.data.fileItems"
-               :key="index"
-               @click="downloadFlies(file)">{{file.name}}</a>
+               :key="index">{{file.name}}</a>
           </div>
         </FormItem>
 
@@ -202,10 +201,9 @@
         </FormItem>
         <FormItem label="计划文件">
           <div style="padding-top: 33px">
-            <a href="javascript:;"
+            <a :href="file.url" :download="file.name" class="download-link"
                v-for="(file, index) in finishedModal.data.fileItems"
-               :key="index"
-               @click="downloadFlies(file)">{{file.name}}</a>
+               :key="index">{{file.name}}</a>
           </div>
         </FormItem>
 
@@ -269,10 +267,10 @@
           <Input class="width-180" v-model="statusDetailModal.form.base.planName" readonly/>
         </FormItem>
         <FormItem label="计划文件">
-          <div style="padding-top: 33px">
-            <a href="javascript:;"
+          <div style="padding-top: 33px" >
+            <a :href="file.url" :download="file.name"
                v-for="(file, index) in statusDetailModal.form.base.fileItems"
-               :key="index" @click="downloadFlies(file)">{{file.name}}</a>
+               :key="index" class="download-link">{{file.name}}</a>
           </div>
 
         </FormItem>
@@ -305,7 +303,6 @@
         </FormItem>
         <FormItem>
           <div style="padding-top: 33px">
-            <!-- TODO: 跳转批次记录列表页-->
             <a href="javascript:;" @click="toPrenatalBatchList">查看批次记录</a>
           </div>
         </FormItem>
@@ -578,10 +575,10 @@
       // 经理审核
       reviewPlan() {
         let msg = this.operationVerify()
-        if (msg) return this.$Message.error(msg)
-        this.reviewModal.modal = true
+        if (msg) return this.$Message.warning(msg)
         let {id, planStatus} = this.planList.selection[0]
-        if(planStatus != 'pendingManagerReview') return this.$Message.error('已审核')
+        if(planStatus != 'pendingManagerReview') return this.$Message.warning('已审核')
+        this.reviewModal.modal = true
         this.reviewModal.reivewer = this.userInfo.realName
         this.reviewModal.form.id = id
         this.spinShow = true
@@ -605,10 +602,10 @@
       // 执行计划
       executePlan() {
         let msg = this.operationVerify()
-        if (msg) return this.$Message.error(msg)
-        let {id, planStatus} = this.planList.selection[0]
+        if (msg) return this.$Message.warning(msg)
+        let {id, planStatus, createdBy} = this.planList.selection[0]
         let conditions = ['executing', 'pendingExecuted']
-        if(!conditions.includes(planStatus)) return this.$Message.error('此计划状态下无法执行计划')
+        if(!conditions.includes(planStatus)) return this.$Message.warning('此计划状态下无法执行计划')
         this.$router.push({
           path: '/production-plan-management/production-plan-execute',
           query: { id },
@@ -618,8 +615,9 @@
       finishedPlan() {
         let msg = this.operationVerify()
         if (msg) return this.$Message.warning(msg)
-        let {id, planStatus} = this.planList.selection[0]
-        if(planStatus != 'executing') return this.$Message.error('此状态下无法无法关闭计划')
+        let {id, planStatus, createdBy} = this.planList.selection[0]
+        if(createdBy !== this.userInfo.realName) return this.$Message.warning('非创建人无法无法关闭计划')
+        if(planStatus != 'executing') return this.$Message.warning('此状态下无法无法关闭计划')
         this.finishedModal.modal = true
         this.spinShow = true
         this.$API.getProductionPlanDetail({id}).then(res => {
@@ -632,6 +630,7 @@
                 }
               }
             }
+            this.finishedModal.data.nextBy = this.userInfo.realName
             this.finishedModal.form.id = id
             this.finishedModal.form.realNum = data.realNum
             this.finishedModal.form.opinion = ''
@@ -688,13 +687,6 @@
           }
         })
       },
-      downloadFlies(file){
-        this.$Message.success('开始下载');
-        let a = document.createElement('a');
-        a.download = file.name;
-        a.href = file.url;
-        a.click();
-      },
       // table 选项操作
       selectionChange(selection) {
         this.planList.selection = selection
@@ -737,6 +729,7 @@
           }
         }).finally(() => {
           this.tableLoading = false
+          this.planList.selection = []
         })
       },
       // 获取计划状态详情
@@ -752,6 +745,8 @@
                 this.statusDetailModal.form.base[key] = detail[key]
               }
             }
+            this.statusDetailModal.form.base.isFillPlan = detail.isFillPlan === 'no' ? '否' : '是'
+
             for (let key in this.statusDetailModal.form.situation) {
               if (situation[0][key] !== null) {
                 // console.log(this.statusDetailModal.form.situation[key])
@@ -829,6 +824,13 @@
     width: 180px;
   }
 
+  .download-link {
+    margin-right: 20px;
+    &:hover {
+      background-color: #f3f3f3;
+    }
+  }
+
   .foot-page {
     padding: 10px;
     height: 50px;
@@ -853,6 +855,11 @@
       border-top: 1px solid #e9ebed;
     }
   }
+
+  /deep/ .ivu-table-header th .ivu-table-cell.ivu-table-cell-with-selection{
+    display: none;
+  }
+
   /deep/ .ivu-modal-header {
     padding-bottom: 0;
     border-bottom: none;

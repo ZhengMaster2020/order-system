@@ -55,10 +55,10 @@
         <Row>
           <Col>
             <FormItem>
-              <Button type="primary" @click="cancelProduction">撤销生产</Button>
+              <Button type="primary" @click="exportList">导表处理</Button>
             </FormItem>
             <FormItem>
-              <Button type="primary" @click="exportList">导表处理</Button>
+              <Button type="primary" @click="cancelProduction">撤销生产</Button>
             </FormItem>
           </Col>
         </Row>
@@ -66,7 +66,7 @@
 
       <!--      Tabs-->
       <Tabs v-model="currentTab">
-        <TabPane label="计划列表" name="prenatalBatch">
+        <TabPane label="生产批次列表" name="prenatalBatch">
 
           <!--          Table-->
           <Table border
@@ -340,7 +340,7 @@
           pageProps: {
             page: 1,
             total: 0,
-            perPage: 10
+            perPage: 3
           },
         },
         exportModal: {
@@ -393,8 +393,8 @@
       this.userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
       this.exportModal.operator = this.userInfo.realName
       this.cancelProductModal.operator = this.userInfo.realName
-      this.exportModal.planNumber = planNumber
-      this.searchForm.planName = planName
+      this.exportModal.planNumber = planNumber || ''
+      this.searchForm.planName = planName || ''
       this.getProductionBatch()
     },
     methods: {
@@ -515,6 +515,9 @@
           }
         }).finally(() => {
           this.tableLoading = false
+          this.prenatalBatch.selection = []
+          let page = this.prenatalBatch.pageProps.page
+          this.cacheSelect[page] = []
         })
       },
       getMKCode: debounce(function () {
@@ -535,17 +538,14 @@
               }
             })
           }
-
         }).finally(() => {
           Cookies.set('authorization', token, { expires: 1 })
         })
-
       }, 500),
 
       getSupplierInfo() {
         let params = {}
         let {supplierOrderNumber, mkCode} = this.exportModal.form
-        // console.log(supplierOrderNumber, mkCode, 'change')
         if(!supplierOrderNumber) return
         if(!mkCode) return
         params.order_no = this.exportModal.form.supplierOrderNumber

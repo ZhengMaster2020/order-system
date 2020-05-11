@@ -32,7 +32,7 @@
         </FormItem>
         <FormItem label="计划文件">
           <div style="padding-top: 33px">
-            <a href="javascript:;" v-for="(file, index) in baseicData.fileItems" :key="index">{{file.name}}</a>
+            <a :href="file.url" :download="file.name" class="download-link" v-for="(file, index) in baseicData.fileItems" :key="index">{{file.name}}</a>
           </div>
         </FormItem>
 
@@ -156,7 +156,6 @@
         this.$refs.form.validate(val => {
           if (val) {
             let remainingQuantity = this.baseicData.remainingQuantity
-            // console.log(this.baseicData.form)
             this.baseicData.form.map(batchDatas => {
               batchDatas.planId = this.planId
               batchDatas.remainingQuantity = remainingQuantity
@@ -223,10 +222,10 @@
         let goodsMax = 1000000
         let data = this.baseicData.form[index]
           if(data.produceType === 'prenatal'){
-            data.remainingQuantity = data.num >= prenatalMax ? prenatalMax : data.num
+            data.remainingQuantity = data.num >= prenatalMax ? prenatalMax : data.remainingQuantity
             data.num = data.num >= prenatalMax ? prenatalMax : data.num
           }else if(data.produceType === 'goods'){
-            data.remainingQuantity = data.num >= goodsMax ? goodsMax : data.num
+            data.remainingQuantity = data.num >= goodsMax ? goodsMax : data.remainingQuantity
             data.num = data.num >= goodsMax ? goodsMax : data.num
           }
           let diff = data.num - prenatalMax
@@ -260,6 +259,7 @@
                   // this.baseicData.form[0].remainingQuantity = 100
                 }
               }
+              this.baseicData.auditAt = this.$format(data.auditAt, 'yyyy-MM-dd hh:mm:ss')
             }
           }
         })
@@ -272,24 +272,34 @@
   }
 </script>
 
-<style scoped>
-.width-195 {
-  width: 195px;
-}
-.font-size-12 {
-  font-size: 12px;
-}
-.title {
-  font-size: 16px;
-  font-weight: 700;
-}
-.necessary:before {
-  content: '*';
-  display: inline-block;
-  margin-right: 4px;
-  line-height: 1;
-  font-family: SimSun;
-  font-size: 12px;
-  color: #ed4014;
-}
+<style lang="less" scoped>
+  .width-195 {
+    width: 195px;
+  }
+
+  .font-size-12 {
+    font-size: 12px;
+  }
+
+  .title {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .necessary:before {
+    content: '*';
+    display: inline-block;
+    margin-right: 4px;
+    line-height: 1;
+    font-family: SimSun;
+    font-size: 12px;
+    color: #ed4014;
+  }
+
+  .download-link {
+    margin-right: 20px;
+    &:hover {
+     background-color: #f3f3f3;
+    }
+  }
 </style>

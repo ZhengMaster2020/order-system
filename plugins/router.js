@@ -15,7 +15,8 @@ export default [
     name: '/production-plan-list',
     title: '生产计划管理',
     children: [
-      { path: 'production-plan-management/production-plan-list', title: '生产计划列表', name: 'production-plan-management/production-plan-list' }
+      { path: 'production-plan-management/production-plan-list', title: '生产计划列表', name: 'production-plan-management/production-plan-list' },
+      { path: 'production-plan-management/production-prenatal-batch-list', title: '生产批次列表', name: 'production-plan-management/production-prenatal-batch-list' }
     ]
   },
   // {
