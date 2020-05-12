@@ -28,7 +28,7 @@
           </Select>
         </FormItem>
         <FormItem label="Q季度" prop="quarter">
-          <Select v-model="form.quarter" clearable placeholder="品牌" class="width-200">
+          <Select v-model="form.quarter" clearable placeholder="季度" class="width-200">
             <Option v-for="quarter in quarterList" :key="quarter.label" :value="quarter.label">{{quarter.value}}
             </Option>
           </Select>
@@ -217,6 +217,7 @@
           if (res.code === 0) {
             this.form.nextId = res.data.list.filter(users => users.realName === this.form.nextBy)[0].id
           }
+        }).finally(() => {
         })
       },
       // 获取计划详情

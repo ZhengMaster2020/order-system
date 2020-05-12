@@ -74,7 +74,7 @@
           </Col>
           <Col span="4">
             <FormItem :prop="'form.' + index + '.num'" :rules='rules.num'>
-              <InputNumber :min="1"
+              <InputNumber :min="0"
                            :max="batchData.remainingQuantity"
                            :precision='0'
                            :formatter="value => `${value}`.replace(/\B(?=(?:\d{3})+\b)/g, ',')"
@@ -178,11 +178,12 @@
       },
       addBatchData(){
         if(this.baseicData.remainingQuantity <= 0) return
+        this.baseicData.remainingQuantity -= 1
         let total = this.getTotalNum(this.baseicData.form)
         this.baseicData.form.push({
           planId: '',
           produceType: '',
-          num: 0,
+          num: 1,
           remainingQuantity: this.realNum - total <= 0 ? 0 : this.realNum - total,
           markType: '',
         })
@@ -211,7 +212,6 @@
           }else {
             items.remainingQuantity = remainNum + items.num
           }
-
           if(index === indx){
             items.num = val > remainNum + items.num ? remainNum + items.num : val
           }
@@ -220,52 +220,43 @@
       markTypeChange(markType, index) {
         let prenatalMax = 10000
         let goodsMax = 1000000
-        let data = this.baseicData.form[index]
-          if(data.produceType === 'prenatal'){
-            data.remainingQuantity = data.num >= prenatalMax ? prenatalMax : data.remainingQuantity
-            data.num = data.num >= prenatalMax ? prenatalMax : data.num
-          }else if(data.produceType === 'goods'){
-            data.remainingQuantity = data.num >= goodsMax ? goodsMax : data.remainingQuantity
-            data.num = data.num >= goodsMax ? goodsMax : data.num
-          }
-          let diff = data.num - prenatalMax
         let total = this.getTotalNum(this.baseicData.form)
         let remainNum = this.realNum - total <= 0 ? 0 : this.realNum - total
-        this.baseicData.remainingQuantity = remainNum
-        this.baseicData.form.map((items, indx) => {
-          if(index !== indx){
-            if(diff < 0){
-              items.remainingQuantity += diff
-            }
-          }
-        })
+        let data = this.baseicData.form[index]
+        if(data.produceType === 'prenatal'){
+          data.remainingQuantity = data.num >= prenatalMax ? prenatalMax : remainNum
+          data.num = data.num >= prenatalMax ? prenatalMax : data.num
+        }else if(data.produceType === 'goods'){
+          data.remainingQuantity = data.num >= goodsMax ? goodsMax : remainNum
+          data.num = data.num >= goodsMax ? goodsMax : data.num
+        }
+        let newTotal = this.getTotalNum(this.baseicData.form)
+        let newRemainNum = this.realNum - newTotal <= 0 ? 0 : this.realNum - newTotal
+        this.baseicData.remainingQuantity = newRemainNum
+
       },
       // 计划详情
       getProductionPlanDetail(id) {
+        let total = this.getTotalNum(this.baseicData.form)
         this.$API.getProductionPlanDetail({id}).then(res => {
           if(res.code === 0){
             let data = res.data
-            this.realNum = parseInt(data.generationCount * 1.1 - data.realNum)
-            // this.realNum = 100
+            this.realNum = parseInt(data.generationCount * 1.1) - data.realNum
             for(let key in this.baseicData) {
               if(key !== 'form'){
                 if(data[key]){
                   this.baseicData[key] = data[key]
-                  this.baseicData.opinion = data.ext.opinion
-                  this.baseicData.planStatus = data.ext.planStatus
-                  this.baseicData.remainingQuantity = this.realNum
-                  this.baseicData.form[0].remainingQuantity = this.realNum
-                  // this.baseicData.remainingQuantity = 100
-                  // this.baseicData.form[0].remainingQuantity = 100
                 }
               }
+              this.baseicData.opinion = data.ext.opinion
+              this.baseicData.planStatus = data.ext.planStatus
+              this.baseicData.remainingQuantity = this.realNum - total
+              this.baseicData.form[0].remainingQuantity = this.realNum - total
               this.baseicData.auditAt = this.$format(data.auditAt, 'yyyy-MM-dd hh:mm:ss')
+              this.baseicData.isFillPlan = data.isFillPlan === 'yes' ? '是' : '否'
             }
           }
         })
-        //   .finally(() => {
-        //   this.spinShow = false
-        // })
       }
 
     },

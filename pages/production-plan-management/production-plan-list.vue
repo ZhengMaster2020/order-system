@@ -216,7 +216,7 @@
           <Input class="width-180" v-model="finishedModal.data.nextBy" readonly/>
         </FormItem>
         <FormItem label="实际执行数量">
-          <InputNumber class="width-180" v-model="finishedModal.realNum" readonly/>
+          <Input class="width-180" v-model="finishedModal.form.realNum" readonly/>
         </FormItem>
         <FormItem label="关闭意见" prop="opinion">
           <Input style="width: 200px" v-model="finishedModal.form.opinion"/>
@@ -591,6 +591,7 @@
                 this.reviewModal.data[key] = data[key]
               }
             }
+            this.reviewModal.data.isFillPlan = data.isFillPlan === 'yes' ? '是' : '否'
             this.reviewModal.form.opinion = data.ext.opinion
             this.reviewModal.form.planStatus = data.ext.planStatus
           }
@@ -603,8 +604,9 @@
       executePlan() {
         let msg = this.operationVerify()
         if (msg) return this.$Message.warning(msg)
-        let {id, planStatus, createdBy} = this.planList.selection[0]
+        let {id, planStatus, generationCount, realNum} = this.planList.selection[0]
         let conditions = ['executing', 'pendingExecuted']
+        if(parseInt(generationCount * 1.1) - realNum === 0) return this.$Message.warning('目前执行量最大值,如需再次执行，请进行补Q计划')
         if(!conditions.includes(planStatus)) return this.$Message.warning('此计划状态下无法执行计划')
         this.$router.push({
           path: '/production-plan-management/production-plan-execute',
@@ -631,6 +633,7 @@
               }
             }
             this.finishedModal.data.nextBy = this.userInfo.realName
+            this.finishedModal.data.isFillPlan = data.isFillPlan === 'yes' ? '是' : '否'
             this.finishedModal.form.id = id
             this.finishedModal.form.realNum = data.realNum
             this.finishedModal.form.opinion = ''

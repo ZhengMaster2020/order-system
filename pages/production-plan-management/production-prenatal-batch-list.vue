@@ -107,7 +107,6 @@
           <Input class="width-180" v-model="exportModal.form.supplierOrderNumber" @on-change="getMKCode"/>
         </FormItem>
         <FormItem label="慕可代码" prop="mkCode">
-          <!--          <Input class="width-180" v-model="exportModal.form.mkCode" readonly/>-->
           <Select v-model="exportModal.form.mkCode" :not-found-text="exportModal.notFoundText" class="width-180" @on-change="getSupplierInfo">
             <Option v-for="code in mkCodeList" :key="code.label" :value="code.label">{{code.value}}</Option>
           </Select>
@@ -380,7 +379,7 @@
         },
         rules: {
           supplierOrderNumber: [{required: true, message: '必填项', trigger: 'change'}],
-          mkCode: [{required: true, message: '必填项', trigger: 'blur'}],
+          mkCode: [{required: true, message: '必填项', trigger: 'change'}],
           opinion: [{required: true, message: '必填项', trigger: 'blur'}]
         },
         cacheSelect: {
@@ -538,11 +537,22 @@
               }
             })
           }
-        }).finally(() => {
+        }).then(() => {
           Cookies.set('authorization', token, { expires: 1 })
+          this.exportModal.form.mkCode = ''
+          this.exportModal.form.packageName = ''
+          this.exportModal.form.supplier = ''
+          this.exportModal.form.orderQuantity = ''
+          this.$API.getProductionBatchCountNum({orderNumber: supplierOrderNumber}).then(res => {
+            if (res.code === 0) {
+              this.exportModal.form.processedNum = +res.data.processedNumber
+            }
+          })
         })
+        setTimeout(() => {
+          Cookies.set('authorization', token, { expires: 1 })
+        }, 1)
       }, 500),
-
       getSupplierInfo() {
         let params = {}
         let {supplierOrderNumber, mkCode} = this.exportModal.form
@@ -560,15 +570,10 @@
             this.exportModal.form.supplierId = data[0].supplier_id
             this.exportModal.form.orderQuantity = +data[0].amount
           }
-           // 获取已处理数量
+        })
+        setTimeout(() => {
           Cookies.set('authorization', token, { expires: 1 })
-          this.$API.getProductionBatchCountNum({orderNumber: supplierOrderNumber}).then(res => {
-            if (res.code === 0) {
-              this.exportModal.form.processedNum = +res.data.processedNumber
-            }
-          }).finally(() => { Cookies.set('authorization', token, { expires: 1 }) })
-
-        }).finally(()=>{ Cookies.set('authorization', token, { expires: 1 }) })
+        }, 1)
       },
 
       submit(modal, form) {
