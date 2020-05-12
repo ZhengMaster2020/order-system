@@ -107,7 +107,8 @@
           <Input class="width-180" v-model="exportModal.form.supplierOrderNumber" @on-change="getMKCode"/>
         </FormItem>
         <FormItem label="慕可代码" prop="mkCode">
-          <Select v-model="exportModal.form.mkCode" :not-found-text="exportModal.notFoundText" class="width-180" @on-change="getSupplierInfo">
+          <Select v-model="exportModal.form.mkCode" :not-found-text="exportModal.notFoundText" class="width-180"
+                  @on-change="getSupplierInfo">
             <Option v-for="code in mkCodeList" :key="code.label" :value="code.label">{{code.value}}</Option>
           </Select>
         </FormItem>
@@ -124,7 +125,7 @@
           <Input class="width-180" v-model="exportModal.form.processedNum" readonly/>
         </FormItem>
         <FormItem label="意见" prop="opinion">
-          <Input style="width: 572px" v-model="exportModal.form.opinion" />
+          <Input style="width: 572px" v-model="exportModal.form.opinion"/>
         </FormItem>
 
         <div class="title">
@@ -177,7 +178,7 @@
       </div>
     </Modal>
 
-  <!--  撤销生产  -->
+    <!--  撤销生产  -->
     <Modal
     v-model="cancelProductModal.modal"
     :title="cancelProductModal.title"
@@ -194,12 +195,13 @@
           <Input class="width-180" v-model="cancelProductModal.operator" readonly/>
         </FormItem>
         <FormItem label="意见" prop="opinion">
-          <Input style="width: 552px" v-model="cancelProductModal.form.opinion" />
+          <Input style="width: 552px" v-model="cancelProductModal.form.opinion"/>
         </FormItem>
       </Form>
       <div class="modal-footer" slot="footer">
         <Button type="default" @click="cancelProductModal.modal = false">取消</Button>
-        <Button type="primary" @click="submit('cancelProductModal', 'cancelProductForm')" :loading="btnLoading">确认</Button>
+        <Button type="primary" @click="submit('cancelProductModal', 'cancelProductForm')" :loading="btnLoading">确认
+        </Button>
       </div>
     </Modal>
   </div>
@@ -207,6 +209,9 @@
 
 <script>
   import Cookies from 'js-cookie'
+  import axios from 'axios'
+  import ENV from '../../api/env'
+
   let debounce = function (fn, delay) {
     let timerId
     return function () {
@@ -275,10 +280,10 @@
                 attrs: {href: 'javascript:void(0)'},
                 on: {
                   click: () => {
-                  //  TODO: 跳转至入库页面
+                    //  TODO: 跳转至入库页面
                   }
                 }
-                }, row.quantity_inbound)
+              }, row.quantity_inbound)
             },
             {
               title: '已出库数量',
@@ -292,11 +297,11 @@
                     //  TODO: 跳转至出库页面
                   }
                 }
-                }, row.quantity_shipped)
+              }, row.quantity_shipped)
             },
             {
               title: '生产状态', key: 'produce_status', align: 'center', minWidth: 100, render: (h, {row}) => {
-               return h('span', {
+                return h('span', {
                   style: {
                     color: row.produce_status === 'revoked' ? 'red' : ''
                   }
@@ -384,7 +389,7 @@
         },
         cacheSelect: {
           1: [],
-        }
+        },
       }
     },
     mounted() {
@@ -395,6 +400,7 @@
       this.exportModal.planNumber = planNumber || ''
       this.searchForm.planName = planName || ''
       this.getProductionBatch()
+      this.supplyInstance()
     },
     methods: {
       // Form 操作
@@ -404,19 +410,19 @@
       cancelProduction() {
         let selection = this.prenatalBatch.selection
 
-        if(selection.length < 1) return this.$Message.warning('请选择批次')
-        if(selection.length > 1) return this.$Message.warning('一次只能撤销一个批次')
+        if (selection.length < 1) return this.$Message.warning('请选择批次')
+        if (selection.length > 1) return this.$Message.warning('一次只能撤销一个批次')
         let isCheck = selection[0].produce_status === 'generated' && selection[0].process_status === 'notExported'
 
-        if(!isCheck) return this.$Message.warning('已生成且未处理的才可撤销')
+        if (!isCheck) return this.$Message.warning('已生成且未处理的才可撤销')
 
         this.cancelProductModal.modal = true
         this.cancelProductModal.title = `撤销生产批次号：${selection[0].batch_number}`
       },
       exportList() {
         let selection = []
-        for(let key in this.cacheSelect){
-          selection = [...selection, ...this.cacheSelect[key] ]
+        for (let key in this.cacheSelect) {
+          selection = [...selection, ...this.cacheSelect[key]]
         }
 
         if (!selection.length) return this.$Message.warning('请选择批次')
@@ -426,7 +432,7 @@
         let isCheck = selection.every(items => items.produce_status === 'generated' && items.process_status === 'notExported' && items.enable_status === 'disabled')
 
         if (!iSsamePlan) return this.$Message.warning('批量操作必须是同一生产计划号')
-        if(!isCheck) return this.$Message.warning('已生成且未处理且未激活的才可导表处理')
+        if (!isCheck) return this.$Message.warning('已生成且未处理且未激活的才可导表处理')
 
         let ids = selection.map(items => items.id)
         let params = {
@@ -449,8 +455,8 @@
           if (res.code === 0) {
             this.exportModal.form.data = res.data.list.map((items, index) => {
               items.index = ++index
-              items.produce_type = items.produce_type === 'prenatal'? '产前样' : '大货样'
-              items.mark_type = items.mark_type === 'P'? '平标' : '卷标'
+              items.produce_type = items.produce_type === 'prenatal' ? '产前样' : '大货样'
+              items.mark_type = items.mark_type === 'P' ? '平标' : '卷标'
               return items
             })
           }
@@ -499,10 +505,10 @@
         this.$API.getProductionBatch(params).then(res => {
           if (res.code === 0) {
             let {list, count, page, perPage} = res.data
-            if(this.cacheSelect && this.cacheSelect[page] && this.cacheSelect[page].length) {
+            if (this.cacheSelect && this.cacheSelect[page] && this.cacheSelect[page].length) {
               list.forEach(items => {
-                let isHas = this.cacheSelect[page].find(selectItem => selectItem.id === items.id )
-                if(isHas){
+                let isHas = this.cacheSelect[page].find(selectItem => selectItem.id === items.id)
+                if (isHas) {
                   items._checked = true
                 }
               })
@@ -525,90 +531,113 @@
         if (!supplierOrderNumber) return
         params.order_no = supplierOrderNumber
         this.exportModal.notFoundText = '加载中...'
-        let token = Cookies.get('authorization')
-        Cookies.set('authorization', 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X', { expires: 1 })
-        this.$API.getOrderPacking(params).then(res => {
-          if (res.code === 200) {
-            let data = res.data
-            this.mkCodeList = data.map(items => {
-              return {
-                label: items.mk_code,
-                value: items.mk_code
+        this.getSupplyInfo(params)
+          .then(res => {
+            if (res.code === 200) {
+              let data = res.data
+              if (!data.length) {
+                this.$Message.info('请确认采购下单编号是否准确')
+                this.exportModal.notFoundText = '无匹配数据'
+                return
               }
-            })
-          }
-        }).then(() => {
-          Cookies.set('authorization', token, { expires: 1 })
-          this.exportModal.form.mkCode = ''
-          this.exportModal.form.packageName = ''
-          this.exportModal.form.supplier = ''
-          this.exportModal.form.orderQuantity = ''
-          this.$API.getProductionBatchCountNum({orderNumber: supplierOrderNumber}).then(res => {
-            if (res.code === 0) {
-              this.exportModal.form.processedNum = +res.data.processedNumber
+              this.mkCodeList = data.map(items => {
+                return {
+                  label: items.mk_code,
+                  value: items.mk_code
+                }
+              })
             }
           })
-        })
-        setTimeout(() => {
-          Cookies.set('authorization', token, { expires: 1 })
-        }, 1)
+          .finally(() => {
+            this.exportModal.form.mkCode = ''
+            this.exportModal.form.packageName = ''
+            this.exportModal.form.supplier = ''
+            this.exportModal.form.orderQuantity = ''
+            this.$API.getProductionBatchCountNum({orderNumber: supplierOrderNumber}).then(res => {
+              if (res.code === 0) {
+                this.exportModal.form.processedNum = +res.data.processedNumber
+              }
+            })
+          })
+          .catch((err) => {
+            console.log(err, 'this')
+          })
+
       }, 500),
       getSupplierInfo() {
         let params = {}
         let {supplierOrderNumber, mkCode} = this.exportModal.form
-        if(!supplierOrderNumber) return
-        if(!mkCode) return
+        if (!supplierOrderNumber) return
+        if (!mkCode) return
         params.order_no = this.exportModal.form.supplierOrderNumber
         params.mk_code = this.exportModal.form.mkCode
-        let token = Cookies.get('authorization')
-        Cookies.set('authorization', 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X', { expires: 1 })
-        this.$API.getOrderPacking(params).then(res => {
-          if (res.code === 200) {
-            let data = res.data
-            this.exportModal.form.packageName = data[0].packing
-            this.exportModal.form.supplier = data[0].supplier
-            this.exportModal.form.supplierId = data[0].supplier_id
-            this.exportModal.form.orderQuantity = +data[0].amount
-          }
-        })
-        setTimeout(() => {
-          Cookies.set('authorization', token, { expires: 1 })
-        }, 1)
+        this.getSupplyInfo(params)
+          .then(res => {
+            if (res.code === 200) {
+              let data = res.data
+              this.exportModal.form.packageName = data[0].packing
+              this.exportModal.form.supplier = data[0].supplier
+              this.exportModal.form.supplierId = data[0].supplier_id
+              this.exportModal.form.orderQuantity = +data[0].amount
+            }
+          })
       },
-
+      // 采购系统api
+      supplyInstance() {
+        const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com'
+        this.instance = axios.create({
+          baseURL: BASE_URL,
+          timeout: 20000,
+          headers: {'Authorization': 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X'}
+        });
+      },
+      getSupplyInfo(params) {
+        return this.instance.get('v1/search/search-order-packing', {params})
+          .then(res => {
+            return res.data
+          }).catch(err => {
+            if (err) return console.log(err.message)
+          })
+      },
       submit(modal, form) {
         // 已选中的总数量+已处理数量不可大于采购下单数量的110%；
         this.$refs[form].validate(val => {
-          if(!val) return
-          this.btnLoading = true
-
-          if(modal === 'exportModal'){
+          if (!val) return
+          if (modal === 'exportModal') {
+            // console.log(this[modal].generateQuantity)
+            // console.log(this[modal].form.processedNum)
+            // console.log(this[modal].form.orderQuantity * 1.1)
             let isCheck = (this[modal].generateQuantity + this[modal].form.processedNum) < (this[modal].form.orderQuantity * 1.1)
-            if(!isCheck) return this.$Message.error('已选中的总数量+已处理数量不可大于采购下单数量的110%')
-
+            if (!isCheck) return this.$Message.error('已选中的总数量+已处理数量不可大于采购下单数量的110%')
+            this.btnLoading = true
             let params = JSON.parse(JSON.stringify(this[modal].form))
             delete params.data
 
             // return console.log(params)
             this.$API.getProductionBatchExport(params).then(res => {
-              if(res.code === 0){
+              if (res.code === 0) {
                 this.$Message.success(res.msg)
                 this[modal].modal = false
                 this.getProductionBatch()
               }
-            }).finally(() => { this.btnLoading = false })
+            }).finally(() => {
+              this.btnLoading = false
+            })
           }
 
-          if(modal === 'cancelProductModal'){
+          if (modal === 'cancelProductModal') {
             let id = this.prenatalBatch.selection[0].id
-            let params = { id, params: this[modal].form }
+            let params = {id, params: this[modal].form}
+            this.btnLoading = true
             this.$API.delProductionBatch(params).then(res => {
-              if(res.code ===0){
+              if (res.code === 0) {
                 this.$Message.success(res.msg)
                 this[modal].modal = false
                 this.getProductionBatch()
               }
-            }).finally(() => { this.btnLoading = false })
+            }).finally(() => {
+              this.btnLoading = false
+            })
           }
 
         })
