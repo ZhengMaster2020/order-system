@@ -104,7 +104,7 @@
         </div>
 
         <FormItem label="采购下单编号" prop="supplierOrderNumber">
-          <Input class="width-180" v-model="exportModal.form.supplierOrderNumber" @on-change="getMKCode"/>
+          <Input class="width-180" v-model="exportModal.form.supplierOrderNumber" @on-blur="getMKCode"/>
         </FormItem>
         <FormItem label="慕可代码" prop="mkCode">
           <Select v-model="exportModal.form.mkCode" :not-found-text="exportModal.notFoundText" class="width-180"
@@ -525,11 +525,12 @@
           this.cacheSelect[page] = []
         })
       },
-      getMKCode: debounce(function () {
+      getMKCode() {
         let params = {}
         let supplierOrderNumber = this.exportModal.form.supplierOrderNumber
         if (!supplierOrderNumber) return
         params.order_no = supplierOrderNumber
+        this.mkCodeList = ''
         this.exportModal.notFoundText = '加载中...'
         this.getSupplyInfo(params)
           .then(res => {
@@ -563,7 +564,7 @@
             console.log(err, 'this')
           })
 
-      }, 500),
+      },
       getSupplierInfo() {
         let params = {}
         let {supplierOrderNumber, mkCode} = this.exportModal.form
