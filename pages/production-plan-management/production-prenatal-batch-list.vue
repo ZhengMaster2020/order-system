@@ -344,7 +344,7 @@
           pageProps: {
             page: 1,
             total: 0,
-            perPage: 3
+            perPage: 10
           },
         },
         exportModal: {
@@ -662,6 +662,9 @@
           'generated': '已生成',
           'revoked': '已撤销'
         }
+
+
+
         return produceStatus[val]
       }
     }
