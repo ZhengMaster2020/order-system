@@ -373,8 +373,8 @@
 
         },
         rules: {
-          supplierOrderNumber: [{required: true, message: '必填项', trigger: 'change'}],
-          mkCode: [{required: true, message: '必填项', trigger: 'change'}],
+          supplierOrderNumber: [{required: true, message: '请从采购系统获取包材订单号', trigger: 'change'}],
+          mkCode: [{required: true, message: '以采购下单编号对应的慕可代码为准，没有请确认下单编号是否正确', trigger: 'change'}],
           opinion: [{required: true, message: '必填项', trigger: 'blur'}]
         },
         cacheSelect: {

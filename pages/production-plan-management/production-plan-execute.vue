@@ -242,7 +242,8 @@
         this.$API.getProductionPlanDetail({id}).then(res => {
           if(res.code === 0){
             let data = res.data
-            this.realNum = parseInt(data.generationCount * 1.1) - data.realNum
+            let generaNum = Math.ceil(data.generationCount * 110 / 100)
+            this.realNum = generaNum - data.realNum
             for(let key in this.baseicData) {
               if(key !== 'form'){
                 if(data[key]){
