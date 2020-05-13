@@ -385,7 +385,8 @@
     watch: {
       'exportModal.modal': function (cur) {
         if(cur) return
-        this.resetExportData()
+        this.$refs.exportForm.resetFields()
+        // this.resetExportData()
       }
     },
     mounted() {
@@ -395,13 +396,13 @@
       this.cancelProductModal.operator = this.userInfo.realName
       this.exportModal.planNumber = planNumber || ''
       this.searchForm.planName = planName || ''
-      this.getProductionBatch()
+      this.getProductionBatch('search')
       this.supplyInstance()
     },
     methods: {
       // Form 操作
       search() {
-        this.getProductionBatch()
+        this.getProductionBatch('search')
       },
       cancelProduction() {
         let selection = this.prenatalBatch.selection
@@ -474,12 +475,12 @@
       // 改变当前分页
       changePage(page, key) {
         this[key].pageProps.page = page;
-        this.getProductionBatch();
+        this.getProductionBatch('changepage');
       },
       // 改变分页size
       changePageSize(perPage, key) {
         this[key].pageProps.perPage = perPage;
-        this.getProductionBatch();
+        this.getProductionBatch('changepage');
       },
       // 批次列表参数
       batchListParams(currentTab, form) {
@@ -494,10 +495,16 @@
         params.perPage = perPage
         return params
       },
-      getProductionBatch() {
+      getProductionBatch(type) {
         let currentTab = this.currentTab
         let params = this.batchListParams(currentTab, this.searchForm)
         this.tableLoading = true
+        if(type === 'search') {
+          this.prenatalBatch.selection = []
+          this.cacheSelect = {
+            1: [],
+          }
+        }
         this.$API.getProductionBatch(params).then(res => {
           if (res.code === 0) {
             let {list, count, page, perPage} = res.data
@@ -516,9 +523,6 @@
           }
         }).finally(() => {
           this.tableLoading = false
-          this.prenatalBatch.selection = []
-          let page = this.prenatalBatch.pageProps.page
-          this.cacheSelect[page] = []
         })
       },
       getMKCode() {
@@ -533,7 +537,6 @@
             if (res.code === 200) {
               let data = res.data
               if (!data.length) {
-                this.$Message.info('请确认采购下单编号是否准确')
                 this.exportModal.notFoundText = '无匹配数据'
                 return
               }
@@ -543,7 +546,6 @@
                   value: items.mk_code
                 }
               })
-
               this.exportModal.form.mkCode = ''
               this.exportModal.form.packageName = ''
               this.exportModal.form.supplier = ''
@@ -613,7 +615,7 @@
               if (res.code === 0) {
                 this.$Message.success(res.msg)
                 this[modal].modal = false
-                this.getProductionBatch()
+                this.getProductionBatch('search')
               }
             }).finally(() => {
               this.btnLoading = false
@@ -628,7 +630,7 @@
               if (res.code === 0) {
                 this.$Message.success(res.msg)
                 this[modal].modal = false
-                this.getProductionBatch()
+                this.getProductionBatch('search')
               }
             }).finally(() => {
               this.btnLoading = false

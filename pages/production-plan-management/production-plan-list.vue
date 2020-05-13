@@ -373,11 +373,12 @@
           columns: [
             {type: 'selection', width: 60, align: 'center'},
             {title: '序号', type: 'index', width: 70, align: 'center'},
-            {title: '计划名称', key: 'planName', align: 'center'},
+            {title: '计划名称', key: 'planName', align: 'center', minWidth: 40},
             {
               title: '计划状态',
               key: 'planStatus',
               align: 'center',
+              minWidth: 30,
               render: (h, {row}) => {
                 let text = this.getPlanStatus(row.planStatus)
                 return h('a', {
@@ -396,7 +397,7 @@
               }
             },
             {title: '季度', key: 'quarter', align: 'center'},
-            {title: '计划编号', key: 'planNumber', align: 'center'},
+            {title: '计划编号', key: 'planNumber', align: 'center', minWidth: 90},
             {
               title: '是否补Q计划',
               key: 'isFillPlan',
@@ -404,7 +405,7 @@
               render: (h, {row}) => h('span', {}, row.isFillPlan === 'yes' ? '是' : '否')
               },
             {title: '品牌', key: 'brand', align: 'center'},
-            {title: '计划数量', key: 'generationCount', align: 'center'},
+            {title: '计划数量', key: 'generationCount', align: 'center', minWidth: 20,},
             {
               title: '实际执行量',
               key: 'realNum',
@@ -435,9 +436,10 @@
               title: '创建时间',
               key: 'createdAt',
               align: 'center',
+              minWidth: 40,
               render: (h, {row}) => h('span', {}, row.createdAt.substr(0, 10))
             },
-            {title: '申请人', key: 'createdBy', align: 'center'},
+            {title: '申请人', key: 'createdBy', align: 'center', minWidth: 20,},
             {title: '备注', key: 'remark', align: 'center'},
             {title: '操作', key: 'action', align: 'center', slot: 'action', width: 130},
           ],

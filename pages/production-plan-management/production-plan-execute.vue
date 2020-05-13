@@ -133,7 +133,7 @@
             {
               planId: '',
               produceType: '',
-              num: 1,
+              num: 0,
               markType: '',
               remainingQuantity: 0,
             }
@@ -155,12 +155,13 @@
       submit() {
         this.$refs.form.validate(val => {
           if (val) {
+            let isCheck = this.baseicData.form.find(items => items.num === 0)
+            if(isCheck) return this.$Message.warning('批次数量不可为 0')
             let remainingQuantity = this.baseicData.remainingQuantity
             this.baseicData.form.map(batchDatas => {
               batchDatas.planId = this.planId
               batchDatas.remainingQuantity = remainingQuantity
             })
-            // console.log(this.baseicData.form)
             let param = {
               id: this.planId,
               params: {
@@ -183,7 +184,7 @@
         this.baseicData.form.push({
           planId: '',
           produceType: '',
-          num: 1,
+          num: 0,
           remainingQuantity: this.realNum - total <= 0 ? 0 : this.realNum - total,
           markType: '',
         })
