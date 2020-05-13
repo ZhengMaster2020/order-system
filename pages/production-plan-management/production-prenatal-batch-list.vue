@@ -208,19 +208,9 @@
 </template>
 
 <script>
-  import Cookies from 'js-cookie'
   import axios from 'axios'
   import ENV from '../../api/env'
-
-  let debounce = function (fn, delay) {
-    let timerId
-    return function () {
-      if (timerId) clearTimeout(timerId)
-      timerId = setTimeout(() => {
-        fn.apply(this, arguments)
-      }, delay)
-    }
-  }
+  
   export default {
     data() {
       return {
@@ -392,6 +382,12 @@
         },
       }
     },
+    watch: {
+      'exportModal.modal': function (cur) {
+        if(cur) return
+        this.resetExportData()
+      }
+    },
     mounted() {
       let {planNumber, planName} = this.$route.params
       this.userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
@@ -547,23 +543,21 @@
                   value: items.mk_code
                 }
               })
+
+              this.exportModal.form.mkCode = ''
+              this.exportModal.form.packageName = ''
+              this.exportModal.form.supplier = ''
+              this.exportModal.form.orderQuantity = ''
+              this.$API.getProductionBatchCountNum({orderNumber: supplierOrderNumber}).then(res => {
+                if (res.code === 0) {
+                  this.exportModal.form.processedNum = +res.data.processedNumber
+                }
+              })
             }
           })
-          .finally(() => {
-            this.exportModal.form.mkCode = ''
-            this.exportModal.form.packageName = ''
-            this.exportModal.form.supplier = ''
-            this.exportModal.form.orderQuantity = ''
-            this.$API.getProductionBatchCountNum({orderNumber: supplierOrderNumber}).then(res => {
-              if (res.code === 0) {
-                this.exportModal.form.processedNum = +res.data.processedNumber
-              }
-            })
-          })
           .catch((err) => {
-            console.log(err, 'this')
+            console.log(err)
           })
-
       },
       getSupplierInfo() {
         let params = {}
@@ -663,10 +657,36 @@
           'generated': '已生成',
           'revoked': '已撤销'
         }
-
-
-
         return produceStatus[val]
+      },
+      // 请空导表数据
+      resetExportData() {
+        this.exportModal = {
+          modal: false,
+            operator: '',
+            generateQuantity: 0,
+            planName: '',
+            brand: '',
+            notFoundText: '无匹配数据',
+            form: {
+            ids: [],
+              supplierOrderNumber: '',
+              mkCode: '',
+              packageName: '',
+              orderQuantity: 0,
+              supplierId: '',
+              supplier: '',
+              processedNum: 0,
+              opinion: '',
+              data: [
+              {
+                id: '',
+                realNum: 0,
+                opinion: ''
+              },
+            ]
+          }
+        }
       }
     }
   }

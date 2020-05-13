@@ -606,7 +606,7 @@
         if (msg) return this.$Message.warning(msg)
         let {id, planStatus, generationCount, realNum} = this.planList.selection[0]
         let conditions = ['executing', 'pendingExecuted']
-        if(parseInt(generationCount * 1.1) - realNum === 0) return this.$Message.warning('目前执行量最大值,如需再次执行，请进行补Q计划')
+        if(parseInt(generationCount * 1.1) - realNum === 0) return this.$Message.warning('目前执行量最大值，如需再次执行，请进行补Q计划')
         if(!conditions.includes(planStatus)) return this.$Message.warning('此计划状态下无法执行计划')
         this.$router.push({
           path: '/production-plan-management/production-plan-execute',
