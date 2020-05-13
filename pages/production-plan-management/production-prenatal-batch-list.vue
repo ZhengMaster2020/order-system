@@ -210,7 +210,7 @@
 <script>
   import axios from 'axios'
   import ENV from '../../api/env'
-  
+
   export default {
     data() {
       return {
@@ -340,7 +340,7 @@
         exportModal: {
           modal: false,
           operator: '',
-          generateQuantity: 0,
+          generateQuantity: '',
           planName: '',
           brand: '',
           notFoundText: '无匹配数据',
@@ -349,15 +349,15 @@
             supplierOrderNumber: '',
             mkCode: '',
             packageName: '',
-            orderQuantity: 0,
+            orderQuantity: '',
             supplierId: '',
             supplier: '',
-            processedNum: 0,
+            processedNum: '',
             opinion: '',
             data: [
               {
                 id: '',
-                realNum: 0,
+                realNum: '',
                 opinion: ''
               },
             ]
