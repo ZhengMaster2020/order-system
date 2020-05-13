@@ -48,9 +48,9 @@ const getProductionBatchCountNum = ({orderNumber}) => {
 };
 
 // 生产批次 - 撤销生产
-const delProductionBatch = ({params, id}) => {
+const delProductionBatch = ({params, id, planId}) => {
   return fetch({
-    url: `traceability/productionBatch/revoke/${id}`,
+    url: `traceability/productionBatch/revoke/${id}/${planId}`,
     method: 'DELETE',
     params: params,
   })

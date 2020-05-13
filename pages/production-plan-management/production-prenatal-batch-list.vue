@@ -620,8 +620,12 @@
           }
 
           if (modal === 'cancelProductModal') {
-            let id = this.prenatalBatch.selection[0].id
-            let params = {id, params: this[modal].form}
+            let {id, plan_id } = this.prenatalBatch.selection[0]
+            let params = {
+              id,
+              planId: plan_id,
+              params: this[modal].form
+            }
             this.btnLoading = true
             this.$API.delProductionBatch(params).then(res => {
               if (res.code === 0) {
