@@ -386,7 +386,7 @@
       'exportModal.modal': function (cur) {
         if(cur) return
         this.$refs.exportForm.resetFields()
-        // this.resetExportData()
+        this.resetExportData()
       }
     },
     mounted() {
@@ -601,9 +601,6 @@
         this.$refs[form].validate(val => {
           if (!val) return
           if (modal === 'exportModal') {
-            // console.log(this[modal].generateQuantity)
-            // console.log(this[modal].form.processedNum)
-            // console.log(this[modal].form.orderQuantity * 1.1)
             let isCheck = (this[modal].generateQuantity + this[modal].form.processedNum) < (this[modal].form.orderQuantity * 1.1)
             if (!isCheck) return this.$Message.error('已选中的总数量+已处理数量不可大于采购下单数量的110%')
             this.btnLoading = true
@@ -663,31 +660,26 @@
       },
       // 请空导表数据
       resetExportData() {
-        this.exportModal = {
-          modal: false,
-            operator: '',
-            generateQuantity: 0,
-            planName: '',
-            brand: '',
-            notFoundText: '无匹配数据',
-            form: {
+        let emptyForm = {
             ids: [],
-              supplierOrderNumber: '',
-              mkCode: '',
-              packageName: '',
-              orderQuantity: 0,
-              supplierId: '',
-              supplier: '',
-              processedNum: 0,
-              opinion: '',
-              data: [
-              {
-                id: '',
-                realNum: 0,
-                opinion: ''
-              },
-            ]
-          }
+            packageName: '',
+            orderQuantity: '',
+            supplierId: '',
+            supplier: '',
+            processedNum: '',
+            opinion: '',
+            data: [
+            {
+              id: '',
+              realNum: '',
+              opinion: ''
+            },
+          ]
+        }
+        this.mkCodeList = []
+        this.exportModal.notFoundText = '无匹配数据'
+        for(let key in emptyForm) {
+          this.exportModal.form[key] = emptyForm[key]
         }
       }
     }
