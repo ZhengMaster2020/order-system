@@ -3,7 +3,7 @@
     <Card>
       <!--      Form-->
       <Form ref="searchForm" :model="searchForm" inline>
-        <Row type="flex" justify="space-between">
+        <Row>
           <Col>
             <FormItem prop="name">
               <Input v-model="searchForm.createdBy" placeholder="申请人" class="width-120"/>
@@ -30,8 +30,6 @@
                 <Option value="no">否</Option>
               </Select>
             </FormItem>
-          </Col>
-          <Col>
             <FormItem>
               <Button type="primary" @click="search">搜索</Button>
             </FormItem>
@@ -63,14 +61,15 @@
                  @on-selection-change="selection => { selectionChange(selection) }"
                  :loading="tableLoading">
             <template slot-scope="{ row, index }" slot="action">
-<!--              <Tooltip placement="top" content="编辑" transfer>-->
-                <Button type="primary" size="small" @click="editPlan(row)"
-                        :disabled="row.createdBy !== userInfo.realName || !['overrule', 'pendingManagerReview'].includes(row.planStatus)">
-                  <Icon type="md-create"/>
-                </Button>
-<!--              </Tooltip>-->
+              <!--              <Tooltip placement="top" content="编辑" transfer>-->
+              <Button type="primary" size="small" @click="editPlan(row)"
+                      :disabled="row.createdBy !== userInfo.realName || !['overrule', 'pendingManagerReview'].includes(row.planStatus)">
+                <Icon type="md-create"/>
+              </Button>
+              <!--              </Tooltip>-->
               <Poptip confirm title="您确认删除这条内容吗？" @on-ok="delPlan(row)" transfer>
-                <Button size="small" :disabled="row.createdBy !== userInfo.realName || !['overrule', 'pendingManagerReview'].includes(row.planStatus)">
+                <Button size="small"
+                        :disabled="row.createdBy !== userInfo.realName || !['overrule', 'pendingManagerReview'].includes(row.planStatus)">
                   <Icon type="md-trash"/>
                 </Button>
               </Poptip>
@@ -267,7 +266,7 @@
           <Input class="width-180" v-model="statusDetailModal.form.base.planName" readonly/>
         </FormItem>
         <FormItem label="计划文件">
-          <div style="padding-top: 33px" >
+          <div style="padding-top: 33px">
             <a :href="file.url" :download="file.name"
                v-for="(file, index) in statusDetailModal.form.base.fileItems"
                :key="index" class="download-link">{{file.name}}</a>
@@ -373,12 +372,12 @@
           columns: [
             {type: 'selection', width: 60, align: 'center'},
             {title: '序号', type: 'index', width: 70, align: 'center'},
-            {title: '计划名称', key: 'planName', align: 'center', minWidth: 40},
+            {title: '计划名称', key: 'planName', align: 'center', width: 150},
             {
               title: '计划状态',
               key: 'planStatus',
               align: 'center',
-              minWidth: 30,
+              width: 100,
               render: (h, {row}) => {
                 let text = this.getPlanStatus(row.planStatus)
                 return h('a', {
@@ -396,20 +395,25 @@
                 }, text)
               }
             },
-            {title: '季度', key: 'quarter', align: 'center'},
-            {title: '计划编号', key: 'planNumber', align: 'center', minWidth: 90},
+            {title: '季度', key: 'quarter', align: 'center', width: 70},
+            {title: '计划编号', key: 'planNumber', align: 'center', minWidth: 170},
             {
               title: '是否补Q计划',
               key: 'isFillPlan',
               align: 'center',
+              width: 80,
               render: (h, {row}) => h('span', {}, row.isFillPlan === 'yes' ? '是' : '否')
-              },
-            {title: '品牌', key: 'brand', align: 'center'},
-            {title: '计划数量', key: 'generationCount', align: 'center', minWidth: 20,},
+            },
+            {title: '品牌', key: 'brand', align: 'center', width: 100},
+            {
+              title: '计划数量', key: 'generationCount', align: 'center', width: 100,
+              render: (h, {row}) => h('span', {}, (row.generationCount + '').replace(/\B(?=(?:\d{3})+\b)/g, ','))
+            },
             {
               title: '实际执行量',
               key: 'realNum',
               align: 'center',
+              width: 100,
               render: (h, {row}) => {
                 return h('a', {
                   attrs: {
@@ -419,7 +423,7 @@
                     click: () => {
                       // TODO: 跳转生产批次
                       let isCheck = ['executing', 'finished'].includes(row.planStatus)
-                      if(!isCheck) return this.$Message.warning(`执行中和执行完毕状态下才有批次记录`)
+                      if (!isCheck) return this.$Message.warning(`执行中和执行完毕状态下才有批次记录`)
                       this.$router.push({
                         name: 'production-plan-management/production-prenatal-batch-list',
                         params: {
@@ -429,19 +433,19 @@
                       })
                     }
                   }
-                }, row.realNum)
+                }, (row.realNum + '').replace(/\B(?=(?:\d{3})+\b)/g, ','))
               }
             },
             {
               title: '创建时间',
               key: 'createdAt',
               align: 'center',
-              minWidth: 40,
+              width: 110,
               render: (h, {row}) => h('span', {}, row.createdAt.substr(0, 10))
             },
-            {title: '申请人', key: 'createdBy', align: 'center', minWidth: 20,},
-            {title: '备注', key: 'remark', align: 'center'},
-            {title: '操作', key: 'action', align: 'center', slot: 'action', width: 130},
+            {title: '申请人', key: 'createdBy', align: 'center', width: 110},
+            {title: '备注', key: 'remark', align: 'center', width: 150},
+            {title: '操作', key: 'action', align: 'center', tooltip: true, slot: 'action', width: 130},
           ],
           data: [],
           selection: [],
@@ -541,12 +545,12 @@
       search() {
         this.getPlanList()
       },
-      delPlan(row){
+      delPlan(row) {
         let {id, planStatus} = row
         // let conditions = ['overrule', 'pendingManagerReview']
         // if(!conditions.includes(planStatus)) return this.$Message.error('待审核和驳回状态下才可删除计划')
         this.$API.delProductionPlan({id}).then(res => {
-          if(res.code === 0 ){
+          if (res.code === 0) {
             this.$Message.success(res.msg)
             this.getPlanList()
           }
@@ -559,7 +563,7 @@
         // if(createdBy !== this.userInfo.realName) return this.$Message.error('非本人无法编辑')
         this.$router.push({
           path: '/production-plan-management/production-plan-add',
-          query: { id },
+          query: {id},
         })
       },
       // 操作验证
@@ -579,7 +583,7 @@
         let msg = this.operationVerify()
         if (msg) return this.$Message.warning(msg)
         let {id, planStatus} = this.planList.selection[0]
-        if(planStatus != 'pendingManagerReview') return this.$Message.warning('已审核')
+        if (planStatus != 'pendingManagerReview') return this.$Message.warning('已审核')
         this.reviewModal.modal = true
         this.reviewModal.reivewer = this.userInfo.realName
         this.reviewModal.form.id = id
@@ -609,11 +613,11 @@
         let {id, planStatus, generationCount, realNum} = this.planList.selection[0]
         let conditions = ['executing', 'pendingExecuted']
         let generaNum = Math.ceil(generationCount * 110 / 100)
-        if(generaNum - realNum === 0) return this.$Message.warning('目前执行量最大值，如需再次执行，请进行补Q计划')
-        if(!conditions.includes(planStatus)) return this.$Message.warning('此计划状态下无法执行计划')
+        if (generaNum - realNum === 0) return this.$Message.warning('目前执行量最大值，如需再次执行，请进行补Q计划')
+        if (!conditions.includes(planStatus)) return this.$Message.warning('此计划状态下无法执行计划')
         this.$router.push({
           path: '/production-plan-management/production-plan-execute',
-          query: { id },
+          query: {id},
         })
       },
       // 执行完毕
@@ -621,16 +625,16 @@
         let msg = this.operationVerify()
         if (msg) return this.$Message.warning(msg)
         let {id, planStatus, createdBy} = this.planList.selection[0]
-        if(createdBy !== this.userInfo.realName) return this.$Message.warning('非创建人无法无法关闭计划')
-        if(planStatus != 'executing') return this.$Message.warning('此状态下无法无法关闭计划')
+        // if (createdBy !== this.userInfo.realName) return this.$Message.warning('非创建人无法无法关闭计划')
+        if (planStatus != 'executing') return this.$Message.warning('此状态下无法无法关闭计划')
         this.finishedModal.modal = true
         this.spinShow = true
         this.$API.getProductionPlanDetail({id}).then(res => {
-          if(res.code === 0){
+          if (res.code === 0) {
             let data = res.data
-            for(let key in this.finishedModal.data) {
-              if(key !== 'form'){
-                if(data[key]){
+            for (let key in this.finishedModal.data) {
+              if (key !== 'form') {
+                if (data[key]) {
                   this.finishedModal.data[key] = data[key]
                 }
               }
@@ -663,7 +667,7 @@
             }
             if (modal === 'finishedModal') {
               // console.log(this.finishedModal.form)
-              let {id, realNum, opinion } = this.finishedModal.form
+              let {id, realNum, opinion} = this.finishedModal.form
               let param = {
                 id,
                 params: {
@@ -683,8 +687,8 @@
         })
       },
 
-      toPrenatalBatchList(){
-        if(!this.statusDetailModal.planStatus) return this.$Message.warning('执行中和执行完毕状态下才有批次记录')
+      toPrenatalBatchList() {
+        if (!this.statusDetailModal.planStatus) return this.$Message.warning('执行中和执行完毕状态下才有批次记录')
         this.$router.push({
           name: 'production-plan-management/production-prenatal-batch-list',
           params: {
@@ -785,35 +789,35 @@
           executing: '执行中',
           finished: '执行完毕',
         }
-       return statusObj[val]
+        return statusObj[val]
       },
       // 请空状态详情
-      resetStatusDetail(){
+      resetStatusDetail() {
         this.statusDetailModal.form = {
           base: {
             createdBy: '',
-              createdAt: '',
-              planNumber: '',
-              brand: '',
-              generationCount: '',
-              quarter: '',
-              isFillPlan: '',
-              planName: '',
-              fileItems: [],
+            createdAt: '',
+            planNumber: '',
+            brand: '',
+            generationCount: '',
+            quarter: '',
+            isFillPlan: '',
+            planName: '',
+            fileItems: [],
           },
           managerReview: {
             createdBy: '',
-              planStatus: '',
-              opinion: '',
+            planStatus: '',
+            opinion: '',
           },
           situation: {
             batchNum: '',
-              batchCount: '',
+            batchCount: '',
           },
           finished: {
             createdBy: '',
-              realNum: '',
-              opinion: '',
+            realNum: '',
+            opinion: '',
           },
         }
       }
@@ -832,6 +836,7 @@
 
   .download-link {
     margin-right: 20px;
+
     &:hover {
       background-color: #f3f3f3;
     }
@@ -862,7 +867,7 @@
     }
   }
 
-  /deep/ .ivu-table-header th .ivu-table-cell.ivu-table-cell-with-selection{
+  /deep/ .ivu-table-header th .ivu-table-cell.ivu-table-cell-with-selection {
     display: none;
   }
 
@@ -870,9 +875,11 @@
     padding-bottom: 0;
     border-bottom: none;
   }
+
   /deep/ .ivu-modal-body {
     padding-top: 0;
   }
+
   .modal-footer {
     text-align: right;
     position: relative;

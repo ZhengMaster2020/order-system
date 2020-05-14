@@ -37,7 +37,7 @@
           <Input class="width-200" v-model="form.planName"/>
         </FormItem>
         <FormItem label="是否补Q计划" prop="isFillPlan">
-          <Select v-model="form.isFillPlan" clearable placeholder="是否补Q计划" class="width-200">
+          <Select v-model="form.isFillPlan" placeholder="是否补Q计划" class="width-200">
             <Option value="yes">是</Option>
             <Option value="no">否</Option>
           </Select>
@@ -103,7 +103,7 @@
           remark: '',
           fileItems: [],
           brand: '',
-          isFillPlan: '',
+          isFillPlan: 'no',
           quarter: '',
         },
         rules: {
