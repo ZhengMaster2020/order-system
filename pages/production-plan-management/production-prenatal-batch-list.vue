@@ -45,8 +45,6 @@
                 <Option value="revoked">已撤销</Option>
               </Select>
             </FormItem>
-          </Col>
-          <Col>
             <FormItem>
               <Button type="primary" @click="search">搜索</Button>
             </FormItem>
@@ -251,7 +249,7 @@
               minWidth: 100,
               render: (h, {row}) => h('span', {}, this.$format(row.created_at, 'yyyy-MM-dd hh:mm:ss'))
             },
-            {title: '所属计划名称', key: 'plan_name', align: 'center', minWidth: 110},
+            {title: '所属计划名称', key: 'plan_name', align: 'center', minWidth: 160},
             {
               title: '品牌',
               key: 'brand',
@@ -259,8 +257,11 @@
               minWidth: 80,
               render: (h, {row}) => h('span', {}, this.getBrand(row.brand))
             },
-            {title: '生产批次号', key: 'batch_number', align: 'center', minWidth: 100},
-            {title: '生产数量', key: 'num', align: 'center', minWidth: 100},
+            {title: '生产批次号', key: 'batch_number', align: 'center', minWidth: 170},
+            {
+              title: '生产数量', key: 'num', align: 'center', minWidth: 100,
+              render: (h, {row}) => h('span', {}, (row.num + '').replace(/\B(?=(?:\d{3})+\b)/g, ','))
+            },
             {
               title: '入库数量',
               key: 'quantity_inbound',
@@ -312,8 +313,8 @@
               minWidth: 100,
               render: (h, {row}) => h('span', {}, row.enable_status === 'disabled' ? '未激活' : '已激活')
             },
-            {title: '下单编号', key: 'supplier_order_number', align: 'center', minWidth: 100},
-            {title: '生产供应商', key: 'supplier', align: 'center', minWidth: 100},
+            {title: '下单编号', key: 'supplier_order_number', align: 'center', minWidth: 160},
+            {title: '生产供应商', key: 'supplier', align: 'center', minWidth: 150},
             {
               title: '生产类型',
               key: 'produce_type',
@@ -384,7 +385,7 @@
     },
     watch: {
       'exportModal.modal': function (cur) {
-        if(cur) return
+        if (cur) return
         this.$refs.exportForm.resetFields()
         this.resetExportData()
       }
@@ -499,7 +500,7 @@
         let currentTab = this.currentTab
         let params = this.batchListParams(currentTab, this.searchForm)
         this.tableLoading = true
-        if(type === 'search') {
+        if (type === 'search') {
           this.prenatalBatch.selection = []
           this.cacheSelect = {
             1: [],
@@ -620,7 +621,7 @@
           }
 
           if (modal === 'cancelProductModal') {
-            let {id, plan_id } = this.prenatalBatch.selection[0]
+            let {id, plan_id} = this.prenatalBatch.selection[0]
             let params = {
               id,
               planId: plan_id,
@@ -665,14 +666,14 @@
       // 请空导表数据
       resetExportData() {
         let emptyForm = {
-            ids: [],
-            packageName: '',
-            orderQuantity: '',
-            supplierId: '',
-            supplier: '',
-            processedNum: '',
-            opinion: '',
-            data: [
+          ids: [],
+          packageName: '',
+          orderQuantity: '',
+          supplierId: '',
+          supplier: '',
+          processedNum: '',
+          opinion: '',
+          data: [
             {
               id: '',
               realNum: '',
@@ -682,7 +683,7 @@
         }
         this.mkCodeList = []
         this.exportModal.notFoundText = '无匹配数据'
-        for(let key in emptyForm) {
+        for (let key in emptyForm) {
           this.exportModal.form[key] = emptyForm[key]
         }
       }

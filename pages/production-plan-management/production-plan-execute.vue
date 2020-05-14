@@ -32,7 +32,8 @@
         </FormItem>
         <FormItem label="计划文件">
           <div style="padding-top: 33px">
-            <a :href="file.url" :download="file.name" class="download-link" v-for="(file, index) in baseicData.fileItems" :key="index">{{file.name}}</a>
+            <a :href="file.url" :download="file.name" class="download-link"
+               v-for="(file, index) in baseicData.fileItems" :key="index">{{file.name}}</a>
           </div>
         </FormItem>
 
@@ -56,23 +57,32 @@
             <FormItem label="剩余可生成数量" class="margin-top-10">
               <Input class="width-195" v-model="baseicData.remainingQuantity" readonly/>
             </FormItem>
+            <FormItem label="批次汇总量" class="margin-top-10">
+              <Input class="width-195" v-model="baseicData.totalBatchNum" readonly/>
+            </FormItem>
           </Col>
         </Row>
-        <Row class="margin-bottom-10">
-          <Col span="4" class="necessary font-size-12">生成类型</Col>
-          <Col span="4" class="necessary font-size-12">批次数量</Col>
-          <Col span="4" class="necessary font-size-12">标类型</Col>
+        <Row class="margin-bottom-10" type="flex">
+          <Col class="font-size-12" style="width: 55px; padding-left: 7px">序号</Col>
+          <Col class="necessary font-size-12 width-215">生成类型</Col>
+          <Col class="necessary font-size-12 width-215">批次数量</Col>
+          <Col class="necessary font-size-12 width-215">标类型</Col>
         </Row>
-        <Row v-for="(batchData, index) in baseicData.form" :key="index">
-          <Col span="4">
+        <Row v-for="(batchData, index) in baseicData.form" :key="index" type="flex">
+          <Col>
+            <FormItem>
+              <Input :value="index+1" style="width: 40px; text-align: center"/></FormItem>
+          </Col>
+          <Col>
             <FormItem :prop="'form.' + index + '.produceType'" :rules='rules.produceType'>
-              <Select v-model="batchData.produceType" class="width-195" @on-change="(val) => {markTypeChange(val, index)}">
+              <Select v-model="batchData.produceType" class="width-195"
+                      @on-change="(val) => {markTypeChange(val, index)}">
                 <Option value="prenatal">产前样</Option>
                 <Option value="goods">大货样</Option>
               </Select>
             </FormItem>
           </Col>
-          <Col span="4">
+          <Col>
             <FormItem :prop="'form.' + index + '.num'" :rules='rules.num'>
               <InputNumber :min="0"
                            :max="batchData.remainingQuantity"
@@ -84,18 +94,16 @@
             </FormItem>
           </Col>
 
-          <Col span="4">
+          <Col>
             <FormItem :prop="'form.' + index + '.markType'" :rules='rules.markType'>
-              <Select v-model="batchData.markType"
-                      class="width-195"
-                      >
+              <Select v-model="batchData.markType" class="width-195">
                 <Option value="P">平标</Option>
                 <Option value="J">卷标</Option>
               </Select>
             </FormItem>
           </Col>
 
-          <Col span="4">
+          <Col>
             <FormItem>
               <Button shape="circle" icon="md-add" @click="addBatchData" v-if="index === 0"></Button>
               <Button shape="circle" icon="md-remove" @click="delBatchData(index)" v-else></Button>
@@ -103,7 +111,7 @@
           </Col>
         </Row>
       </Form>
-<!--      <Spin size="large" fix v-if="spinShow"></Spin>-->
+      <!--      <Spin size="large" fix v-if="spinShow"></Spin>-->
     </Card>
   </div>
 </template>
@@ -118,11 +126,11 @@
           auditBy: '',
           auditAt: '',
           opinion: '',
-
           createdBy: '',
           createdAt: '',
           planNumber: '',
           planName: '',
+          totalBatchNum: '',
           generationCount: '',
           isFillPlan: '',
           brand: '',
@@ -147,6 +155,11 @@
         }
       }
     },
+    watch: {
+      'baseicData.remainingQuantity': function () {
+        this.baseicData.totalBatchNum = this.getTotalNum(this.baseicData.form)
+      }
+    },
     mounted() {
       this.planId = this.$route.query.id
       this.getProductionPlanDetail(this.planId)
@@ -154,66 +167,75 @@
     methods: {
       submit() {
         this.$refs.form.validate(val => {
-          if (val) {
-            let isCheck = this.baseicData.form.find(items => items.num === 0)
-            if(isCheck) return this.$Message.warning('批次数量不可为 0')
-            let remainingQuantity = this.baseicData.remainingQuantity
-            this.baseicData.form.map(batchDatas => {
-              batchDatas.planId = this.planId
-              batchDatas.remainingQuantity = remainingQuantity
-            })
-            let param = {
-              id: this.planId,
-              params: {
-                batchData: this.baseicData.form
-              }
+          if (!val) return this.$Message.warning('请确认是否填写完整')
+          let isCheck = this.baseicData.form.find(items => items.num === 0)
+          if (isCheck) return this.$Message.warning('批次数量不可为 0')
+          let remainingQuantity = this.baseicData.remainingQuantity
+          this.baseicData.form.map(batchDatas => {
+            batchDatas.planId = this.planId
+            batchDatas.remainingQuantity = remainingQuantity
+          })
+          let param = {
+            id: this.planId,
+            params: {
+              batchData: this.baseicData.form
             }
-            this.$API.executeProductionPlan(param).then(res => {
-              if(res.code === 0) {
-                this.$Message.success(res.msg)
-                this.$router.push('/production-plan-management/production-plan-list')
-              }
-            })
           }
+          this.$API.executeProductionPlan(param).then(res => {
+            if (res.code === 0) {
+              this.$Message.success(res.msg)
+              this.$router.push('/production-plan-management/production-plan-list')
+            }
+          })
         })
       },
-      addBatchData(){
-        if(this.baseicData.remainingQuantity <= 0) return
-        this.baseicData.remainingQuantity -= 1
-        let total = this.getTotalNum(this.baseicData.form)
-        this.baseicData.form.push({
-          planId: '',
-          produceType: '',
-          num: 0,
-          remainingQuantity: this.realNum - total <= 0 ? 0 : this.realNum - total,
-          markType: '',
-        })
+      addBatchData() {
+        if (this.baseicData.remainingQuantity <= 0) return
+        let remainingQuantity = this.baseicData.remainingQuantity
+        let prenatalMax = 10000
+        let goodsMax = 1000000
+        let newItems = JSON.parse(JSON.stringify(this.baseicData.form[this.baseicData.form.length - 1]))
+        let newItemsNum = newItems.num
+
+        if (newItems.produceType === 'prenatal') {
+          newItems.remainingQuantity = remainingQuantity >= prenatalMax ? prenatalMax : remainingQuantity
+          newItems.num = newItemsNum > remainingQuantity ? remainingQuantity : newItemsNum > prenatalMax ? prenatalMax : newItemsNum
+        } else if (newItems.produceType === 'goods') {
+          newItems.remainingQuantity = remainingQuantity >= goodsMax ? goodsMax : remainingQuantity
+          newItems.num = newItemsNum > remainingQuantity ? remainingQuantity : newItemsNum > goodsMax ? goodsMax : newItemsNum
+        } else {
+          newItems.num = newItemsNum > remainingQuantity ? remainingQuantity : newItemsNum
+          newItems.remainingQuantity = remainingQuantity - newItems.num <= 0 ? 0 : remainingQuantity - newItems.num
+        }
+        this.baseicData.remainingQuantity -= newItems.num
+        console.log(newItems)
+        this.baseicData.form.push(newItems)
       },
-      delBatchData(index){
+      delBatchData(index) {
         this.baseicData.form.splice(index, 1)
         let total = this.getTotalNum(this.baseicData.form)
         this.baseicData.remainingQuantity = this.realNum - total
       },
-      getTotalNum(arr){
+      getTotalNum(arr) {
         let totalNum = 0
-        arr.forEach(items => totalNum += items.num )
+        arr.forEach(items => totalNum += items.num)
         return totalNum
       },
-      numChange(val, index){
+      numChange(val, index) {
         let total = this.getTotalNum(this.baseicData.form)
         let prenatalMax = 10000
         let goodsMax = 1000000
         let remainNum = this.realNum - total <= 0 ? 0 : this.realNum - total
         this.baseicData.remainingQuantity = remainNum
         this.baseicData.form.map((items, indx) => {
-          if(items.produceType === 'prenatal'){
+          if (items.produceType === 'prenatal') {
             items.remainingQuantity = (remainNum + items.num) >= prenatalMax ? prenatalMax : (remainNum + items.num)
-          }else if(items.produceType === 'goods'){
+          } else if (items.produceType === 'goods') {
             items.remainingQuantity = (remainNum + items.num) >= goodsMax ? goodsMax : (remainNum + items.num)
-          }else {
+          } else {
             items.remainingQuantity = remainNum + items.num
           }
-          if(index === indx){
+          if (index === indx) {
             items.num = val > remainNum + items.num ? remainNum + items.num : val
           }
         })
@@ -224,10 +246,10 @@
         let total = this.getTotalNum(this.baseicData.form)
         let remainNum = this.realNum - total <= 0 ? 0 : this.realNum - total
         let data = this.baseicData.form[index]
-        if(data.produceType === 'prenatal'){
+        if (data.produceType === 'prenatal') {
           data.remainingQuantity = data.num >= prenatalMax ? prenatalMax : remainNum
           data.num = data.num >= prenatalMax ? prenatalMax : data.num
-        }else if(data.produceType === 'goods'){
+        } else if (data.produceType === 'goods') {
           data.remainingQuantity = data.num >= goodsMax ? goodsMax : remainNum
           data.num = data.num >= goodsMax ? goodsMax : data.num
         }
@@ -240,13 +262,13 @@
       getProductionPlanDetail(id) {
         let total = this.getTotalNum(this.baseicData.form)
         this.$API.getProductionPlanDetail({id}).then(res => {
-          if(res.code === 0){
+          if (res.code === 0) {
             let data = res.data
             let generaNum = Math.ceil(data.generationCount * 110 / 100)
             this.realNum = generaNum - data.realNum
-            for(let key in this.baseicData) {
-              if(key !== 'form'){
-                if(data[key]){
+            for (let key in this.baseicData) {
+              if (key !== 'form') {
+                if (data[key]) {
                   this.baseicData[key] = data[key]
                 }
               }
@@ -270,6 +292,10 @@
     width: 195px;
   }
 
+  .width-215 {
+    width: 215px;
+  }
+
   .font-size-12 {
     font-size: 12px;
   }
@@ -291,8 +317,9 @@
 
   .download-link {
     margin-right: 20px;
+
     &:hover {
-     background-color: #f3f3f3;
+      background-color: #f3f3f3;
     }
   }
 </style>
