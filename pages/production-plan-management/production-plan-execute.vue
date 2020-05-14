@@ -51,7 +51,7 @@
 
         <Row class="margin-bottom-10 title">
           <Col>
-            指定生产批次号
+            制定生产批次号
           </Col>
           <Col>
             <FormItem label="剩余可生成数量" class="margin-top-10">
