@@ -306,7 +306,7 @@
         this.$API[apiKey]({...pageProps, ...search})
           .then(res => {
             this.isTableLoading = false;
-            if (res.code === 0) {
+            if (res.code === 0 && res.data.data) {
               if (pageProps.page !== page || pageProps.prePage !== prePage || this.selectTab !== selectTab) return;
               if (selectList.length && selectList[page] && selectList[page].length) {
                 // 选中数组中该页有数据  赋值checked
@@ -425,15 +425,11 @@
         this.$API.getSecurityExportKey()
           .then(res => {
             if (res.code === 0) {
-              if (res.data && res.data.indexOf('失败') > -1) {
-                this.$Message.error(res.data)
-              } else if (res.data && res.data.indexOf('有效期') > -1) {
-                this.$Message.warning(res.data)
-              } else {
-                this.$Message.success(res.data)
+              if (res.data.phone) {
+                this.$Message.success('验证码已发送至' + res.data.phone + ',请注意查收!')
               }
             }
-          })
+          }).catch(err => {})
       },
       // 获取搜索数据
       getSearch () {
@@ -481,17 +477,21 @@
             postData.check = 1
           }
           this.$API[apiName](postData).then(res => {
-            let data = res
             this.isExportLoading = false;
-            this.isShowExportModal = false;
-            if (typeof window.navigator.msSaveBlob !== 'undefined') {
-              // IE version
-              window.navigator.msSaveBlob(data);
+            if (res.code === 0) {
+              let data = res
+              this.isShowExportModal = false;
+              if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                // IE version
+                window.navigator.msSaveBlob(data);
+              } else {
+                // Firefox version
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(data);
+                link.click();
+              }
             } else {
-              // Firefox version
-              var link = document.createElement('a');
-              link.href = window.URL.createObjectURL(data);
-              link.click();
+              this.$Message.error(res.subMsg)
             }
           }).catch((err) => {
             this.isExportLoading = false;

@@ -12,6 +12,7 @@ import ENV from './env'
 let baseUrl = '//api.fandow.com/oa/'
 let fileUrl = '//api.fandow.com/oa/file'
 let UAC_URL = '//api.fandow.com/oa/uac'
+let userUrl = '//api.fandow.com/'
 
 if (ENV === 'production') {
   console.log('---- production ----')
@@ -20,13 +21,16 @@ if (ENV === 'production') {
   baseUrl = 'http://kongtest.fandow.com/oa/'
   fileUrl = 'http://apibeta.fandow.com/oa/file'
   UAC_URL = 'http://kongtest.fandow.com/oa/uac'
+  USER_URL = 'http://kongtest.fandow.com/oa/uac'
 } else {
   console.log('---- develop ----')
   baseUrl = 'http://kongtest.fandow.com/oa/'
   fileUrl = 'http://apibeta.fandow.com/oa/file'
   UAC_URL = 'http://kongtest.fandow.com/oa/uac'
+  USER_URL = 'http://kongtest.fandow.com/oa/uac'
 }
 
 export const SERVER_UAC_URL = UAC_URL
 export const SERVER_BASE_URL = baseUrl
 export const FILE_BASE_URL = fileUrl
+export const USER_URL = userUrl
