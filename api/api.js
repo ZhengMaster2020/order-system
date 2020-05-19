@@ -1,9 +1,10 @@
 import fetch from './fetch'
-import { SERVER_UAC_URL } from './config'
+import { SERVER_UAC_URL, USER_URL } from './config'
 
 const login = (params) => {
   return fetch({
-    url: 'uac/authentication/password-grant',
+    baseURL: USER_URL,
+    url: 'authentication/password-grant',
     method: 'POST',
     data: params
   })
@@ -12,7 +13,7 @@ const login = (params) => {
 // 获取用户信息
 const getUserInfo = () => {
   return fetch({
-    baseURL: SERVER_UAC_URL,
+    baseURL: USER_URL,
     url: 'auth/userinfo',
     method: 'GET',
   })
