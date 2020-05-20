@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import iView, { Notice } from 'iview'
+import iView, { Notice } from 'view-design'
 // import { router } from 'vue-router'
 import { SERVER_BASE_URL } from './config'
 
