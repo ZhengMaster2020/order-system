@@ -145,6 +145,7 @@
       },
 
       getList() {
+        this.tableLoading = true
         let params = {}
         for (let key in this.searchForm) {
           !!this.searchForm[key] && (params[key] = this.searchForm[key])
