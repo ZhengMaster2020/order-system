@@ -81,12 +81,12 @@ update_site(){
     ln -snf ${releasesdir}/${uptime}  ${sitebasedir}/current && echo "切换current软链成功" || echo "切换current软链失败"
 
     echo "保留版本数"
-    #cd ${releasesdir} && ls -t  | awk 'NR==7{print}' | xargs -i rm -rf {} && ls -lt ${releasesdir}
-    if [ $status == "product" ];then
-        cd ${releasesdir} && ll -lt | awk 'NR>7{print $NF}' | xargs -i rm -rf {}  && ls -lt ${releasesdir}
-    esle
-        cd ${releasesdir} && ll -lt | awk 'NR>4{print $NF}' | xargs -i rm -rf {}  && ls -lt ${releasesdir}
-    fi
+    cd ${releasesdir} && ls -t  | awk 'NR==6{print}' | xargs -i rm -rf {} && ls -lt ${releasesdir}
+    #if [ $status == "product" ];then
+    #    cd ${releasesdir} && ll -lt | awk 'NR>7{print $NF}' | xargs -i rm -rf {}  && ls -lt ${releasesdir}
+    #esle
+    #    cd ${releasesdir} && ll -lt | awk 'NR>4{print $NF}' | xargs -i rm -rf {}  && ls -lt ${releasesdir}
+    #fi
 eeooff
 }
 
