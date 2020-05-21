@@ -84,7 +84,7 @@
             render: (h, {row}) => h('span', {}, row.status === 'disable' ? '禁用' : '启用')
           },
           {title: '创建人', key: 'createdBy', width: 110, align: 'center'},
-          {title: '时间', key: 'createdAt', width: 100, align: 'center',
+          {title: '时间', key: 'createdAt', width: 110, align: 'center',
             render: (h, {row}) => h('span', {}, this.$format(row.createdAt, 'yyyy-MM-dd hh:mm:ss'))
           },
           {title: '修改', key: 'action', width: 70, align: 'center', slot: 'action'}
@@ -117,15 +117,11 @@
       enAbleSetting() {
         let selection = this.selection
         if(selection.length > 1) return this.$Message.error('一次只能操作一条数据')
-        console.log({
-          id: selection[0].id,
-          status: selection[0].status === 'disable' ? 'enable' : 'disable'
-        })
+
         this.$API.statusChangeFQA({
           id: selection[0].id,
           status: selection[0].status === 'disable' ? 'enable' : 'disable'
         }).then(res => {
-          console.log(res)
           if(res.code === 0) {
             this.$Message.success('更新成功')
             this.getList()
@@ -156,7 +152,6 @@
         params.perPage = this.pageProps.perPage
         // return console.log(params)
         this.$API.getFQAlist(params).then(res => {
-          console.log(res)
           if (res.code === 0) {
             let {count, list, page} = res.data
             this.data = list
