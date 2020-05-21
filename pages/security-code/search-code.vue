@@ -318,6 +318,8 @@
               }
               pageProps.count = res.data.count
               this[tableDataKey] = res.data.data
+            } else {
+              this[tableDataKey] = []
             }
           })
           .catch(() => {
