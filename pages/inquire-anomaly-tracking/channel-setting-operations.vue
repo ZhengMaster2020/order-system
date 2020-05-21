@@ -2,19 +2,18 @@
   <div>
     <Card>
       <Row type="flex" justify="end" style="padding-bottom: 24px; margin-bottom: 24px; border-bottom: 1px solid #ccc; ">
-        <Button type="error" :loading="submintLodaing" class="margin-right-10">删除</Button>
+        <Button type="error" class="margin-right-10" @click="delConfirm" v-if="pageTitle === 'edit'">删除</Button>
         <Button type="primary" @click="submit" :loading="submintLodaing">确认提交</Button>
       </Row>
-
       <Form :model="form" ref="form" inline :rules="rules">
         <FormItem label="创建人" prop="applicant">
-          <Input class="width-200" v-model="applicant"/>
+          <Input class="width-200" v-model="form.createdBy" readonly/>
         </FormItem>
-        <FormItem label="渠道名称">
-          <Input class="width-200" v-model="applicant"/>
+        <FormItem label="渠道名称" prop="channel">
+          <Input class="width-200" v-model="form.channel"/>
         </FormItem>
-        <FormItem label="渠道排序">
-          <Input class="width-200" v-model="applicant"/>
+        <FormItem label="渠道排序" prop="sort">
+          <InputNumber :min="0" class="width-200" v-model="form.sort"/>
         </FormItem>
       </Form>
       <Spin size="large" fix v-if="spinShow"></Spin>
@@ -29,16 +28,15 @@
         applicant: '',
         submintLodaing: false,
         spinShow: false,
+        pageTitle: 'add',
         form: {
-          nextBy: '李时达',
-          remark: '',
-          fileItems: [],
-          brand: '',
-          isFillPlan: 'no',
-          quarter: '',
+          createdBy: '',
+          channel: '',
+          sort: null,
         },
         rules: {
-          applicant: [{required: true, message: '必填项', trigger: 'change'}],
+          channel: [{required: true, message: '必填项', trigger: 'change'}],
+          sort: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
         }
       }
     },
@@ -46,48 +44,71 @@
       submit() {
         this.$refs.form.validate(val => {
           if (val) {
-            // return console.log(this.form)
             this.submintLodaing = true
-            if (this.id) {
-              let param = {
-                id: this.id,
-                params: this.form
-              }
-              // this.$API.editProductionPlan(param).then(res => {
-              //   if (res.code === 0) {
-              //     this.$Message.success('编辑成功')
-              //     this.$router.push('/production-plan-management/production-plan-list')
-              //   }
-              // }).finally(() => {
-              //   this.submintLodaing = false
-              // })
-              return
+            let params = {
+              data: {},
+              id: ''
             }
-            // this.$API.addProductionPlan(this.form).then(res => {
-            //   if (res.code === 0) {
-            //     this.$Message.success('添加成功')
-            //     this.$router.push('/production-plan-management/production-plan-list')
-            //   }
-            // }).finally(() => {
-            //   this.submintLodaing = false
-            // })
+            let apiKey = 'addChannelLists'
+            let successMsg = '添加成功'
+            let paramsKeys = ['sort', 'channel']
+            paramsKeys.forEach(key => {
+              !!this.form[key] && (params.data[key] = this.form[key])
+            })
+            if (this.id) {
+              apiKey = 'editChannelLists'
+              successMsg = '修改成功'
+              params.id = this.id
+            }
+
+            this.$API[apiKey](params).then(res => {
+              if (res.code === 0) {
+                this.$Message.success(successMsg)
+                this.$router.push('/inquire-anomaly-tracking/channel-store-settings')
+              }
+            }).finally(() => {
+              this.submintLodaing = false
+            })
           }
         })
       },
 
-
+      delConfirm() {
+        this.$Modal.confirm({
+          title: '删除',
+          content: '<p>确认删除该渠道?</p>',
+          okText: '确定',
+          cancelText: '取消',
+          onOk: () => {
+            this.$API.delChannelLists(this.id).then(res => {
+              res.code === 0 && this.$Message.success(res.msg)
+              this.$router.push('/inquire-anomaly-tracking/channel-store-settings')
+            })
+          },
+        })
+      },
 
       // 获取计划详情
-      getProductionPlanDetail(id) {
-
+      getChannelDetail(id) {
+        this.$API.getChannelListsDetail({id}).then(res => {
+          if (res.code === 0) {
+            for (let key in this.form) {
+              this.form[key] = res.data[key]
+            }
+          }
+        })
       }
     },
     mounted() {
       this.id = this.$route.query.id
-      // this.getNextByUser()
+
       if (this.id) {
-        // this.getProductionPlanDetail(this.id)
+        this.getChannelDetail(this.id)
+        this.pageTitle = 'edit'
+        return
       }
+      let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
+      this.form.createdBy = userInfo.realName
     }
   }
 </script>

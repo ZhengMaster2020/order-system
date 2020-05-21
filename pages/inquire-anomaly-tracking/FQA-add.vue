@@ -7,17 +7,17 @@
 
       <Form :model="form" ref="form" inline :rules="rules">
         <FormItem label="创建人">
-          <Input class="width-200" v-model="form.createdBy"/>
+          <Input class="width-200" v-model="form.createdBy" readonly/>
         </FormItem>
         <FormItem label="排序" prop="sort">
           <InputNumber :min="1" class="width-200" v-model="form.sort"/>
         </FormItem>
         <FormItem label="状态">
           <InputNumber :min="1" class="width-200" v-model="form.status" readonly/>
-<!--          <Select clearable placeholder="状态" class="width-200" v-model="form.status">-->
-<!--            <Option value="enable">启用</Option>-->
-<!--            <Option value="disable">停用</Option>-->
-<!--          </Select>-->
+          <!--          <Select clearable placeholder="状态" class="width-200" v-model="form.status">-->
+          <!--            <Option value="enable">启用</Option>-->
+          <!--            <Option value="disable">停用</Option>-->
+          <!--          </Select>-->
         </FormItem>
         <Row>
           <FormItem label="问题" prop="problem">
@@ -92,8 +92,8 @@
       // 获取计划详情
       getFQADetail(id) {
         this.$API.getFQAlistDetail({id}).then(res => {
-          if(res.code ===0) {
-            for(let key in this.form) {
+          if (res.code === 0) {
+            for (let key in this.form) {
               this.form[key] = res.data[key]
             }
           }
