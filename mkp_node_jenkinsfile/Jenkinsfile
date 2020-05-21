@@ -13,7 +13,7 @@ pipeline {
 
         //目标主机目录变量
         sitename = "${JOB_NAME}"  //项目名称（需修改）
-        sitebasedir = "/home/wwwroot/${sitename}/front-end"  //项目基础目录
+        sitebasedir = "/home/wwwroot/${sitename}"  //项目基础目录
         releasesdir = "${sitebasedir}/releases"  //版本库一般是固定的
 
 	    //获取发布版本的时间戳
@@ -38,7 +38,7 @@ pipeline {
         srcipts_dir = "${WORKSPACE}/mkp_node_jenkinsfile"
 
         //git_url
-        git_url = "git@gitlab.fandow.com:fandow/dingtalk-lark.fandow.com.git"
+        git_url = "git@gitlab.fandow.com:fandow/security-code.fandow.com.git"
     }
         //参数化构建
     parameters {
