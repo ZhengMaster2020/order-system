@@ -1,6 +1,6 @@
 #!/bin/bash
 pm2=`type -p pm2`
-sitename=$1_test
+sitename=$1
 service_pid=`$pm2 pid ${sitename}`
 if [ $service_pid -ge 0 ];then
     $pm2 del $sitename
