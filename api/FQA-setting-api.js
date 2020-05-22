@@ -12,11 +12,11 @@ const getFQAlist = (params) => {
 }
 
 // 新增
-const addFQAlist = (params) => {
+const addFQAlist = ({data}) => {
   return fetch({
     url: `traceability/FAQ`,
     method: 'POST',
-    data: params
+    data
   })
 }
 

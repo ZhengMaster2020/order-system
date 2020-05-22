@@ -13,7 +13,7 @@
           <Input class="width-200" v-model="form.channel"/>
         </FormItem>
         <FormItem label="渠道排序" prop="sort">
-          <InputNumber :min="0" class="width-200" v-model="form.sort"/>
+          <InputNumber :min="1" class="width-200" v-model="form.sort"/>
         </FormItem>
       </Form>
       <Spin size="large" fix v-if="spinShow"></Spin>
@@ -32,7 +32,7 @@
         form: {
           createdBy: '',
           channel: '',
-          sort: null,
+          sort: 1,
         },
         rules: {
           channel: [{required: true, message: '必填项', trigger: 'change'}],
@@ -55,6 +55,7 @@
             paramsKeys.forEach(key => {
               !!this.form[key] && (params.data[key] = this.form[key])
             })
+
             if (this.id) {
               apiKey = 'editChannelLists'
               successMsg = '修改成功'
@@ -88,7 +89,6 @@
         })
       },
 
-      // 获取计划详情
       getChannelDetail(id) {
         this.$API.getChannelListsDetail({id}).then(res => {
           if (res.code === 0) {
