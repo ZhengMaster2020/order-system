@@ -39,22 +39,27 @@ pipeline {
 
         //git_url
         git_url = "git@gitlab.fandow.com:fandow/security-code.fandow.com.git"
+        
+        //扫描器配置
+        //sonar_scanner = "sonar-scanner \
+        //    -Dsonar.projectKey=live-app.7wenyi.com \
+        //    -Dsonar.projectName=${JOB_NAME} \
+        //    -Dsonar.sources=. \
+        //    -Dsonar.host.url=http://192.168.1.201:9000 \
+        //    -Dsonar.login=f8ce3afc3bb6990b281fcb1669c60b0b531cd2e0"
     }
         //参数化构建
     parameters {
-        choice(
-           choices: 'test\nproduct\nrollback_test\nrollback_product',
-           description: 'choose deploy environment or rollback',
-           name: 'status'
-       )
+        choice(name: 'status',choices:'test\nproduct\nrollback_test\nrollback_product',description: '请选择部署还是回退')
         gitParameter name: 'BRANCH_TAG', 
-                     type: 'PT_BRANCH_TAG',
-                     branchFilter: 'origin/(.*)',  //origin是一个远程服务器名称
-                     defaultValue: 'master',  //默认值
-                     selectedValue: 'DEFAULT',  //选择值
-                     sortMode: 'ASCENDING_SMART',  //排序方式
-                                         description: 'Select your branch or tag.'
-    }
+            type: 'PT_BRANCH_TAG',
+            branchFilter: 'origin/(.*)',
+            defaultValue: 'master',  //默认值
+            selectedValue: 'DEFAULT',  //选择值
+            sortMode: 'ASCENDING_SMART', //排序方式
+			quickFilterEnabled: 'true',  //搜索框
+			description: 'Select your branch or tag.'
+	}
 
     stages{
         stage('开始部署流程') {
@@ -64,10 +69,9 @@ pipeline {
                     steps{
                     timeout(1) { //一分钟没有输入密码则中断构建
                          script {
-//                            when { environment name: 'status', value: 'product' }
                              //对部署环境判断，匹配相应的验证才能继续往下执行
                              if ( env.status == "product"){
-                                 userMap = input message: 'please input password', ok: 'ok', submitter: 'admin', parameters: [password(name:'password', defaultValue: '123456', description: '发布代码口令' )], submitterParameter: 'admin'
+                                 userMap = input message: 'please input password', ok: 'ok', submitter: 'admin', parameters: [password(name:'password', defaultValue: '', description: '发布代码口令' )], submitterParameter: 'admin'
                                  if (userMap['password'].toString() == "123456"){
                                      echo "密码正确"
                                  }else{
@@ -75,39 +79,38 @@ pipeline {
                                  }
                              }
                          }
-//                            tag_version = """${ssh $ip "/bin/find $release_dir -type d -name "$deploy_name-*-$BRANCH_TAG" 2>/dev/null | /bin/wc -l"}"""
-//                            echo "${tag_version}"
-//                            if ( env.tag_version == '1' ) {
-//                                input message:'请勿重复构建，继续执行构建选择ok',ok:'ok'
                        }
                     }
                 }
 
 
-           stage('pull code') {
-               //when { anyOf { environment name: 'status', value: 'test'; environment name: 'status', value: 'product' } }
-               steps {
-                   checkout([$class: 'GitSCM', 
-                             branches: [[name: "${params.BRANCH_TAG}"]], 
-                             doGenerateSubmoduleConfigurations: false, 
-                             extensions: [], 
-                             gitTool: 'Default', 
-                             submoduleCfg: [], 
-                             userRemoteConfigs: [[url: "${git_url}",credentialsId: 'for_gitlab',]]
-                           ])
-                   }
-                }
+//           stage('pull code') {
+//               steps {
+//                   checkout([$class: 'GitSCM', 
+//                             branches: [[name: "${params.BRANCH_TAG}"]], 
+//                             doGenerateSubmoduleConfigurations: false, 
+//                             extensions: [], 
+//                             gitTool: 'Default', 
+//                             submoduleCfg: [], 
+//                             userRemoteConfigs: [[url: "${git_url}",credentialsId: 'for_gitlab',]]
+//                           ])
+//                   }
+//                }
                 
 //			    stage('代码质量检查') {
-//			        //when { environment name: 'status', value: 'update_test' }
-//			        //when { anyOf { environment 'status.update_test'; environment 'status.update_product' } }
 //			        steps {
 //			            withSonarQubeEnv('sonarqube') {
-//			            sh label: '', script: '/usr/local/sonar-scanner/bin/sonar-scanner -Dsonar.projectKey=php -Dsonar.projectName=${JOB_NAME} -Dsonar.sources=. '
+//			            sh label: '', script: '${sonar_scanner}'
 //			            }
 //			        }
 //			    }
-                
+//				stage("代码质量结果判断") {
+//					steps{
+//						timeout(time: 1, unit: 'HOURS') {
+//						waitForQualityGate abortPipeline: true
+//						}
+//					}
+//				}
         				stage('部署') {
         					steps {
         						sh 'sh -x ${srcipts_dir}/deploy_mkp_node.sh $status'
@@ -116,12 +119,31 @@ pipeline {
                    }
                 }
     		    stage('回退') {
-                when { anyOf { environment name: 'status', value: 'rollback_test'; environment name: 'status', value: 'rollback_product' } }
-    			steps {
+            when { anyOf { environment name: 'status', value: 'rollback_test'; environment name: 'status', value: 'rollback_product' } }
+    			    steps {
+                timeout(1) { //一分钟没有输入密码则中断构建
+                    script {
+                        //对部署环境判断，匹配相应的验证才能继续往下执行
+                        if ( env.status == "rollback_product"){
+                            userMap = input message: 'please input password', ok: 'ok', submitter: 'admin', parameters: [password(name:'password', defaultValue: '', description: '发布代码口令' )], submitterParameter: 'admin'
+                            if (userMap['password'].toString() == "123456"){
+                                echo "密码正确"
+                            }else{
+                                echo "密码错误，请确认您是否有权限操作"
+                            }
+                        }
+                    }       
+                }
+
     						sh 'sh -x ${srcipts_dir}/deploy_mkp_node.sh $status'
     			} 
     		}
-    	}
+//		stage('清除工作空间'){ 
+//			steps{
+//				cleanWs()
+//			}
+//	    }
+    }
 //    post('代码发布结果通知') {
 //        success {
 //            dingtalk (
