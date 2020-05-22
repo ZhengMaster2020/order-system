@@ -6,8 +6,8 @@
         <Button type="primary" @click="submit" :loading="submintLodaing">确认提交</Button>
       </Row>
       <Form :model="form" ref="form" inline :rules="rules">
-        <FormItem label="创建人" prop="applicant">
-          <Input class="width-200" v-model="form.createdBy" readonly/>
+        <FormItem label="创建人" prop="applicant" >
+          <Input class="width-200 color-gray" v-model="form.createdBy" readonly/>
         </FormItem>
         <FormItem label="渠道名称" prop="channel">
           <Input class="width-200" v-model="form.channel"/>
@@ -132,4 +132,7 @@
     color: #ed4014;
   }
 
+  .color-gray /deep/ .ivu-input{
+    color: #9999a6;
+  }
 </style>

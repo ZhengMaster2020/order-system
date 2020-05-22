@@ -6,7 +6,7 @@
         <Row type="flex" justify="space-between">
           <Col>
             <FormItem>
-              <Input v-model="searchForm.createdBy" placeholder="申请人" class="width-120"/>
+              <Input v-model="searchForm.createdBy" placeholder="创建人" class="width-120"/>
             </FormItem>
             <FormItem>
               <Select clearable placeholder="状态" class="width-120" v-model="searchForm.status">
@@ -81,7 +81,7 @@
           {title: '问题', key: 'problem', align: 'center'},
           {title: '解答', key: 'answer', align: 'center'},
           {title: '状态', key: 'status', width: 70, align: 'center',
-            render: (h, {row}) => h('span', {}, row.status === 'disable' ? '禁用' : '启用')
+            render: (h, {row}) => h('span', {}, row.status === 'disable' ? '停用' : '启用')
           },
           {title: '创建人', key: 'createdBy', width: 110, align: 'center'},
           {title: '时间', key: 'createdAt', width: 110, align: 'center',

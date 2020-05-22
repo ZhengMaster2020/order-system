@@ -6,7 +6,7 @@
         <Row type="flex" justify="space-between">
           <Col>
             <FormItem>
-              <Select clearable filterable placeholder="渠道" class="width-120" v-model="searchForm.channelId">
+              <Select clearable filterable placeholder="请选择渠道" class="width-120" v-model="searchForm.channelId">
                 <Option v-for="channel in channelList" :value="channel.id" :key="channel.id">{{channel.channel}}
                 </Option>
               </Select>

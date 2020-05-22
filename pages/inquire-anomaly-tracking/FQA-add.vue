@@ -6,7 +6,7 @@
       </Row>
 
       <Form :model="form" ref="form" inline :rules="rules">
-        <FormItem label="创建人">
+        <FormItem label="创建人" class="color-gray">
           <Input class="width-200" v-model="form.createdBy" readonly/>
         </FormItem>
         <FormItem label="排序" prop="sort">
@@ -90,7 +90,7 @@
             for (let key in this.form) {
               this.form[key] = res.data[key]
             }
-            this.form.status = this.form.status === 'enable' ? '启用' : '禁用'
+            this.form.status = this.form.status === 'enable' ? '启用' : '停用'
           }
         })
       }
@@ -121,6 +121,10 @@
     font-family: SimSun;
     font-size: 12px;
     color: #ed4014;
+  }
+
+  .color-gray /deep/ .ivu-input{
+    color: #9999a6;
   }
 
 </style>
