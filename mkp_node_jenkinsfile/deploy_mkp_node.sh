@@ -3,6 +3,12 @@
 #version_3.0
 #time:20200520
 
+#使用该脚本前提
+#1.目标主机已安装node、pm2、yarn工具
+#2.jenkins已经将ssh-key发往目标主机
+
+
+
 set -e
 
 
@@ -35,19 +41,33 @@ deploy(){
 
 rollback_env(){
     if [ $deploy_env == "rollback_test" ];then
-        $rsync -avzP ./mkp_node_jenkinsfile $leave_test:${sitebasedir}/current > /dev/null 2>&1
+        $rsync -avzP ./mkp_jenkins $leave_test:${sitebasedir}/current > /dev/null 2>&1
     elif [ $deploy_env == "rollback_product" ];then
-        $rsync -avzP ./mkp_node_jenkinsfile $leave_product:${sitebasedir}/current > /dev/null 2>&1
+        #指定回滚版本名称
+        rollback_tag=`ssh $leave "/bin/find ${releasesdir} -type d -name "${sitename}_*_${BRANCH_TAG}""`
+        
+        #是否有回滚的版本
+        tag_num=`ssh $leave "/bin/find ${releasesdir} -type d -name "${sitename}_*_${BRANCH_TAG}" 2>/dev/null | /bin/wc -l"`
+        
+        #判断如果该tag没有找到则认为回退的版本不存在
+        if [ $tag_num == 1 ];then
+            echo "开始回滚操作"
+            $rsync -avzP ./mkp_jenkins $leave_product:${rollback_tag} > /dev/null 2>&1
+        else
+            echo "回滚版本不存在，请确认是否有该版本"
+            exit 123
+        fi
     else
         echo "请输入回滚的环境"
 		exit 123
     fi
 }
 
+
+
 update_site(){
     ssh -T $leave << eeooff
     cd ${releasesdir}/${uptime}
-    ####$sed -i 's/30005/30006/g' ./server/index.js && echo "端口替换成功"
     #安装依赖包
     $yarn install > /dev/null && echo "$yarn install依赖包安装成功"
     if [ $? -ne 0 ]
@@ -82,11 +102,12 @@ update_site(){
 
     echo "保留版本数"
     cd ${releasesdir} && ls -t  | awk 'NR==6{print}' | xargs -i rm -rf {} && ls -lt ${releasesdir}
-    #if [ $status == "product" ];then
-    #    cd ${releasesdir} && ll -lt | awk 'NR>7{print $NF}' | xargs -i rm -rf {}  && ls -lt ${releasesdir}
-    #esle
-    #    cd ${releasesdir} && ll -lt | awk 'NR>4{print $NF}' | xargs -i rm -rf {}  && ls -lt ${releasesdir}
+    #if [ ${deploy_env} == "product" ];then
+    #    cd ${releasesdir} && /usr/bin/ls -lt | awk 'NR>7{print $NF}' | xargs -i rm -rf {}  && ls -lt ${releasesdir}
+    #else
+    #    cd ${releasesdir} && /usr/bin/ls -lt | awk 'NR>4{print $NF}' | xargs -i rm -rf {}  && ls -lt ${releasesdir}
     #fi
+
 eeooff
 }
 
@@ -125,21 +146,52 @@ rollback_test(){
 eeooff
 }
 
+#线上环境版本回滚操作
+rollback_product(){
+    ssh -T $leave << eeooff
+        cd ${sitebasedir}
+        /bin/find ${releasesdir} -type d -name "$sitename_*_$BRANCH_TAG" | /bin/xargs -i /bin/ln -snf {} current
+        cd ${sitebasedir}/current
+        #生产
+        $yarn build-env > /dev/null 2>&1 
+        if [ $? -eq 0 ];then
+            echo "$yarn build-env完成"  
+        else
+            echo "$yarn build-env失败"
+    	    exit 123
+        fi
+        
+        #构建项目
+        $yarn build > /dev/null 2>&1
+        if [ $? -eq 0 ];then
+            echo "$yarn build完成"
+        else
+            echo "$yarn build失败"
+            exit 123
+        fi
+        
+        #aaa.sh脚本作用：先判断服务pid存不存在，存在停掉服务、删掉服务，然后在启动新的服务；不存在直接启动新服务
+        sh ${sitebasedir}/current/mkp_jenkins/aaa.sh ${sitename} && echo "回滚${BRANCH_TAG}版本成功" || echo "回滚${BRANCH_TAG}失败"
+eeooff
+}
+
+
+
 main(){
     deploy_env=$1
     #BRANCH_TAG=$2
     case $1 in
         test)
             echo "更新测试环境"
-            init_dir
-            deploy
+            init_dir  #初始化代码目录
+            deploy  #同步代码到目标主机
             update_site  #更新代码
         ;;
         product)   
             echo "更新生产环境"
             init_dir
             deploy
-            update_site  #更新代码   
+            update_site  
         ;;
         rollback_test)
             echo "测试回滚上一个版本"
@@ -148,7 +200,7 @@ main(){
         ;;
         rollback_product)
             echo "线上回滚上一个版本"
-            rollback_env 
+            rollback_env
             rollback_product  #生产回滚
         ;;
         *)
