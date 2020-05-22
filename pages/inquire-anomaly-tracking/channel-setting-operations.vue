@@ -36,7 +36,7 @@
         },
         rules: {
           channel: [{required: true, message: '必填项', trigger: 'change'}],
-          sort: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
+          sort: [{required: true, type: 'number', message: '必填项', trigger: 'blur'}],
         }
       }
     },

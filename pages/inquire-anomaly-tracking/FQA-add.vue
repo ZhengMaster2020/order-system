@@ -12,9 +12,6 @@
         <FormItem label="排序" prop="sort">
           <InputNumber :min="1" class="width-200" v-model="form.sort"/>
         </FormItem>
-        <FormItem label="状态">
-          <Input :min="1" class="width-200" v-model="form.status" readonly/>
-        </FormItem>
         <Row>
           <FormItem label="问题" prop="problem">
             <Input style="width: 810px" v-model="form.problem"/>
@@ -43,7 +40,6 @@
           problem: '',
           answer: '',
           createdBy: '',
-          status: '启用',
         },
         rules: {
           sort: [{required: true, type: 'number', message: '必填项', trigger: 'blur'}],
@@ -90,7 +86,6 @@
             for (let key in this.form) {
               this.form[key] = res.data[key]
             }
-            this.form.status = this.form.status === 'enable' ? '启用' : '停用'
           }
         })
       }
