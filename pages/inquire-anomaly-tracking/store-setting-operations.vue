@@ -50,9 +50,9 @@
           isShow: '',
         },
         rules: {
-          status: [{required: true, message: '必填项', trigger: 'change'}],
+          status: [{required: true, message: '必填项', trigger: 'change'}],l
           channelId: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
-          sort: [{required: true, type: 'number', message: '必填项', trigger: 'blur'}],
+          sort: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
           keywords: [{required: true, message: '必填项', trigger: 'blur'}],
           shop: [{required: true, message: '必填项', trigger: 'blur'}],
           isShow: [{required: true, message: '必填项', trigger: 'change'}],
