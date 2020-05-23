@@ -84,7 +84,7 @@
             render: (h, {row}) => h('span', {}, row.status === 'disable' ? '停用' : '启用')
           },
           {title: '创建人', key: 'createdBy', width: 110, align: 'center'},
-          {title: '时间', key: 'createdAt', width: 110, align: 'center',
+          {title: '时间', key: 'createdAt', width: 170, align: 'center',
             render: (h, {row}) => h('span', {}, this.$format(row.createdAt, 'yyyy-MM-dd hh:mm:ss'))
           },
           {title: '修改', key: 'action', width: 70, align: 'center', slot: 'action'}

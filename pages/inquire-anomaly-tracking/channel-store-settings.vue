@@ -96,7 +96,7 @@
               render: (h, {row}) => h('span', {}, row.isShow === 'yes' ? '是' : '否')
             },
             {
-              title: '创建时间', key: 'createdAt', align: 'center', width: 110,
+              title: '创建时间', key: 'createdAt', align: 'center', width: 170,
               render: (h, {row}) => h('span', {}, this.$format(row.createdAt, 'yyyy-MM-dd hh:mm:ss'))
             },
             {title: '操作', key: 'action', align: 'center', slot: 'action', width: 160},
