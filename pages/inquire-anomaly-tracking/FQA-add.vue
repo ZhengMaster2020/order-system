@@ -14,12 +14,12 @@
         </FormItem>
         <Row>
           <FormItem label="问题" prop="problem">
-            <Input style="width: 810px" v-model="form.problem"/>
+            <Input style="width: 810px" v-model.trim="form.problem"/>
           </FormItem>
         </Row>
         <Row>
           <FormItem label="解答" prop="answer">
-            <Input style="width: 810px" v-model="form.answer"/>
+            <Input style="width: 810px" v-model.trim="form.answer"/>
           </FormItem>
         </Row>
       </Form>

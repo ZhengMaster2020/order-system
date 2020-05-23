@@ -12,7 +12,7 @@
               </Select>
             </FormItem>
             <FormItem>
-              <Input placeholder="请输入店铺名称" class="width-120" v-model="searchForm.shop"/>
+              <Input clearable placeholder="请输入店铺名称" class="width-120" v-model="searchForm.shop"/>
             </FormItem>
             <FormItem>
               <Select clearable placeholder="是否显示" class="width-120" v-model="searchForm.isShow">
