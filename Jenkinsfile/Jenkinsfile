@@ -39,7 +39,7 @@ pipeline {
         //DingTalk_robot = "a32c081e-a529-4938-97bf-3d1ba9dc7eb6"
         
 	    //脚本路径
-        srcipts_dir = "${WORKSPACE}/mkp_node_jenkinsfile"
+        srcipts_dir = "${WORKSPACE}/Jenkinsfile"
 
         //git_url
         git_url = "git@gitlab.fandow.com:fandow/security-code.fandow.com.git"
@@ -117,7 +117,7 @@ pipeline {
 //				}
         				stage('部署') {
         					steps {
-        						sh 'sh -x ${srcipts_dir}/deploy_mkp_node.sh $status'
+        						sh 'sh -x ${srcipts_dir}/deployp_node.sh $status'
         					} 
         				}
                    }
@@ -139,7 +139,7 @@ pipeline {
                     }       
                 }
 
-    						sh 'sh -x ${srcipts_dir}/deploy_mkp_node.sh $status'
+    						sh 'sh -x ${srcipts_dir}/deploy_node.sh $status'
     			} 
     		}
 		stage('清除工作空间'){ 
