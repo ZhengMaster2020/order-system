@@ -41,7 +41,7 @@ deploy(){
 
 rollback_env(){
     if [ $deploy_env == "rollback_test" ];then
-        $rsync -avzP ./mkp_jenkins $leave_test:${sitebasedir}/current > /dev/null 2>&1
+        $rsync -avzP ./Jenkinsfile $leave_test:${sitebasedir}/current > /dev/null 2>&1
     elif [ $deploy_env == "rollback_product" ];then
         #指定回滚版本名称
         rollback_tag=`ssh $leave "/bin/find ${releasesdir} -type d -name "${sitename}_*_${BRANCH_TAG}""`
@@ -52,7 +52,7 @@ rollback_env(){
         #判断如果该tag没有找到则认为回退的版本不存在
         if [ $tag_num == 1 ];then
             echo "开始回滚操作"
-            $rsync -avzP ./mkp_jenkins $leave_product:${rollback_tag} > /dev/null 2>&1
+            $rsync -avzP ./Jenkinsfile $leave_product:${rollback_tag} > /dev/null 2>&1
         else
             echo "回滚版本不存在，请确认是否有该版本"
             exit 123
@@ -68,6 +68,7 @@ rollback_env(){
 update_site(){
     ssh -T $leave << eeooff
     cd ${releasesdir}/${uptime}
+    #$sed -i 's/2323/23232/g' ./server/index.js && echo "端口替换成功"
     #安装依赖包
     $yarn install > /dev/null && echo "$yarn install依赖包安装成功"
     if [ $? -ne 0 ]
@@ -95,7 +96,7 @@ update_site(){
     fi
 
     #aaa.sh脚本作用：先判断服务pid存不存在，存在停掉服务、删掉服务，然后在启动新的服务；不存在直接启动新服务
-    sh -x ${releasesdir}/${uptime}/mkp_node_jenkinsfile/aaa.sh ${sitename}
+    sh -x ${releasesdir}/${uptime}/Jenkinsfile/aaa.sh ${sitename}
      
     #切换软链到current目录下
     ln -snf ${releasesdir}/${uptime}  ${sitebasedir}/current && echo "切换current软链成功" || echo "切换current软链失败"
@@ -137,7 +138,7 @@ rollback_test(){
     fi
 
     #aaa.sh脚本作用：先判断服务pid存不存在，存在停掉服务、删掉服务，然后在启动新的服务；不存在直接启动新服务
-    sh ${sitebasedir}/current/mkp_node_jenkinsfile/aaa.sh ${sitename} && echo "回滚上一个版本成功" || echo "回滚上一个版本失败"
+    sh ${sitebasedir}/current/Jenkinsfile/aaa.sh ${sitename} && echo "回滚上一个版本成功" || echo "回滚上一个版本失败"
 
     cd ${releasesdir}
     #直接回滚到上一个版本
@@ -171,7 +172,7 @@ rollback_product(){
         fi
         
         #aaa.sh脚本作用：先判断服务pid存不存在，存在停掉服务、删掉服务，然后在启动新的服务；不存在直接启动新服务
-        sh ${sitebasedir}/current/mkp_jenkins/aaa.sh ${sitename} && echo "回滚${BRANCH_TAG}版本成功" || echo "回滚${BRANCH_TAG}失败"
+        sh ${sitebasedir}/current/Jenkinsfile/aaa.sh ${sitename} && echo "回滚${BRANCH_TAG}版本成功" || echo "回滚${BRANCH_TAG}失败"
 eeooff
 }
 
