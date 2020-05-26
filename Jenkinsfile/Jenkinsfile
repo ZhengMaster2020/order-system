@@ -16,9 +16,9 @@ pipeline {
         date_time = createVersion()
 
         //目标主机目录变量
-        sitename = "${JOB_NAME}"  //项目名称（需修改）
-        sitebasedir = "/home/wwwroot/${sitename}"  //项目基础目录
-        releasesdir = "${sitebasedir}/releases"  //版本库一般是固定的
+        //sitename = "${JOB_NAME}"  //项目名称（需修改）
+        //sitebasedir = "/home/wwwroot/${sitename}"  //项目基础目录
+        //releasesdir = "${sitebasedir}/releases"  //版本库一般是固定的
 
 	    //获取发布版本的时间戳
         uptime = "${sitename}_${date_time}_$BRANCH_TAG"
@@ -36,7 +36,7 @@ pipeline {
 
 
         //钉钉token
-        //DingTalk_robot = "a32c081e-a529-4938-97bf-3d1ba9dc7eb6"
+        DingTalk_robot = "a32c081e-a529-4938-97bf-3d1ba9dc7eb6"
         
 	    //脚本路径
         srcipts_dir = "${WORKSPACE}/Jenkinsfile"
@@ -45,12 +45,12 @@ pipeline {
         git_url = "git@gitlab.fandow.com:fandow/security-code.fandow.com.git"
         
         //扫描器配置
-        //sonar_scanner = "sonar-scanner \
-        //    -Dsonar.projectKey=live-app.7wenyi.com \
-        //    -Dsonar.projectName=${JOB_NAME} \
-        //    -Dsonar.sources=. \
-        //    -Dsonar.host.url=http://192.168.1.201:9000 \
-        //    -Dsonar.login=f8ce3afc3bb6990b281fcb1669c60b0b531cd2e0"
+        sonar_scanner = "/usr/local/sonar-scanner/bin/sonar-scanner \
+            -Dsonar.projectKey=security-code \
+            -Dsonar.projectName=${JOB_NAME} \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=http://192.168.1.201:9000 \
+            -Dsonar.login=cecac6b1add8d0d1efeed47ef9bf3904fa9a83c0"
     }
         //参数化构建
     parameters {
@@ -103,7 +103,7 @@ pipeline {
                 
 //			    stage('代码质量检查') {
 //			        steps {
-//			            withSonarQubeEnv('sonarqube') {
+//			            withSonarQubeEnv('sonar-server') {
 //			            sh label: '', script: '${sonar_scanner}'
 //			            }
 //			        }
