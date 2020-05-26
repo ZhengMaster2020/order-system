@@ -86,35 +86,21 @@ pipeline {
                        }
                     }
                 }
-
-
-//           stage('pull code') {
-//               steps {
-//                   checkout([$class: 'GitSCM', 
-//                             branches: [[name: "${params.BRANCH_TAG}"]], 
-//                             doGenerateSubmoduleConfigurations: false, 
-//                             extensions: [], 
-//                             gitTool: 'Default', 
-//                             submoduleCfg: [], 
-//                             userRemoteConfigs: [[url: "${git_url}",credentialsId: 'for_gitlab',]]
-//                           ])
-//                   }
-//                }
                 
-//			    stage('代码质量检查') {
-//			        steps {
-//			            withSonarQubeEnv('sonar-server') {
-//			            sh label: '', script: '${sonar_scanner}'
-//			            }
-//			        }
-//			    }
-//				stage("代码质量结果判断") {
-//					steps{
-//						timeout(time: 1, unit: 'HOURS') {
-//						waitForQualityGate abortPipeline: true
-//						}
-//					}
-//				}
+			    stage('代码质量检查') {
+			        steps {
+			            withSonarQubeEnv('sonar-server') {
+			            sh label: '', script: '${sonar_scanner}'
+			            }
+			        }
+			    }
+				stage("代码质量结果判断") {
+					steps{
+						timeout(time: 1, unit: 'HOURS') {
+						waitForQualityGate abortPipeline: true
+						}
+					}
+				}
         				stage('部署') {
         					steps {
         						sh 'sh -x ${srcipts_dir}/deployp_node.sh $status'
@@ -148,28 +134,28 @@ pipeline {
 			}
 	    }
     }
-//    post('代码发布结果通知') {
-//        success {
-//            dingtalk (
-//                robot: "$DingTalk_robot",
-//                type: 'LINK',
-//                title:'请查收${BUILD_URL}项目的代码部署结果',
-//                text: [
-//                    '代码部署成功'
-//                ],
-//                messageUrl: '${BUILD_URL}',
-//            )
-//        }
-//        failure {
-//            dingtalk (
-//                robot: "$DingTalk_robot",
-//                type: 'LINK',
-//                title:'请查收${BUILD_URL}项目的代码部署结果',
-//                text: [
-//                    '代码部署失败'
-//                ],
-//                messageUrl: '${BUILD_URL}',
-//            )
-//        }
-//    }
+    post('代码发布结果通知') {
+        success {
+            dingtalk (
+                robot: "$DingTalk_robot",
+                type: 'LINK',
+                title:'请查收${BUILD_URL}项目的代码部署结果',
+                text: [
+                    '代码部署成功'
+                ],
+                messageUrl: '${BUILD_URL}',
+            )
+        }
+        failure {
+            dingtalk (
+                robot: "$DingTalk_robot",
+                type: 'LINK',
+                title:'请查收${BUILD_URL}项目的代码部署结果',
+                text: [
+                    '代码部署失败'
+                ],
+                messageUrl: '${BUILD_URL}',
+            )
+        }
+    }
 }
