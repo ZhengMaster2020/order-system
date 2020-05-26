@@ -1,0 +1,175 @@
+//时间函数
+def createVersion() {
+    // 定义一个版本号作为当次构建的版本，输出结果
+    return new Date().format('yyyyMMddHHmmss')
+}
+
+    options {
+        timestamps()
+    }
+
+pipeline {
+    agent any
+    //环境变量
+    environment {
+        //时间变量
+        date_time = createVersion()
+
+        //目标主机目录变量
+        sitename = "${JOB_NAME}"  //项目名称（需修改）
+        sitebasedir = "/home/wwwroot/${sitename}"  //项目基础目录
+        releasesdir = "${sitebasedir}/releases"  //版本库一般是固定的
+
+	    //获取发布版本的时间戳
+        uptime = "${sitename}_${date_time}_$BRANCH_TAG"
+
+        //项目变量
+        leave_test = "www@120.26.240.150"   //测试机IP地址()
+        //leave_product = "www@192.168.1.18"  //生产IP地址()
+
+        //命令变量
+        git = "/usr/bin/git"
+        sed = "/usr/bin/sed"
+        pm2 = "/usr/bin/pm2"
+        yarn = "/usr/bin/yarn"
+        rsync = "/usr/bin/rsync"
+
+
+        //钉钉token
+        //DingTalk_robot = "a32c081e-a529-4938-97bf-3d1ba9dc7eb6"
+        
+	    //脚本路径
+        srcipts_dir = "${WORKSPACE}/Jenkinsfile"
+
+        //git_url
+        git_url = "git@gitlab.fandow.com:fandow/security-code.fandow.com.git"
+        
+        //扫描器配置
+        //sonar_scanner = "sonar-scanner \
+        //    -Dsonar.projectKey=live-app.7wenyi.com \
+        //    -Dsonar.projectName=${JOB_NAME} \
+        //    -Dsonar.sources=. \
+        //    -Dsonar.host.url=http://192.168.1.201:9000 \
+        //    -Dsonar.login=f8ce3afc3bb6990b281fcb1669c60b0b531cd2e0"
+    }
+        //参数化构建
+    parameters {
+        choice(name: 'status',choices:'test\nproduct\nrollback_test\nrollback_product',description: '请选择部署还是回退')
+        gitParameter name: 'BRANCH_TAG', 
+            type: 'PT_BRANCH_TAG',
+            branchFilter: 'origin/(.*)',
+            defaultValue: 'master',  //默认值
+            selectedValue: 'DEFAULT',  //选择值
+            sortMode: 'ASCENDING_SMART', //排序方式
+			quickFilterEnabled: 'true',  //搜索框
+			description: 'Select your branch or tag.'
+	}
+
+    stages{
+        stage('开始部署流程') {
+            when { anyOf { environment name: 'status', value: 'test'; environment name: 'status', value: 'product' } }
+            stages {
+                stage('部署确认'){
+                    steps{
+                    timeout(1) { //一分钟没有输入密码则中断构建
+                         script {
+                             //对部署环境判断，匹配相应的验证才能继续往下执行
+                             if ( env.status == "product"){
+                                 userMap = input message: 'please input password', ok: 'ok', submitter: 'admin', parameters: [password(name:'password', defaultValue: '', description: '发布代码口令' )], submitterParameter: 'admin'
+                                 if (userMap['password'].toString() == "123456"){
+                                     echo "密码正确"
+                                 }else{
+                                     echo "密码错误，请确认您是否有权限操作"
+                                 }
+                             }
+                         }
+                       }
+                    }
+                }
+
+
+//           stage('pull code') {
+//               steps {
+//                   checkout([$class: 'GitSCM', 
+//                             branches: [[name: "${params.BRANCH_TAG}"]], 
+//                             doGenerateSubmoduleConfigurations: false, 
+//                             extensions: [], 
+//                             gitTool: 'Default', 
+//                             submoduleCfg: [], 
+//                             userRemoteConfigs: [[url: "${git_url}",credentialsId: 'for_gitlab',]]
+//                           ])
+//                   }
+//                }
+                
+//			    stage('代码质量检查') {
+//			        steps {
+//			            withSonarQubeEnv('sonarqube') {
+//			            sh label: '', script: '${sonar_scanner}'
+//			            }
+//			        }
+//			    }
+//				stage("代码质量结果判断") {
+//					steps{
+//						timeout(time: 1, unit: 'HOURS') {
+//						waitForQualityGate abortPipeline: true
+//						}
+//					}
+//				}
+        				stage('部署') {
+        					steps {
+        						sh 'sh -x ${srcipts_dir}/deployp_node.sh $status'
+        					} 
+        				}
+                   }
+                }
+    		    stage('回退') {
+            when { anyOf { environment name: 'status', value: 'rollback_test'; environment name: 'status', value: 'rollback_product' } }
+    			    steps {
+                timeout(1) { //一分钟没有输入密码则中断构建
+                    script {
+                        //对部署环境判断，匹配相应的验证才能继续往下执行
+                        if ( env.status == "rollback_product"){
+                            userMap = input message: 'please input password', ok: 'ok', submitter: 'admin', parameters: [password(name:'password', defaultValue: '', description: '发布代码口令' )], submitterParameter: 'admin'
+                            if (userMap['password'].toString() == "123456"){
+                                echo "密码正确"
+                            }else{
+                                echo "密码错误，请确认您是否有权限操作"
+                            }
+                        }
+                    }       
+                }
+
+    						sh 'sh -x ${srcipts_dir}/deploy_node.sh $status'
+    			} 
+    		}
+		stage('清除工作空间'){ 
+			steps{
+				cleanWs()
+			}
+	    }
+    }
+//    post('代码发布结果通知') {
+//        success {
+//            dingtalk (
+//                robot: "$DingTalk_robot",
+//                type: 'LINK',
+//                title:'请查收${BUILD_URL}项目的代码部署结果',
+//                text: [
+//                    '代码部署成功'
+//                ],
+//                messageUrl: '${BUILD_URL}',
+//            )
+//        }
+//        failure {
+//            dingtalk (
+//                robot: "$DingTalk_robot",
+//                type: 'LINK',
+//                title:'请查收${BUILD_URL}项目的代码部署结果',
+//                text: [
+//                    '代码部署失败'
+//                ],
+//                messageUrl: '${BUILD_URL}',
+//            )
+//        }
+//    }
+}
