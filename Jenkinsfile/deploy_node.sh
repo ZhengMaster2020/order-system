@@ -14,8 +14,18 @@ set -e
 
 if [[ $status == "test" ]] || [[ $status == "rollback_test" ]];then
     leave=$leave_test
+    
+    #目标主机目录变量
+    #sitename=${JOB_NAME}
+    sitebasedir=/home/wwwroot/${sitename}/front-end
+    releasesdir=${sitebasedir}/releases"
 else
     leave=$leave_product
+
+    #目标主机目录变量
+    #sitename=${JOB_NAME} 
+    sitebasedir=/data/wwwroot/${sitename}/front-end
+    releasesdir=${sitebasedir}/releases"
 fi
 
 
