@@ -3,6 +3,8 @@ import commonApi from './common-api.js'
 import securityCodeApi from './security-code-api.js'
 import productionPlanListApi from './production-plan-list-api.js'
 import productionPrenatalBatchListApi from './production-prenatal-batch-list-api.js'
+import FQASettingApi from './FQA-setting-api.js'
+import channerlStoreSettingsApi from './channerl-store-settings-api'
 import CSKQOutboundApplicationApi from './CSKQ-outbound-application-api'
 
 /**
@@ -18,5 +20,7 @@ export default {
   ...securityCodeApi,
   ...productionPlanListApi,
   ...productionPrenatalBatchListApi,
+  ...FQASettingApi,
+  ...channerlStoreSettingsApi
   ...CSKQOutboundApplicationApi,
 }

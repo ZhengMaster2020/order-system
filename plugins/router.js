@@ -27,6 +27,16 @@ export default [
       { path: 'outbound-management/CKSQ-outbound-application', title: '出库申请单', name: 'outbound-management/CKSQ-outbound-application' }
     ]
   },
+  {
+    path: '/inquire-anomaly-tracking',
+    icon: 'ios-book',
+    name: '/inquire-anomaly-tracking',
+    title: '查询及异常追踪',
+    children: [
+      { path: 'inquire-anomaly-tracking/FQA-setting', title: '常见问题设置', name: 'inquire-anomaly-tracking/FQA-setting' },
+      { path: 'inquire-anomaly-tracking/channel-store-settings', title: '渠道和店铺设置', name: 'inquire-anomaly-tracking/channel-store-settings' }
+    ]
+  },
   // {
   //   path: '/anti-channel-conflict',
   //   icon: 'ios-book',
