@@ -28,7 +28,7 @@ else
         exit 123
     fi
 fi
-pwd
+
 rm -rf ${srcipts_dir}
 if [ $? -eq 0 ];then
     echo "${srcipts_dir}脚本目录已删除"
