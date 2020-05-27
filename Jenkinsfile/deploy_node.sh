@@ -11,23 +11,21 @@
 
 set -e
 
-
 if [[ $status == "test" ]] || [[ $status == "rollback_test" ]];then
     leave=$leave_test
     
     #目标主机目录变量
-    sitename=${JOB_NAME}
+    #sitename=${JOB_NAME}
     sitebasedir=/home/wwwroot/${sitename}/front-end
     releasesdir=${sitebasedir}/releases
 else
     leave=$leave_product
 
     #目标主机目录变量
-    sitename=${JOB_NAME} 
+    #sitename=${JOB_NAME} 
     sitebasedir=/data/wwwroot/${sitename}/front-end
     releasesdir=${sitebasedir}/releases
 fi
-
 
 # 使用帮助函数
 usage(){ 
@@ -51,7 +49,7 @@ deploy(){
 
 rollback_env(){
     if [ $deploy_env == "rollback_test" ];then
-        $rsync -avzP ./Jenkinsfile $leave_test:${sitebasedir}/current > /dev/null 2>&1
+        $rsync -avzP ${srcipts_dir} $leave_test:${sitebasedir}/current > /dev/null 2>&1
     elif [ $deploy_env == "rollback_product" ];then
         #指定回滚版本名称
         rollback_tag=`ssh $leave "/bin/find ${releasesdir} -type d -name "${sitename}_*_${BRANCH_TAG}""`
@@ -62,7 +60,7 @@ rollback_env(){
         #判断如果该tag没有找到则认为回退的版本不存在
         if [ $tag_num == 1 ];then
             echo "开始回滚操作"
-            $rsync -avzP ./Jenkinsfile $leave_product:${rollback_tag} > /dev/null 2>&1
+            $rsync -avzP ${srcipts_dir} $leave_product:${rollback_tag} > /dev/null 2>&1
         else
             echo "回滚版本不存在，请确认是否有该版本"
             exit 123
@@ -78,26 +76,39 @@ rollback_env(){
 update_site(){
     ssh -T $leave << eeooff
     cd ${releasesdir}/${uptime}
-    #$sed -i 's/2323/23232/g' ./server/index.js && echo "端口替换成功"
+	
     #安装依赖包
-    $yarn install > /dev/null && echo "$yarn install依赖包安装成功"
-    if [ $? -ne 0 ]
-    then
+    $yarn install > /dev/null 2>&1
+    if [ $? -ne 0 ];then
         echo "$yarn install依赖包安装失败"
         exit 123
+	else
+	    echo "$yarn install依赖包安装成功"
     fi
     if [ ${deploy_env} == "product" ];then
         #生产
-        $yarn build-env > /dev/null 2>&1 && echo "$yarn build-env完成"  || echo "$yarn build-env失败"
+        $yarn build-env
+        if [ $? -ne 0 ];then
+		    echo "$yarn build-env失败"
+			exit 123
+		else
+		    echo "$yarn build-env成功"
+		fi
     elif [ ${deploy_env} == "test" ];then
         #测试
-        $yarn build-env-test > /dev/null 2>&1 && echo "$yarn build-env-test完成"  ||   echo "$yarn build-env-test失败"
+        $yarn build-env-test
+		if [ $? -ne 0 ];then
+		    echo "$yarn build-env-test失败"
+			exit 123
+		else
+		    echo "$yarn build-env-test完成"
+		fi
     else
         echo "$deploy_env参数有误，请重新选择"
     fi
 
     #构建项目
-    $yarn build > /dev/null 2>&1
+    $yarn build  > /dev/null 2>&1
     if [ $? -eq 0 ];then
         echo "$yarn build完成"
     else
@@ -105,20 +116,19 @@ update_site(){
         exit 123
     fi
 
-    #aaa.sh脚本作用：先判断服务pid存不存在，存在停掉服务、删掉服务，然后在启动新的服务；不存在直接启动新服务
-    sh -x ${releasesdir}/${uptime}/Jenkinsfile/aaa.sh ${sitename}
+    #${scripts_name3}脚本作用：先判断服务pid存不存在，存在停掉服务、删掉服务，然后在启动新的服务；不存在直接启动新服务
+    sh ${releasesdir}/${uptime}/${srcipts_dir_name}/${scripts_name3} ${sitename} ${scripts_name1} ${deploy_env}
      
     #切换软链到current目录下
     ln -snf ${releasesdir}/${uptime}  ${sitebasedir}/current && echo "切换current软链成功" || echo "切换current软链失败"
 
-    echo "保留版本数"
-    cd ${releasesdir} && ls -t  | awk 'NR==6{print}' | xargs -i rm -rf {} && ls -lt ${releasesdir}
-    #if [ ${deploy_env} == "product" ];then
-    #    cd ${releasesdir} && /usr/bin/ls -lt | awk 'NR>7{print $NF}' | xargs -i rm -rf {}  && ls -lt ${releasesdir}
-    #else
-    #    cd ${releasesdir} && /usr/bin/ls -lt | awk 'NR>4{print $NF}' | xargs -i rm -rf {}  && ls -lt ${releasesdir}
-    #fi
-
+    if [ ${deploy_env} == "product" ];then
+        echo "保留版本数"
+        cd ${releasesdir} && ls -t  | awk 'NR==6{print}' | xargs -i rm -rf {} && ls -lt ${releasesdir}
+    else
+        echo "保留版本数"
+        cd ${releasesdir} && ls -t  | awk 'NR==3{print}' | xargs -i rm -rf {} && ls -lt ${releasesdir}
+    fi
 eeooff
 }
 
@@ -130,7 +140,7 @@ rollback_test(){
     cd ${releasesdir}/${bbb}
 
     #测试
-    $yarn build-env-test > /dev/null 2>&1 
+    $yarn build-env-test 
     if [ $? -eq 0 ];then
         echo "$yarn build-env-test完成"  
     else
@@ -147,8 +157,8 @@ rollback_test(){
         exit 123
     fi
 
-    #aaa.sh脚本作用：先判断服务pid存不存在，存在停掉服务、删掉服务，然后在启动新的服务；不存在直接启动新服务
-    sh ${sitebasedir}/current/Jenkinsfile/aaa.sh ${sitename} && echo "回滚上一个版本成功" || echo "回滚上一个版本失败"
+    #${scripts_name3}脚本作用：先判断服务pid存不存在，存在停掉服务、删掉服务，然后在启动新的服务；不存在直接启动新服务
+    sh ${sitebasedir}/current/${srcipts_dir_name}/${scripts_name3} ${sitename} ${scripts_name1} ${deploy_env} && echo "回滚上一个版本成功" || echo "回滚上一个版本失败"
 
     cd ${releasesdir}
     #直接回滚到上一个版本
@@ -164,7 +174,7 @@ rollback_product(){
         /bin/find ${releasesdir} -type d -name "$sitename_*_$BRANCH_TAG" | /bin/xargs -i /bin/ln -snf {} current
         cd ${sitebasedir}/current
         #生产
-        $yarn build-env > /dev/null 2>&1 
+        $yarn build-env
         if [ $? -eq 0 ];then
             echo "$yarn build-env完成"  
         else
@@ -181,8 +191,8 @@ rollback_product(){
             exit 123
         fi
         
-        #aaa.sh脚本作用：先判断服务pid存不存在，存在停掉服务、删掉服务，然后在启动新的服务；不存在直接启动新服务
-        sh ${sitebasedir}/current/Jenkinsfile/aaa.sh ${sitename} && echo "回滚${BRANCH_TAG}版本成功" || echo "回滚${BRANCH_TAG}失败"
+        #${scripts_name3}脚本作用：先判断服务pid存不存在，存在停掉服务、删掉服务，然后在启动新的服务；不存在直接启动新服务
+        sh ${sitebasedir}/current/${srcipts_dir_name}/${scripts_name3} ${sitename} ${scripts_name1} ${deploy_env} && echo "回滚${BRANCH_TAG}版本成功" || echo "回滚${BRANCH_TAG}失败"
 eeooff
 }
 
@@ -210,7 +220,7 @@ main(){
             rollback_test  #测试回滚
         ;;
         rollback_product)
-            echo "线上回滚上一个版本"
+            echo "线上回滚指定版本"
             rollback_env
             rollback_product  #生产回滚
         ;;
