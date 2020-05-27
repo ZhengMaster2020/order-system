@@ -38,6 +38,8 @@ module.exports = {
     },
     '@/plugins/api',
     '@/plugins/format',
+    '@/plugins/print',
+    '@/plugins/debonce',
   ],
   /*
    ** Nuxt.js modules

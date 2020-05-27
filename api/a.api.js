@@ -21,6 +21,6 @@ export default {
   ...productionPlanListApi,
   ...productionPrenatalBatchListApi,
   ...FQASettingApi,
-  ...channerlStoreSettingsApi
+  ...channerlStoreSettingsApi,
   ...CSKQOutboundApplicationApi,
 }

@@ -11,7 +11,7 @@
             <Input class="width-200" v-model="form.applicant" disabled/>
           </FormItem>
           <FormItem label="品牌">
-            <Select v-model="form.brand" clearable placeholder="品牌" class="width-200">
+            <Select v-model="form.brand" placeholder="品牌" class="width-200">
               <Option v-for="brand in brandList" :key="brand.label" :value="brand.label">{{brand.value}}</Option>
             </Select>
           </FormItem>
@@ -20,8 +20,10 @@
           </FormItem>
           <FormItem label="慕可代码">
             <Select v-model="form.mkCode" class="width-200">
-              <Option value="yes">是</Option>
-              <Option value="no">否</Option>
+              <Option v-for="mkCode in mkCodeList"
+                      :key="mkCode.label"
+                      :value="mkCode.label"
+                      :not-found-text="notFoundText">{{mkCode.value}}</Option>
             </Select>
           </FormItem>
           <FormItem label="产品名称">
@@ -48,8 +50,8 @@
           <FormItem label="供应商名称">
             <Input class="width-200" v-model="form.supplier" readonly/>
           </FormItem>
-          <FormItem label="紧急程度">
-            <Input class="width-200" v-model="form.urgency" readonly/>
+          <FormItem label="紧急程度" prop="urgency">
+            <Input class="width-200" v-model="form.urgency"/>
           </FormItem>
         </Row>
 
@@ -63,7 +65,6 @@
           <FormItem label="补发类型" prop="reissueType">
             <Select v-model="form.reissueType"
                     class="width-200"
-                    placeholder="不是补发不可选择"
                     @on-change="resetExpectNum"
                     :disabled="form.isReissue === 1 ? false : true">
               <Option value="损耗">损耗</Option>
@@ -72,12 +73,10 @@
           </FormItem>
           <FormItem label="损耗记录单" prop="lossSn">
             <Input class="width-200"
-                   placeholder="不是损耗类型的补发不可编辑"
                    v-model="form.lossSn" :disabled="form.reissueType === '损耗' ? false : true"/>
           </FormItem>
           <FormItem label="损耗数量" prop="lossNumber">
             <Input class="width-200"
-                   placeholder="-"
                    v-model="form.lossNumber" disabled/>
           </FormItem>
           <FormItem label="下级经办人" prop="nextBy">
@@ -120,22 +119,30 @@
         submintLodaing: false,
         spinShow: false,
         gbOrderSnNum: '',
+        notFoundText: '无匹配数据',
+        mkCodeList: [
+          // MK-GB-20052338251
+          { value: 'MK60003', label: 'MK60003'},
+          { value: 'MK60004', label: 'MK60004'},
+          { value: 'MK61071', label: 'MK61071'},
+          { value: 'MK60001', label: 'MK60001'},
+        ],
         form: {
-          orderNumber: '1',
-          gbOrderSn: '', // 关联采购订单号
-          mkCode: '', // 关联采购订单号
-          productName: '', // 关联采购订单号
-          productType: '', // 关联采购订单号
-          requireDeliveryTime: '', // 关联采购订单号
-          supplier: '', // 关联采购订单号
+          orderNumber: 10000,
+          gbOrderSn: 'MK-GB-20052338251', // 关联采购订单号
+          mkCode: 'MK60003', // 关联采购订单号
+          productName: '+WIS+黑头导出精华液', // 关联采购订单号
+          productType: '单品', // 关联采购订单号
+          requireDeliveryTime: '2020-05-23', // 关联采购订单号
+          supplier: '广州仟智生物科技有限公司', // 关联采购订单号
           urgency: '', // 关联采购订单号
           isReissue: 0,
-          reissueType: '',
-          lossSn: '',
-          lossNumber: '123', // 关联采购订单号
-          expectedOutboundNumber: 100,
+          reissueType: '其他',
+          lossSn: '-',
+          lossNumber: 0, // 关联采购订单号
+          expectedOutboundNumber: null,
           outboundReason: '',
-          brand: '',
+          brand: 'WIS',
           //
           nextBy: '产品供应部-经理',
           // remainNumer: null,
@@ -143,12 +150,13 @@
         },
         rules: {
           gbOrderSn: [{required: true, message: '必填项', trigger: 'blur'}],
+          urgency: [{required: true, message: '必填项', trigger: 'blur'}],
           reissueType: [{required: true, message: '必填项', trigger: 'change'}],
           lossSn: [{required: true, message: '必填项', trigger: 'change'}],
           nextBy: [{required: true, message: '必填项', trigger: 'blur'}],
           outboundReason: [{required: true, message: '必填项', trigger: 'blur'}],
           lossNumber: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
-          isReissue: [{required: true, type: 'number', message: '必填项', trigger: 'blur'}],
+          isReissue: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
           expectedOutboundNumber: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
         },
 
@@ -165,28 +173,29 @@
         change: this.$debonce(this.gbOrderSnChange, 500, 'footer')
 
       }
+
+
     },
     watch: {
       ['form.reissueType'](cur) {
-        if(cur !== '损耗') {
-          this.form.lossSn = '-'
-        }else {
-          this.form.lossSn = ''
-        }
+        // if(cur !== '损耗') {
+        //   this.form.lossSn = '-'
+        // }else {
+        //   this.form.lossSn = ''
+        // }
+        this.form.lossSn = cur !== '损耗' ? '-' : ''
         // && (this.form.lossNumber = '-')
       },
       ['form.isReissue'](cur) {
-        if(cur !== 1) {
-          this.form.reissueType = '-'
-        }
+        console.log(cur)
+        cur !== 1 && (this.form.reissueType = '其他')
+        console.log(this.form.reissueType)
       }
     },
     computed: {
       remainNum() {
         // 下单数量 - 汇总该灌包订单在出库记录中【待确认】+【已确认】的数量
-        // this.form.orderNumber - this.gbOrderSnNum
-
-        return 10000
+        return this.form.orderNumber - this.gbOrderSnNum
       },
       expectedMaxNum() {
         let max = null
@@ -196,6 +205,8 @@
           /*  非补发 (或者补发但不是损耗状态)情况下： 预计本次出库量 不大于 剩余可出库数量 */
           max = Number(this.remainNum)
         }
+
+        this.form.expectedOutboundNumber = this.form.expectedOutboundNumber > max ? max : this.form.expectedOutboundNumber
         // console.log(max)
         return max
       }
@@ -204,33 +215,52 @@
       resetExpectNum() {
         this.form.expectedOutboundNumber = null
       },
+
       gbOrderSnChange(){
         // 获取mkCode
         console.log(this.form.gbOrderSn)
+        this.notFoundText = '加载中...'
+        setTimeout(()=> {
+          if(this.form.gbOrderSn === 'MK-GB-20051184191'){
+            this.mkCodeList = [
+              { value: 'MK60001', label: 'MK60001'},
+            ]
+            this.notFoundText = ''
+            this.form.mkCode = this.mkCodeList[0].value
+          }else{
+            this.notFoundText = '无匹配数据'
+          }
+
+        }, 1000)
+
+        this.getOutboundOrderNum()
       },
       submit() {
         // this.submintLodaing = true
         this.$refs.form.validate(val => {
           if (!val) return
 
-          let dateleParams = ['nextBy', 'applicant']
+          let apiKey = 'addOutboundLsit'
           let params = JSON.parse(JSON.stringify(this.form))
-          dateleParams.forEach(items => {
-            delete params[items]
-          })
+
+          delete params.nextBy
+          delete params.applicant
           // TODO: 补发类型 损耗记录单 ('-' 则删除) --- 删除
-          // this.form.reissueType === '-' && delete params.reissueType
-          // this.form.lossSn === '-' && delete params.lossSn
-          this.id && (params.id = this.id)
+          for(let key in params) {
+            params[key] === '-' && (params[key] = '')
+          }
+
+          if(this.id) {
+            params.id = this.id
+            apiKey = 'editOutboundLsit'
+          }
 
           console.log(params)
-          // addOutboundLsit
-          this.$API.addOutboundLsit(params).then(res => {
-            // if(res.code ===0) {
+          this.$API[apiKey](params).then(res => {
+            if (res.code !== 0) return
             this.$Message.success(res.msg)
             this.$router.push('/outbound-management/CKSQ-outbound-application')
             this.submintLodaing = false
-            // }
           })
         })
       },
@@ -238,18 +268,18 @@
         let params = {
           gbOrderSn: this.form.gbOrderSn || '1321231412414'
         }
-        this.$API.getGBOrderSnNum(params).then(res => {
-          console.log(res)
-          // if(res.code === 0) {
-          this.gbOrderSnNum = res.data[0] + res.data[1]
-          // }
-        })
+        // this.$API.getGBOrderSnNum(params).then(res => {
+        //   console.log(res)
+        //   if (res.code !== 0) return
+        //   this.gbOrderSnNum = Number(res.data[0]) + Number(res.data[1])
+        // })
+        this.gbOrderSnNum = 500
       },
 
       getOutboundDetail(id) {
         this.$API.getOutboundLsitDetail(id).then(res => {
           console.log(res)
-          // if (res.code !== 0) return
+          if (res.code !== 0) return
           this.spinShow = false
           for (let key in res.data) {
             this.form[key] = res.data[key]

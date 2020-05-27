@@ -27,24 +27,22 @@
 
       <Form ref="recordSearchForm" :model="recordSearchForm" inline v-show="currentTab === 'outboundRecord'">
         <Row>
-          <Input v-model="recordSearchForm.name" placeholder="品牌" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.name" placeholder="灌包订单号" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.name" placeholder="慕可代码" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.name" placeholder="产品名称" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.name" placeholder="出库记录人" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.name" placeholder="出库时间" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.name" placeholder="出库单号" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.name" placeholder="供应商" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.name" placeholder="序列号" class="width-120 margin-bottom-10"/>
-          <Button type="primary" class="margin-bottom-10">搜索</Button>
+          <Input v-model="recordSearchForm.brand" placeholder="品牌" class="width-120 margin-bottom-10"/>
+          <Input v-model="recordSearchForm.gbOrderSn" placeholder="灌包订单号" class="width-120 margin-bottom-10"/>
+          <Input v-model="recordSearchForm.mkCode" placeholder="慕可代码" class="width-120 margin-bottom-10"/>
+          <Input v-model="recordSearchForm.productName" placeholder="产品名称" class="width-120 margin-bottom-10"/>
+          <Input v-model="recordSearchForm.createdBy" placeholder="出库记录人" class="width-120 margin-bottom-10"/>
+          <Input v-model="recordSearchForm.createdTime" placeholder="出库时间" class="width-120 margin-bottom-10"/>
+          <Input v-model="recordSearchForm.outboundOrderSn" placeholder="出库单号" class="width-120 margin-bottom-10"/>
+          <Input v-model="recordSearchForm.supplier" placeholder="供应商" class="width-120 margin-bottom-10"/>
+          <Input v-model="recordSearchForm.serialCode" placeholder="序列号" class="width-120 margin-bottom-10"/>
+          <Button type="primary" class="margin-bottom-10" @click="search">搜索</Button>
         </Row>
         <Row>
           <Button type="primary" class="margin-bottom-10">导出数据</Button>
           <Button type="primary" class="margin-bottom-10" @click="outboundConfirm">出库确认</Button>
           <Button type="primary" class="margin-bottom-10" @click="repeal">作废</Button>
-          <Button type="primary" class="margin-bottom-10" @click="$router.push('/outbound-management/outbound-add')">
-            修改
-          </Button>
+          <Button type="primary" class="margin-bottom-10" @click="editOutboundConfirm">修改</Button>
         </Row>
       </Form>
 
@@ -167,7 +165,7 @@
           <span class="line"></span>
         </div>
         <FormItem label="经办人">
-          <Input class="width-170" v-model="detailData.handleBy" readonly/>
+          <Input class="width-170" v-model="userInfo.realName" readonly/>
         </FormItem>
         <FormItem label="审核" prop="isPass" v-show="reviewModal.title === '出库单审核'">
           <RadioGroup v-model="reviewModal.form.isPass" class="width-120">
@@ -197,8 +195,8 @@
     </Modal>
 
     <!-- 打印出库单  -->
-    <Modal v-model="printModal.show" title="打印出库单" width="1137" footer-hide>
-      <div id="print">
+    <Modal v-model="printModal.show" title="打印出库单" width="944" footer-hide>
+      <div id="printForm">
         <h3 style="text-align: center">防伪标出库申请单</h3>
         <div class="sub-title">一、申请出库明细</div>
         <div class="table-wrap">
@@ -212,21 +210,21 @@
               <td>慕可代码</td>
               <td>产品名称</td>
               <td>要求货期</td>
-              <td>紧急程度</td>
-              <td>产品类型</td>
-              <td>下单数量</td>
+              <td width="60">紧急程度</td>
+              <td width="60">产品类型</td>
+              <td width="60">下单数量</td>
             </tr>
             <tr>
-              <td>2020-04-10</td>
-              <td>广州市藻谷生物科技有限公司</td>
-              <td>MK-GB-20041325473</td>
-              <td>WIS</td>
-              <td>DP411</td>
-              <td>+WIS+晶润紧致眼膜</td>
-              <td>2020-04-30</td>
-              <td>紧急</td>
-              <td>新品</td>
-              <td>10000</td>
+              <td width="100">2020-04-10</td>
+              <td width="125">广州市藻谷生物科技有限公司</td>
+              <td width="100">MK-GB-20041325473</td>
+              <td width="100">WIS</td>
+              <td width="90">DP411</td>
+              <td width="125">+WIS+晶润紧致眼膜</td>
+              <td width="100">2020-04-30</td>
+              <td width="60">紧急</td>
+              <td width="60">新品</td>
+              <td width="60">100000000</td>
             </tr>
             <tr class="td-title">
               <td>剩余可出库量</td>
@@ -239,8 +237,8 @@
             </tr>
             <tr>
               <td>2020-04-10</td>
-              <td>广州市藻谷生物科技有限公司</td>
-              <td>MK-GB-20041325473</td>
+              <td>是</td>
+              <td>损耗</td>
               <td>WIS</td>
               <td>DP411</td>
               <td>+WIS+晶润紧致眼膜</td>
@@ -264,7 +262,7 @@
             <div class="fillin">123</div>
           </Col>
         </Row>
-        <Row class="font-size-12 margin-top-10 margin-bottom-10">
+        <Row class="font-size-10 margin-top-10 margin-bottom-10">
           <Col span="8">
             打印流水：001
           </Col>
@@ -284,7 +282,12 @@
             <div class="sub-title">四、拣货人员签名回传，提交出库数据</div>
           </Col>
           <Col>
-            <div class="qrcode">sad</div>
+            <div class="qrcode">
+              <img style="width: 100%; height: 100%"
+                   src="https://c-ssl.duitang.com/uploads/item/201910/13/20191013165225_VWjFE.thumb.200_200_c.jpeg"
+                   alt="qrcode">
+            </div>
+            <div style="font-size: 12px; text-align: center">条形码编号</div>
           </Col>
         </Row>
 
@@ -303,7 +306,7 @@
             <div class="fillin">123</div>
           </Col>
         </Row>
-        <Row class="font-size-12 margin-top-10">
+        <Row class="font-size-10 margin-top-10">
           <Col span="8">
             打印流水：001
           </Col>
@@ -313,7 +316,7 @@
         </Row>
       </div>
       <div style="text-align: right">
-        <Button type="primary">打印</Button>
+        <Button type="primary" @click="print">打印</Button>
       </div>
       <Spin size="large" fix v-if="spinShow"></Spin>
       <!--      <div class="modal-footer" slot="footer">-->
@@ -323,7 +326,7 @@
     </Modal>
 
     <!-- 出库确认  -->
-    <Modal class="reivew-modal" v-model="confirmModal.show" title="出库确认" width="1137">
+    <Modal class="reivew-modal" v-model="confirmModal.show" title="出库确认" width="1152">
       <Form inline ref="confirmForm" :model="confirmModal.form" :rules="rules">
         <div class="title">
           <span class="line"></span>
@@ -384,24 +387,41 @@
           <div class="title-text">待确认出库</div>
           <span class="line"></span>
         </div>
-        <FormItem label="出库人员">
-          <Input class="width-170" v-model="detailData.handleBy" readonly/>
-        </FormItem>
-        <FormItem label="实际点货量" prop="isPass">
-          <Input class="width-170" v-model="detailData.expectedOutboundNumber" readonly/>
-        </FormItem>
-        <FormItem label="出库仓位号">
-          <Input class="width-170" v-model="detailData.expectedOutboundNumber" readonly/>
-        </FormItem>
-        <FormItem label="出库回传单附件">
-          <Input class="width-170" v-model="detailData.expectedOutboundNumber" readonly/>
-        </FormItem>
-        <FormItem label="序列号表格" prop="opinion">
-          <Input style="width: 413px" v-model="confirmModal.form.opinion"/>
-        </FormItem>
-        <div style="text-align: center">
-          <a href="javascript:void(0)" class="font-size-12">点击查看出库点出库记录>></a>
-        </div>
+        <Row>
+          <Col span="12">
+            <FormItem label="出库人员">
+              <Input class="width-170" v-model="detailData.handleBy" readonly/>
+            </FormItem>
+            <FormItem label="实际点货量" prop="isPass">
+              <Input class="width-170" v-model="detailData.expectedOutboundNumber" readonly/>
+            </FormItem>
+            <FormItem label="出库仓位号">
+              <Input class="width-170" v-model="detailData.expectedOutboundNumber" readonly/>
+            </FormItem>
+            <div style="text-align: center">
+              <a href="javascript:void(0)" class="font-size-12"
+                 @click="toOutbountRecord('confirmModal')">点击查看出库点出库记录>></a>
+            </div>
+          </Col>
+          <Col span="12">
+            <Row type="flex">
+              <div style=" margin-right: 40px">
+                <div style="padding: 10px 0;">出库回传单附件</div>
+
+                <a href="javascript:void(0)" class="font-size-12">点击查看出库点出库记录>></a>
+
+              </div>
+              <div style=" margin-right: 40px">
+                <div style="padding: 10px 0;">序列号表格</div>
+                <!--                <a :href="file.url" :download="file.name" class="download-link"-->
+                <!--                   v-for="(file, index) in reviewModal.data.fileItems"-->
+                <!--                   :key="index">{{file.name}}</a>-->
+                <a href="javascript:void(0)" class="font-size-12">点击查看出库点出库记录>></a>
+              </div>
+            </Row>
+          </Col>
+        </Row>
+
 
         <div class="title">
           <span class="line"></span>
@@ -492,24 +512,27 @@
     </Modal>
 
     <!-- 作废  -->
-    <Modal class="reivew-modal" v-model="repealModal.show" title="作废入库记录" width="1137">
+    <Modal class="reivew-modal"
+           v-model="repealModal.show"
+           :mask-closable="false"
+           @on-ok="repealOutboundRecord"
+           @on-cancel="hideRepealModal"
+           title="作废入库记录"
+           width="800" >
       <div class="title">
         <span class="line"></span>
         <div class="title-text">作废</div>
         <span class="line"></span>
       </div>
 
-      <Form inline>
+      <Form ref="repealForm" :model="repealModal.form" :rules="rules" inline>
         <FormItem label="撤销人" class="width-170">
-          <Input/>
+          <Input v-model="userInfo.realName" readonly/>
         </FormItem>
-        <FormItem label="意见" style="width: 500px">
-          <Input/>
+        <FormItem label="意见" style="width: 500px" prop="opinion">
+          <Input v-model="repealModal.form.opinion"/>
         </FormItem>
       </Form>
-
-
-      <Spin size="large" fix v-if="spinShow"></Spin>
     </Modal>
   </div>
 </template>
@@ -521,7 +544,10 @@
         currentTab: 'outboundList',
         tableLoading: false,
         spinShow: false,
-        selection: [],
+        selection: {
+          1: []
+        },
+        userInfo: {},
 
         listSearchForm: {
           gbOrderSn: '',
@@ -533,7 +559,15 @@
           brand: ''
         },
         recordSearchForm: {
-          name: ''
+          gbOrderSn: '',
+          mkCode: '',
+          productName: '',
+          createdBy: '',
+          createdTime: '',
+          outboundOrderSn: '',
+          supplier: '',
+          serialCode: '',
+          brand: ''
         },
         outboundList: {
           columns: [
@@ -621,7 +655,7 @@
         confirmModal: {
           show: false,
           form: {
-            outboundApplyId: '',
+            ids: [],
             isPass: 'yes',
             opinion: ''
           }
@@ -632,7 +666,10 @@
         },
         repealModal: {
           show: false,
-          form: {}
+          form: {
+            id: '',
+            opinion: ''
+          }
         },
         printModal: {
           show: false,
@@ -646,7 +683,7 @@
     },
     watch: {
       currentTab(cur) {
-        if(cur === 'outboundList') {
+        if (cur === 'outboundList') {
           this.listSearchForm = {
             gbOrderSn: '',
             mkCode: '',
@@ -656,9 +693,17 @@
             outboundOrderSn: '',
             brand: ''
           }
-        }else {
+        } else {
           this.recordSearchForm = {
-            name: ''
+            gbOrderSn: '',
+            mkCode: '',
+            productName: '',
+            createdBy: '',
+            createdTime: '',
+            outboundOrderSn: '',
+            supplier: '',
+            serialCode: '',
+            brand: ''
           }
         }
         this[cur].pageProps.page = 1
@@ -666,14 +711,26 @@
       }
     },
     methods: {
+      // 单条数据操作
+      singelOperate() {
+        let message = ''
+        let currentTab = this.currentTab
+        let pageProps = this[currentTab].pageProps
+        if (this.selection[pageProps.page].length > 1) return message = '一次只能操作一条数据'
+        if (this.selection[pageProps.page].length === 0) return message = '请选择'
+      },
+
       // Form 操作
       addPlan() {
-        if (this.selection.length > 1) return this.$Message.warning('一次只能操作一条数据')
+        let currentTab = this.currentTab
+        let pageProps = this[currentTab].pageProps
+        if (this.selection[pageProps.page].length > 1) return this.$Message.warning('一次只能操作一条数据')
       },
 
       editApply() {
-        if (this.selection.length > 1) return this.$Message.warning('一次只能操作一条数据')
-        if (this.selection.length === 0) return this.$Message.warning('请选择')
+        let msg = this.singelOperate()
+        if(msg) return this.$Message.warning(msg)
+
         this.$router.push({
           path: '/outbound-management/outbound-add',
           query: {
@@ -682,13 +739,26 @@
         })
       },
 
-      manualOutbound() {
-        if (this.selection.length > 1) return this.$Message.warning('一次只能操作一条数据')
-        if (this.selection.length === 0) return this.$Message.warning('请选择')
+      editOutboundConfirm() {
+        let msg = this.singelOperate()
+        if(msg) return this.$Message.warning(msg)
+
         this.$router.push({
           path: '/outbound-management/outbound-manual',
           query: {
-            id: this.selection[0].id
+            id: this.selection[pageProps.page][0].id
+          }
+        })
+      },
+
+      manualOutbound() {
+        let msg = this.singelOperate()
+        if(msg) return this.$Message.warning(msg)
+
+        this.$router.push({
+          path: '/outbound-management/outbound-manual',
+          query: {
+            id: this.selection[pageProps.page].id
           }
         })
       },
@@ -699,7 +769,9 @@
       },
       // table 选项操作
       selectionChange(selection) {
-        this.selection = selection
+        let currentTab = this.currentTab
+        let pageProps = this[currentTab].pageProps
+        this.selection[pageProps.page] = selection
         console.log(this.selection)
       },
       // 改变当前分页
@@ -719,45 +791,73 @@
       },
 
       showReviewModal(title) {
-        if (this.selection.length > 1) return this.$Message.warning('一次只能操作一条数据')
-        if (this.selection.length === 0) return this.$Message.warning('请选择')
+        let currentTab = this.currentTab
+        let msg = this.singelOperate()
+        if(msg) return this.$Message.warning(msg)
+
         this.getOutboundDetail()
         this.reviewModal.show = true
         this.reviewModal.title = title
-        this.reviewModal.form.outboundApplyId = this.selection[0].id
+        this.reviewModal.form.outboundApplyId = this.selection[this[currentTab].pageProps.page][0].id
       },
 
       outboundConfirm() {
-        // if (this.selection.length > 1) return this.$Message.warning('一次只能操作一条数据')
-        // if (this.selection.length === 1) return this.$Message.warning('请选择')
-        // this.getOutboundDetail()
+        let msg = this.singelOperate()
+        if(msg) return this.$Message.warning(msg)
+
+        this.getOutboundDetail()
         this.confirmModal.show = true
       },
 
       printOutboundSn() {
+        let msg = this.singelOperate()
+        if(msg) return this.$Message.warning(msg)
+
         this.printModal.show = true
       },
 
       repeal() {
+        let msg = this.singelOperate()
+        if(msg) return this.$Message.warning(msg)
+
         this.repealModal.show = true
+        this.repealModal.form.id = this.selection[this.currentTab.pageProps.page][0].id
       },
 
-      submit(modal, form ,apiKey = 'outboundLsitReview') {
+      repealOutboundRecord() {
+        this.$API.repealOutboundRecord(this.repealModal.form).then(res => {
+          if(res.code !== 0) return
+          this.$Message.success(res.msg)
+          this.repealModal.show = false
+          this.init()
+        })
+      },
+
+      hideRepealModal() {
+        this.repealModal.show = false
+        this.$refs.repealForm.resetFields()
+      },
+
+      print() {
+        this.$print('#printForm')
+        // TODO: 打印之后调接口改变状态？
+      },
+      submit(modal, form, apiKey = 'outboundLsitReview') {
         let params = {}
-        if(this[modal].title === '完成出库'){
+        if (this[modal].title === '完成出库') {
           params = {
             id: this[modal].form.outboundApplyId,
             opinion: this[modal].form.opinion,
           }
           apiKey = 'outboundLsitFinished'
-        }else {
+        } else {
           params = this[modal].form
         }
 
         this.$refs[form].validate(val => {
-          if(!val) return
+          if (!val) return
           this.$API[apiKey](params).then(res => {
-            // if (res.code !== 0) return
+            if (res.code !== 0) return
             this.$Message.success(res.msg)
             this[modal].show = false
             this.$refs[form].resetFields()
@@ -794,22 +894,25 @@
 
         this.$API[apiKey](params).then(res => {
           // console.log(res)
-          // if (res.code === 0) {
-            let {count, page, list} = res.data
-            this[currentTab].pageProps.page = page
-            this[currentTab].pageProps.total = count
-            this[currentTab].data = list
-          // }
+          if (res.code !== 0) return
+          let {count, page, list} = res.data
+          this[currentTab].pageProps.page = page
+          this[currentTab].pageProps.total = count
+          this[currentTab].data = list
         }).finally(() => {
           this.tableLoading = false
+
         })
 
       },
 
       getOutboundDetail() {
-        this.$API.getOutboundLsitDetail(this.selection[0].id).then(res => {
+        let currentTab = this.currentTab
+        let pageProps = this[currentTab].pageProps
+        console.log(this.selection[pageProps.page][0])
+        this.$API.getOutboundLsitDetail(this.selection[pageProps.page][0].id).then(res => {
           console.log(res)
-          // if (res.code !== 0) return
+          if (res.code !== 0) return
           this.spinShow = false
           for (let key in res.data) {
             this.detailData[key] = res.data[key]
@@ -820,6 +923,8 @@
       }
     },
     mounted() {
+      this.userInfo = JSON.parse(window.localStorage.getItem('userInfo')) || {}
+      this.currentTab = this.$route.params.currentTab || 'outboundList'
       this.init()
     }
   }
@@ -836,6 +941,10 @@
 
   .font-size-12 {
     font-size: 12px;
+  }
+
+  .font-size-10 {
+    font-size: 10px;
   }
 
   .foot-page {
@@ -855,6 +964,7 @@
     .title-text {
       flex-shrink: 0;
       padding: 0 10px;
+      font-weight: 700;
     }
 
     .line {
@@ -884,11 +994,19 @@
     }
   }
 
-  #print {
+  #printForm {
     padding: 0 15px;
+
+    .qrcode {
+      width: 125px;
+      height: 125px;
+      background-color: skyblue;
+    }
   }
 
   .table-wrap {
+    font-size: 12px;
+
     .table-style {
       text-align: center;
       width: 100%;
@@ -896,8 +1014,8 @@
 
       tr {
         td {
-          padding: 4px 8px;
-          height: 40px;
+          padding: 2px 4px;
+          height: 30px;
           border: 1px #dcdee2 solid;
         }
       }

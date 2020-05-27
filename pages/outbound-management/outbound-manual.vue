@@ -109,7 +109,7 @@
         <Row class="margin-bottom-10">
           <Col >
             <span class="title">手动出库</span>
-            <a style="font-size: 12px" href="javascript:void(0)">&nbsp;&nbsp;&nbsp;点击供应商查看出库记录>></a>
+            <a style="font-size: 12px" href="javascript:void(0)" @click="toOutbountRecord">&nbsp;&nbsp;&nbsp;点击供应商查看出库记录>></a>
           </Col>
         </Row>
         <Row>
@@ -324,17 +324,26 @@
     },
     methods: {
 
+      toOutbountRecord() {
+        this.$router.push({
+          name: 'outbound-management/CKSQ-outbound-application',
+          params: {
+            currentTab: 'outboundRecord'
+          }
+        })
+      },
+
       beforeUpload(file, type) {
         console.log(type)
         if(type === '回传单'){
+
+        } else {
+          // 单个文件 上传多个会覆盖？
           const check = /.txt$/.test(file.name)
           if (check) {
             this.$Message.warning('请不要上传txt格式的文件')
           }
           return !check;
-        } else {
-          // 单个文件 上传多个会覆盖？
-
         }
 
       },
