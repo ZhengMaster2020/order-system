@@ -8,40 +8,47 @@ pipeline {
     agent any
     
     options {
+        //显示发布过程的时间
         timestamps()
     }
-
+    
     //环境变量
     environment {
         //时间变量
         date_time = createVersion()
 
-        //目标主机目录变量
-        //sitename = "${JOB_NAME}"  //项目名称
+        //目标主机目录变量（已迁移到deploy_node.sh上）
+        sitename = "${JOB_NAME}"  //项目名称
         //sitebasedir = "/home/wwwroot/${sitename}/front-end"  //项目基础目录
         //releasesdir = "${sitebasedir}/releases"  //版本库一般是固定的
 
 	    //获取发布版本的时间戳
         uptime = "${sitename}_${date_time}_$BRANCH_TAG"
 
-        //项目变量
-        leave_test = "www@120.26.240.150"   //测试机IP地址()
-        //leave_product = "www@192.168.1.18"  //生产IP地址()
+        //需要部署的远程主机
+        leave_test = "www@120.26.240.150"
+        leave_product = "www@192.168.1.248"
 
         //命令变量
         git = "/usr/bin/git"
         sed = "/usr/bin/sed"
         pm2 = "/usr/bin/pm2"
-        npm = "/usr/local/bin/npm"
         yarn = "/usr/bin/yarn"
         rsync = "/usr/bin/rsync"
 
+        //脚本名字
+        scripts_name1 = "Jenkinsfile"
+        scripts_name2 = "deploy_node.sh"
+        scripts_name3 = "aaa.sh"
 
-        //钉钉token
-        //DingTalk_robot = "a32c081e-a529-4938-97bf-3d1ba9dc7eb6"
+        //放置脚本的目录名称
+        srcipts_dir_name = "Jenkinsfile"
         
 	    //脚本路径
-        srcipts_dir = "${WORKSPACE}/Jenkinsfile"
+        srcipts_dir = "${WORKSPACE}/${srcipts_dir_name}"
+
+        //钉钉token
+        DingTalk_robot = "df86538a-4473-4572-aaee-c823a3957218"
 
         //git_url
         git_url = "git@gitlab.fandow.com:fandow/security-code.fandow.com.git"
@@ -69,26 +76,38 @@ pipeline {
 
     stages{
         stage('开始部署流程') {
+            //判断是否是发布还是回滚，发布则执行，回滚则跳过
             when { anyOf { environment name: 'status', value: 'test'; environment name: 'status', value: 'product' } }
             stages {
                 stage('部署确认'){
+                    //对部署环境判断，匹配相应的验证才能继续往下执行
+                    when { environment name: 'status', value: 'product'}
                     steps{
                     timeout(1) { //一分钟没有输入密码则中断构建
-                         script {
-                             //对部署环境判断，匹配相应的验证才能继续往下执行
-                             if ( env.status == "product"){
-                                 userMap = input message: 'please input password', ok: 'ok', submitter: 'admin', parameters: [password(name:'password', defaultValue: '', description: '发布代码口令' )], submitterParameter: 'admin'
-                                 if (userMap['password'].toString() == "123456"){
-                                     echo "密码正确"
-                                 }else{
-                                     echo "密码错误，请确认您是否有权限操作"
-                                 }
-                             }
+                        script {
+                                userMap = input message: 'please input password', ok: 'ok', submitter: 'admin', parameters: [password(name:'password', defaultValue: '', description: '发布代码口令' )], submitterParameter: 'admin'
+                                if (userMap['password'].toString() == "123456"){
+                                    echo "密码正确"
+                                }else{
+                                    echo "密码错误，请确认您是否有权限操作"
+                                }
+                                 
+                                    sh("ls -al ${env.WORKSPACE}")
+					                deleteDir()  // clean up current work directory
+					                sh("ls -al ${env.WORKSPACE}")                                
                          }
                        }
+                        checkout([$class: 'GitSCM', 
+                            branches: [[name: "${params.BRANCH_TAG}"]], 
+                            doGenerateSubmoduleConfigurations: false, 
+                            extensions: [], 
+                            gitTool: 'Default', 
+                            submoduleCfg: [], 
+                            userRemoteConfigs: [[url: "${GIT_URL}"]]
+                                ])
                     }
                 }
-                
+
 			    stage('代码质量检查') {
 			        steps {
 			            withSonarQubeEnv('sonar-server') {
@@ -98,23 +117,23 @@ pipeline {
 			    }
 				stage("代码质量结果判断") {
 					steps{
-						timeout(time: 1, unit: 'HOURS') {
+						timeout(time: 5, unit: 'MINUTES') {
 						waitForQualityGate abortPipeline: true
 						}
 					}
 				}
         				stage('部署') {
         					steps {
-        						sh 'sh -x ${srcipts_dir}/deploy_node.sh $status'
+        						sh 'sh ${srcipts_dir}/${scripts_name2} $status'
         					} 
         				}
                    }
                 }
-    		    stage('回退') {
+    	stage('回退') {
             when { anyOf { environment name: 'status', value: 'rollback_test'; environment name: 'status', value: 'rollback_product' } }
-    			    steps {
+    		steps {
                 timeout(1) { //一分钟没有输入密码则中断构建
-                    script {
+                script {
                         //对部署环境判断，匹配相应的验证才能继续往下执行
                         if ( env.status == "rollback_product"){
                             userMap = input message: 'please input password', ok: 'ok', submitter: 'admin', parameters: [password(name:'password', defaultValue: '', description: '发布代码口令' )], submitterParameter: 'admin'
@@ -127,36 +146,49 @@ pipeline {
                     }       
                 }
 
-    						sh 'sh -x ${srcipts_dir}/deploy_node.sh $status'
-    			} 
-    		}
-		stage('清除工作空间'){ 
-			steps{
-				cleanWs()
-			}
-	    }
+    			sh 'sh ${srcipts_dir}/${scripts_name2} $status'
+    		} 
+    	}
     }
+
     post('代码发布结果通知') {
         success {
             dingtalk (
-                robot: "$DingTalk_robot",
-                type: 'LINK',
-                title:'请查收${BUILD_URL}项目的代码部署结果',
-                text: [
-                    '代码部署成功'
-                ],
-                messageUrl: '${BUILD_URL}',
+                robot: "${DingTalk_robot}",
+                type: 'TEXT',
+                at:[],
+                text:[
+					'状态:构建成功',
+					'项目:${JOB_NAME}',
+					'分支:${BRANCH_TAG}',
+					'查看链接：${JOB_URL}'
+				],
             )
         }
         failure {
             dingtalk (
-                robot: "$DingTalk_robot",
-                type: 'LINK',
-                title:'请查收${BUILD_URL}项目的代码部署结果',
-                text: [
-                    '代码部署失败'
-                ],
-                messageUrl: '${BUILD_URL}',
+                robot: "${DingTalk_robot}",
+                type: 'TEXT',
+                at:[],
+                text:[
+					'状态:构建失败',
+					'项目:${JOB_NAME}',
+					'分支:${BRANCH_TAG}',
+					'查看链接：${JOB_URL}'
+				],
+            )
+        }
+        aborted {
+            dingtalk (
+                robot: "${DingTalk_robot}",
+                type: 'TEXT',
+                at:[],
+                text:[
+					'状态:构建中止',
+					'项目:${JOB_NAME}',
+					'分支:${BRANCH_TAG}',
+					'查看链接：${JOB_URL}'
+				],
             )
         }
     }
