@@ -18,6 +18,14 @@ export default [
       { path: 'production-plan-management/production-plan-list', title: '生产计划列表', name: 'production-plan-management/production-plan-list' },
       { path: 'production-plan-management/production-prenatal-batch-list', title: '生产批次列表', name: 'production-plan-management/production-prenatal-batch-list' }
     ]
+  },{
+    path: '/outbound-management',
+    icon: 'ios-book',
+    name: '/outbound-management',
+    title: '出库管理',
+    children: [
+      { path: 'outbound-management/CKSQ-outbound-application', title: '出库申请单', name: 'outbound-management/CKSQ-outbound-application' }
+    ]
   },
   // {
   //   path: '/anti-channel-conflict',
