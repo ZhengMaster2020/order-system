@@ -22,9 +22,6 @@ pipeline {
         //sitebasedir = "/home/wwwroot/${sitename}/front-end"  //项目基础目录
         //releasesdir = "${sitebasedir}/releases"  //版本库一般是固定的
 
-	    //获取发布版本的时间戳
-        uptime = "${sitename}_${date_time}_$BRANCH_TAG"
-
         //需要部署的远程主机
         leave_test = "www@120.26.240.150"
         leave_product = "www@192.168.1.248"
@@ -49,9 +46,6 @@ pipeline {
 
         //钉钉token
         DingTalk_robot = "df86538a-4473-4572-aaee-c823a3957218"
-
-        //git_url
-        git_url = "git@gitlab.fandow.com:fandow/security-code.fandow.com.git"
         
         //扫描器配置
         sonar_scanner = "/usr/local/sonar-scanner/bin/sonar-scanner \
