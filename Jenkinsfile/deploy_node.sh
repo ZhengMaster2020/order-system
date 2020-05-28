@@ -18,6 +18,9 @@ if [[ $status == "test" ]] || [[ $status == "rollback_test" ]];then
     #sitename=${JOB_NAME}
     sitebasedir=/home/wwwroot/${sitename}/front-end
     releasesdir=${sitebasedir}/releases
+	    
+    #获取发布版本的时间戳
+    uptime=${sitename}_${date_time}
 else
     leave=$leave_product
 
@@ -25,6 +28,9 @@ else
     #sitename=${JOB_NAME} 
     sitebasedir=/data/wwwroot/${sitename}/front-end
     releasesdir=${sitebasedir}/releases
+    
+    #获取发布版本的时间戳
+    uptime=${sitename}_${date_time}_$BRANCH_TAG
 fi
 
 # 使用帮助函数
