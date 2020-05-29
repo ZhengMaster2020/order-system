@@ -7,30 +7,38 @@
 #1.目标主机已安装node、pm2、yarn工具
 #2.jenkins已经将ssh-key发往目标主机
 
-
-
 set -e
 
-if [[ $status == "test" ]] || [[ $status == "rollback_test" ]];then
-    leave=$leave_test
-    
-    #目标主机目录变量
-    #sitename=${JOB_NAME}
-    sitebasedir=/home/wwwroot/${sitename}/front-end
-    releasesdir=${sitebasedir}/releases
-	    
-    #获取发布版本的时间戳
-    uptime=${sitename}_${date_time}
-else
+if [[ $status == "product" ]] || [[ $status == "rollback_product" ]];then
     leave=$leave_product
 
     #目标主机目录变量
     #sitename=${JOB_NAME} 
     sitebasedir=/data/wwwroot/${sitename}/front-end
     releasesdir=${sitebasedir}/releases
-    
+
     #获取发布版本的时间戳
     uptime=${sitename}_${date_time}_$BRANCH_TAG
+elif [[ $status == "test" ]] || [[ $status == "rollback_test" ]];then
+    leave=$leave_test
+	
+    #目标主机目录变量
+    #sitename=${JOB_NAME}
+    sitebasedir=/home/wwwroot/${sitename}/front-end
+    releasesdir=${sitebasedir}/releases
+	
+	#获取发布版本的时间戳
+    uptime=${sitename}_${date_time}
+else
+    leave=$leave_beta
+	
+    #目标主机目录变量
+    #sitename=${JOB_NAME}
+    sitebasedir=/home/wwwroot/${sitename}/front-end
+    releasesdir=${sitebasedir}/releases
+
+    #获取发布版本的时间戳
+    uptime=${sitename}_${date_time}
 fi
 
 # 使用帮助函数
@@ -54,9 +62,7 @@ deploy(){
 }
 
 rollback_env(){
-    if [ $deploy_env == "rollback_test" ];then
-        $rsync -avzP ${srcipts_dir} $leave_test:${sitebasedir}/current > /dev/null 2>&1
-    elif [ $deploy_env == "rollback_product" ];then
+    if [ $deploy_env == "rollback_product" ];then
         #指定回滚版本名称
         rollback_tag=`ssh $leave "/bin/find ${releasesdir} -type d -name "${sitename}_*_${BRANCH_TAG}""`
         
@@ -72,19 +78,16 @@ rollback_env(){
             exit 123
         fi
     else
-        echo "请输入回滚的环境"
-		exit 123
+        $rsync -avzP ${srcipts_dir} $leave_test:${sitebasedir}/current > /dev/null 2>&1
     fi
 }
-
-
 
 update_site(){
     ssh -T $leave << eeooff
     cd ${releasesdir}/${uptime}
-	
+	###$sed -i 's/30005/30010/g' ./server/index.js && echo "端口替换成功"
     #安装依赖包
-    $yarn install > /dev/null 2>&1
+    $yarn install
     if [ $? -ne 0 ];then
         echo "$yarn install依赖包安装失败"
         exit 123
@@ -100,7 +103,7 @@ update_site(){
 		else
 		    echo "$yarn build-env成功"
 		fi
-    elif [ ${deploy_env} == "test" ];then
+    elif [ ${deploy_env} == "test" ] || [ ${deploy_env} == "beta" ];then
         #测试
         $yarn build-env-test
 		if [ $? -ne 0 ];then
@@ -114,7 +117,7 @@ update_site(){
     fi
 
     #构建项目
-    $yarn build  > /dev/null 2>&1
+    $yarn build > /dev/null 2>&1
     if [ $? -eq 0 ];then
         echo "$yarn build完成"
     else
@@ -138,7 +141,7 @@ update_site(){
 eeooff
 }
 
-rollback_test(){
+rollback_beta_test(){
     #获取回滚服务文件名
     bbb=`ssh -T $leave "ls -t ${releasesdir} | awk 'NR==2{print}' "`
     
@@ -202,12 +205,16 @@ rollback_product(){
 eeooff
 }
 
-
-
 main(){
     deploy_env=$1
     #BRANCH_TAG=$2
     case $1 in
+        beta)
+            echo "更新开发环境"
+            init_dir  #初始化代码目录
+            deploy  #同步代码到目标主机
+            update_site  #更新代码
+        ;;
         test)
             echo "更新测试环境"
             init_dir  #初始化代码目录
@@ -220,10 +227,15 @@ main(){
             deploy
             update_site  
         ;;
+        rollback_beta)
+            echo "开发环境回滚上一个版本"
+            rollback_env  #判断回滚环境并且同步脚本过去
+            rollback_beta_test  #开发环境回滚
+        ;;
         rollback_test)
             echo "测试回滚上一个版本"
             rollback_env  #判断回滚环境并且同步脚本过去
-            rollback_test  #测试回滚
+            rollback_beta_test  #测试回滚
         ;;
         rollback_product)
             echo "线上回滚指定版本"
@@ -234,5 +246,4 @@ main(){
             usage;
     esac
 }
-
 main $1
