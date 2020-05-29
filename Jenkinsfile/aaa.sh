@@ -5,7 +5,7 @@ srcipts_dir=$2
 deploy_env=$3
 service_pid=`$pm2 pid ${sitename}`
 
-if [[ $deploy_env == "test" ]] || [[ $deploy_env == "rollback_test" ]];then
+if [[ $deploy_env == "beta" ]] || [[ $deploy_env == "rollback_beta" ]] || [[ $deploy_env == "test" ]] || [[ $deploy_env == "rollback_test" ]];then
     status=starttest
 else
     status=start
