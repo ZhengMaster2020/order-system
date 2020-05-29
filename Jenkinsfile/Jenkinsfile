@@ -23,8 +23,9 @@ pipeline {
         //releasesdir = "${sitebasedir}/releases"  //版本库一般是固定的
 
         //需要部署的远程主机
-        leave_test = "www@120.26.240.150"
-        leave_product = "www@192.168.1.248"
+		leave_beta = "www@192.168.1.200"  //开发测试地址
+        leave_test = "www@120.26.240.150"  //dev测试地址
+        leave_product = "www@192.168.1.248"  //线上测试地址
 
         //命令变量
         git = "/usr/bin/git"
@@ -46,7 +47,7 @@ pipeline {
 
         //钉钉token
         DingTalk_robot = "df86538a-4473-4572-aaee-c823a3957218"
-        
+
         //扫描器配置
         sonar_scanner = "/usr/local/sonar-scanner/bin/sonar-scanner \
             -Dsonar.projectKey=security-code \
@@ -55,42 +56,46 @@ pipeline {
             -Dsonar.host.url=http://192.168.1.201:9000 \
             -Dsonar.login=cecac6b1add8d0d1efeed47ef9bf3904fa9a83c0"
     }
-        //参数化构建
+    //参数化构建
     parameters {
-        choice(name: 'status',choices:'test\nproduct\nrollback_test\nrollback_product',description: '请选择部署还是回退')
+        choice(name: 'status',choices:'beta\ntest\nproduct\nrollback_beta\nrollback_test\nrollback_product',description: 'beta 发布到开发环境\ntest 发布到测试环境\nproduct 线上生产环境\nrollback_beta 开发环境代码回滚\nrollback_test 测试环境代码回滚\nrollback_product 线上生产环境回滚 ')
         gitParameter name: 'BRANCH_TAG', 
-            type: 'PT_BRANCH_TAG',
-            branchFilter: 'origin/(.*)',
+            type: 'PT_BRANCH_TAG',  //选择类型
+            branchFilter: 'origin/(.*)',  //获取远程的所有分支
             defaultValue: 'master',  //默认值
             selectedValue: 'DEFAULT',  //选择值
             sortMode: 'ASCENDING_SMART', //排序方式
 			quickFilterEnabled: 'true',  //搜索框
-			description: 'Select your branch or tag.'
+			description: 'Select your branch or tag.' //描述
 	}
 
     stages{
         stage('开始部署流程') {
             //判断是否是发布还是回滚，发布则执行，回滚则跳过
-            when { anyOf { environment name: 'status', value: 'test'; environment name: 'status', value: 'product' } }
+            when { anyOf { environment name: 'status', value: 'beta'; environment name: 'status', value: 'test'; environment name: 'status', value: 'product' } }
             stages {
                 stage('部署确认'){
                     //对部署环境判断，匹配相应的验证才能继续往下执行
                     when { environment name: 'status', value: 'product'}
                     steps{
+                    //获取用户名和密码
+                    withCredentials([usernamePassword(credentialsId: "7f7b3fee-86b7-4c70-907e-e39381fe3ebc", usernameVariable: "username", passwordVariable: "password")]){
                     timeout(1) { //一分钟没有输入密码则中断构建
                         script {
                                 userMap = input message: 'please input password', ok: 'ok', submitter: 'admin', parameters: [password(name:'password', defaultValue: '', description: '发布代码口令' )], submitterParameter: 'admin'
-                                if (userMap['password'].toString() == "123456"){
+                                if (userMap['password'].toString() == "$password"){
                                     echo "密码正确"
                                 }else{
                                     echo "密码错误，请确认您是否有权限操作"
+                                    exit 123
                                 }
-                                 
                                     sh("ls -al ${env.WORKSPACE}")
 					                deleteDir()  // clean up current work directory
 					                sh("ls -al ${env.WORKSPACE}")                                
-                         }
-                       }
+                            }
+                        }
+                    }
+					    //再次拉取代码
                         checkout([$class: 'GitSCM', 
                             branches: [[name: "${params.BRANCH_TAG}"]], 
                             doGenerateSubmoduleConfigurations: false, 
@@ -104,7 +109,7 @@ pipeline {
 
 			    stage('代码质量检查') {
 			        steps {
-			            withSonarQubeEnv('sonar-server') {
+			            withSonarQubeEnv('sonar-server') {  //sonar-server在代码质检的固定名称
 			            sh label: '', script: '${sonar_scanner}'
 			            }
 			        }
@@ -124,22 +129,25 @@ pipeline {
                    }
                 }
     	stage('回退') {
-            when { anyOf { environment name: 'status', value: 'rollback_test'; environment name: 'status', value: 'rollback_product' } }
+            when { anyOf { environment name: 'status', value: 'rollback_test';  environment name: 'status', value: 'rollback_beta'; environment name: 'status', value: 'rollback_product' } }
     		steps {
+    		    //获取用户名和密码
+    		    withCredentials([usernamePassword(credentialsId: "7f7b3fee-86b7-4c70-907e-e39381fe3ebc", usernameVariable: "username", passwordVariable: "password")]){
                 timeout(1) { //一分钟没有输入密码则中断构建
                 script {
                         //对部署环境判断，匹配相应的验证才能继续往下执行
                         if ( env.status == "rollback_product"){
                             userMap = input message: 'please input password', ok: 'ok', submitter: 'admin', parameters: [password(name:'password', defaultValue: '', description: '发布代码口令' )], submitterParameter: 'admin'
-                            if (userMap['password'].toString() == "123456"){
+                            if (userMap['password'].toString() == "$password"){
                                 echo "密码正确"
                             }else{
                                 echo "密码错误，请确认您是否有权限操作"
+                                exit 123
                             }
                         }
                     }       
                 }
-
+            }
     			sh 'sh ${srcipts_dir}/${scripts_name2} $status'
     		} 
     	}
