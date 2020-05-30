@@ -46,7 +46,40 @@ export default function fetch(options) {
     // 请求处理
     instance(options)
       .then((res) => {
-        toSuccess(res, resolve, reject)
+        let data = res.data
+        if (res.status === 202) {
+          if (data.__proto__ === Blob.prototype) {
+            var reader = new FileReader();
+            reader.readAsText(data, 'utf-8');
+            reader.onload = function () {
+              data = JSON.parse(reader.result)
+              Notice.error({
+                title: '错误代码：' + data.code,
+                desc: data.subMsg || data.msg,
+                duration: 3
+              })
+              reject(data);
+            }
+          }
+          return;
+        } else if (data.code >= 1) {
+          if (data.__proto__ === Blob.prototype) {
+            var reader = new FileReader();
+            reader.readAsText(data, 'utf-8');
+            reader.onload = function () {
+              data = JSON.parse(reader.result)
+              let title = data.subMsg || data.message
+              data.data = data.data || []
+              Notice.warning({
+                title: 'code: ' + data.code,
+                desc: title
+              })
+              reject(data);
+            }
+          }
+        } else {
+          resolve(data)
+        }
         return false
       })
       .catch((error) => {
@@ -102,34 +135,4 @@ export default function fetch(options) {
         reject(error)
       })
   })
-}
-
-// 成功返回
-function toSuccess (res, resolve, reject) {
-  let data = res.data
-  if (res.status === 202) {
-    if (data.__proto__ === Blob.prototype) {
-      var reader = new FileReader();
-      reader.readAsText(data, 'utf-8');
-      reader.onload = function () {
-        data = JSON.parse(reader.result)
-        Notice.error({
-          title: '错误代码：' + data.code,
-          desc: data.subMsg || data.msg,
-          duration: 3
-        })
-        reject(data);
-      }
-    }
-    return;
-  }
-  if (data.code >= 1) {
-    let title = data.subMsg || data.message
-    data.data = data.data || []
-    Notice.warning({
-      title: 'code: ' + data.code,
-      desc: title
-    })
-  }
-  resolve(data)
 }
