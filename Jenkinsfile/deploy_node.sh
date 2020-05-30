@@ -80,7 +80,6 @@ rollback_env(){
     else
         #获取回滚服务文件名
         bbb=`ssh -T $leave "ls -t ${releasesdir} | awk 'NR==2{print}' "`
-        #ccc=`ssh -T $leave "ls -t ${releasesdir} | awk 'NR==1{print}' "`
         echo "同步脚本"
         $rsync -avzP ${srcipts_dir} $leave:${releasesdir}/${bbb} > /dev/null 2>&1
     fi
