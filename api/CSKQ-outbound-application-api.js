@@ -49,6 +49,15 @@ const outboundLsitReview = (data) => {
   })
 }
 
+// 手动出库
+const outboundLsitManual = (data) => {
+  return fetch({
+    url: `traceability/outbound-apply/handle-outbound`,
+    method: 'POST',
+    data
+  })
+}
+
 // 完成出库
 const outboundLsitFinished = (data) => {
   return fetch({
@@ -79,27 +88,29 @@ const getGBOrderSnNum = (params) => {
 // 获取出库申请单待确认出库+已确认出库数量
 const getOutboundApplySnNum = (id) => {
   return fetch({
-    url: `traceability/outbound-apply/outbound-apply-number/{id}`,
+    url: `traceability/outbound-apply/outbound-apply-number/${id}`,
     method: 'GET'
   })
 }
 
 // 模板导出
-const exportOutboundtemplate = () => {
+const exportOutboundtemplate = (data) => {
   return fetch({
     url: `traceability/outbound-apply/template-export`,
-    method: 'POST'
+    method: 'POST',
+    responseType: 'blob',
+    data
   })
 }
 
-// // 数据导入
-// const importSerialCodeData = (data) => {
-//   return fetch({
-//     url: `traceability/outbound-apply/data-import`,
-//     method: 'POST',
-//     data
-//   })
-// }
+// 数据导入
+const importSerialCodeData = (data) => {
+  return fetch({
+    url: `traceability/outbound-apply/data-import`,
+    method: 'POST',
+    data
+  })
+}
 
 // 记录-作废
 const repealOutboundRecord = (data) => {
@@ -121,8 +132,9 @@ export default {
   getOutboundRecordIndex,
   getGBOrderSnNum,
   outboundLsitFinished,
+  outboundLsitManual,
   getOutboundApplySnNum,
   exportOutboundtemplate,
-  // importSerialCodeData,
-  repealOutboundRecord,
+  importSerialCodeData,
+  repealOutboundRecord
 }

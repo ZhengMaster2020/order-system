@@ -156,7 +156,7 @@
           <Input class="width-170" v-model="detailData.lossNumber" readonly/>
         </FormItem>
         <FormItem label="出库理由">
-          <Input class="width-170" v-model="detailData.outboundReason" readonly/>
+          <Input style="width: 540px" v-model="detailData.outboundReason" readonly/>
         </FormItem>
 
         <div class="title">
@@ -215,16 +215,17 @@
               <td width="60">下单数量</td>
             </tr>
             <tr>
-              <td width="100">2020-04-10</td>
-              <td width="125">广州市藻谷生物科技有限公司</td>
-              <td width="100">MK-GB-20041325473</td>
-              <td width="100">WIS</td>
-              <td width="90">DP411</td>
-              <td width="125">+WIS+晶润紧致眼膜</td>
-              <td width="100">2020-04-30</td>
-              <td width="60">紧急</td>
-              <td width="60">新品</td>
-              <td width="60">100000000</td>
+              <td width="100">{{detailData.createdAt}}</td>
+              <td width="125">{{detailData.supplier}}</td>
+              <td width="100">{{detailData.gbOrderSn}}</td>
+              <td width="100">{{detailData.brand}}</td>
+              <td width="90">{{detailData.mkCode}}</td>
+              <td width="125">{{detailData.productName}}</td>
+              <td width="100">{{detailData.requireDeliveryTime}}</td>
+<!--            TODO:  紧急程度-->
+              <td width="60">{{detailData.urgency == '' ? '-' : detailData.urgency}}</td>
+              <td width="60">{{detailData.productType}}</td>
+              <td width="60">{{detailData.orderNumber}}</td>
             </tr>
             <tr class="td-title">
               <td>剩余可出库量</td>
@@ -236,13 +237,14 @@
               <td colspan="4">出库理由</td>
             </tr>
             <tr>
-              <td>2020-04-10</td>
-              <td>是</td>
-              <td>损耗</td>
-              <td>WIS</td>
-              <td>DP411</td>
-              <td>+WIS+晶润紧致眼膜</td>
-              <td colspan="4">紧急新品</td>
+              <!--            TODO:  剩余可出库量-->
+              <td>{{detailData.expectedOutboundNumber}}</td>
+              <td>{{detailData.isReissue}}</td>
+              <td>{{detailData.reissueType}}</td>
+              <td>{{detailData.lossSn}}</td>
+              <td>{{detailData.lossNumber}}</td>
+              <td>{{detailData.expectedOutboundNumber}}</td>
+              <td colspan="4">{{detailData.outboundReason}}</td>
             </tr>
             </tbody>
           </table>
@@ -251,23 +253,23 @@
         <Row>
           <Col span="8">
             <h3 class="margin-top-10">实际出库数量：</h3>
-            <div class="fillin">231</div>
+            <div class="fillin"></div>
           </Col>
           <Col span="8">
             <h3 class="margin-top-10">送货员签名：</h3>
-            <div class="fillin">312</div>
+            <div class="fillin"></div>
           </Col>
           <Col span="8">
             <h3 class="margin-top-10">预计送达时间：</h3>
-            <div class="fillin">123</div>
+            <div class="fillin"></div>
           </Col>
         </Row>
         <Row class="font-size-10 margin-top-10 margin-bottom-10">
           <Col span="8">
-            打印流水：001
+            打印流水：{{detailData.flowingWater}}
           </Col>
           <Col span="8" offset="8">
-            打印日期：2323-12-32
+            打印日期：{{$format(Date.now()/1000, 'yyyy-MM-dd')}}
           </Col>
         </Row>
 
@@ -284,7 +286,7 @@
           <Col>
             <div class="qrcode">
               <img style="width: 100%; height: 100%"
-                   src="https://c-ssl.duitang.com/uploads/item/201910/13/20191013165225_VWjFE.thumb.200_200_c.jpeg"
+                   :src="detailData.qrCodeUrl"
                    alt="qrcode">
             </div>
             <div style="font-size: 12px; text-align: center">条形码编号</div>
@@ -295,23 +297,23 @@
         <Row>
           <Col span="8">
             <h3 class="margin-top-10">执行人：</h3>
-            <div class="fillin">231</div>
+            <div class="fillin"></div>
           </Col>
           <Col span="8">
             <h3 class="margin-top-10">实际执行数量：</h3>
-            <div class="fillin">312</div>
+            <div class="fillin"></div>
           </Col>
           <Col span="8">
             <h3 class="margin-top-10">执行日期：</h3>
-            <div class="fillin">123</div>
+            <div class="fillin"></div>
           </Col>
         </Row>
         <Row class="font-size-10 margin-top-10">
           <Col span="8">
-            打印流水：001
+            打印流水：{{detailData.flowingWater}}
           </Col>
           <Col span="8" offset="8">
-            打印日期：2323-12-32
+            打印日期：{{$format(Date.now()/1000, 'yyyy-MM-dd')}}
           </Col>
         </Row>
       </div>
@@ -541,6 +543,13 @@
   export default {
     data() {
       return {
+        freeze: Object.freeze({
+          api: 'add',
+          params: {
+            name: 'jsom',
+            age: 10,
+          },
+        }),
         currentTab: 'outboundList',
         tableLoading: false,
         spinShow: false,
@@ -575,7 +584,7 @@
             {title: '序号', type: 'index', width: 70, align: 'center'},
             {title: '申请人', key: 'created_by', width: 110, align: 'center'},
             {title: '申请时间', key: 'created_at', width: 110, align: 'center'},
-            {title: '出库单号', key: 'outbound_order_sn', minWidth: 160, align: 'center'},
+            {title: '出库单号', key: 'outbound_order_sn', minWidth: 195, align: 'center'},
             {title: '是否补发', key: 'is_reissue', width: 70, align: 'center'},
             {title: '慕可代码', key: 'mk_code', minWidth: 100, align: 'center'},
             {title: '产品名称', key: 'product_name', minWidth: 160, align: 'center'},
@@ -642,6 +651,9 @@
           outboundReason: '',
           handleBy: '',
           expectedOutboundNumber: '',
+          qrCodeUrl: '',
+          flowingWater: '',
+          urgency: '',
         },
         reviewModal: {
           show: false,
@@ -730,13 +742,19 @@
       editApply() {
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
-
-        this.$router.push({
-          path: '/outbound-management/outbound-add',
-          query: {
-            id: this.selection[0].id
-          }
-        })
+        let selection = this.selection[this[this.currentTab].pageProps.page][0]
+        // console.log(selection.status)
+        if(selection.created_by !== this.userInfo.realName) return this.$Message.error('非创建人无法修改')
+        if(selection.status === '待审核' || selection.status === '已驳回') {
+          this.$router.push({
+            path: '/outbound-management/outbound-add',
+            query: {
+              id: selection.id
+            }
+          })
+        }else{
+          this.$Message.error('该状态下无法修改')
+        }
       },
 
       editOutboundConfirm() {
@@ -746,7 +764,7 @@
         this.$router.push({
           path: '/outbound-management/outbound-manual',
           query: {
-            id: this.selection[pageProps.page][0].id
+            id: this.selection[this[this.currentTab].pageProps.page][0].id
           }
         })
       },
@@ -754,11 +772,13 @@
       manualOutbound() {
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
+        let selection = this.selection[this[this.currentTab].pageProps.page][0]
+        if(selection.status !== '待出库' || selection.status !== '部分出库') return this.$Message.error('待出库或者出库中的才可手动出库')
 
         this.$router.push({
           path: '/outbound-management/outbound-manual',
           query: {
-            id: this.selection[pageProps.page].id
+            id: selection.id
           }
         })
       },
@@ -772,7 +792,7 @@
         let currentTab = this.currentTab
         let pageProps = this[currentTab].pageProps
         this.selection[pageProps.page] = selection
-        console.log(this.selection)
+        // console.log(this.selection)
       },
       // 改变当前分页
       changePage(page, key) {
@@ -791,14 +811,17 @@
       },
 
       showReviewModal(title) {
-        let currentTab = this.currentTab
+        let selection = this.selection[this[this.currentTab].pageProps.page][0]
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
+        if(title === '出库单审核') {
+          if(selection.status !== '待审核') return this.$Message.error('已审核')
+        }
 
         this.getOutboundDetail()
         this.reviewModal.show = true
         this.reviewModal.title = title
-        this.reviewModal.form.outboundApplyId = this.selection[this[currentTab].pageProps.page][0].id
+        this.reviewModal.form.outboundApplyId = selection.id
       },
 
       outboundConfirm() {
@@ -812,7 +835,10 @@
       printOutboundSn() {
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
+        let selection = this.selection[this[this.currentTab].pageProps.page][0]
+        if(selection.status !== '待打印') return this.$Message.error('待打印状态下才能打印')
 
+        this.getOutboundDetail()
         this.printModal.show = true
       },
 
@@ -861,10 +887,7 @@
             this.$Message.success(res.msg)
             this[modal].show = false
             this.$refs[form].resetFields()
-            // console.log(this.$refs[form].resetFields())
-
             this[modal + 'ResetFields']()
-            console.log(this[modal].form)
             this.init()
           })
         })
@@ -909,17 +932,28 @@
       getOutboundDetail() {
         let currentTab = this.currentTab
         let pageProps = this[currentTab].pageProps
-        console.log(this.selection[pageProps.page][0])
+
         this.$API.getOutboundLsitDetail(this.selection[pageProps.page][0].id).then(res => {
-          console.log(res)
           if (res.code !== 0) return
           this.spinShow = false
           for (let key in res.data) {
             this.detailData[key] = res.data[key]
           }
+
+          this.detailData.reissueType = this.switchReiusseType(this.detailData.reissueType)
         })
       },
-      getOutboundLsitIndex() {
+      switchReiusseType(type) {
+        switch (type) {
+          case 'other' :
+            return '其他'
+          break;
+            case 'loss' :
+            return '补发'
+          break;
+          default:
+            return '-'
+        }
       }
     },
     mounted() {

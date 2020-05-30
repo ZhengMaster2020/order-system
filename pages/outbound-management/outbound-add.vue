@@ -67,13 +67,13 @@
                     class="width-200"
                     @on-change="resetExpectNum"
                     :disabled="form.isReissue === 1 ? false : true">
-              <Option value="损耗">损耗</Option>
-              <Option value="其他">其他</Option>
+              <Option value="loss">损耗</Option>
+              <Option value="other">其他</Option>
             </Select>
           </FormItem>
           <FormItem label="损耗记录单" prop="lossSn">
             <Input class="width-200"
-                   v-model="form.lossSn" :disabled="form.reissueType === '损耗' ? false : true"/>
+                   v-model="form.lossSn" :disabled="form.isReissue === 1 ? false : true"/>
           </FormItem>
           <FormItem label="损耗数量" prop="lossNumber">
             <Input class="width-200"
@@ -137,9 +137,9 @@
           supplier: '广州仟智生物科技有限公司', // 关联采购订单号
           urgency: '', // 关联采购订单号
           isReissue: 0,
-          reissueType: '其他',
-          lossSn: '-',
-          lossNumber: 0, // 关联采购订单号
+          reissueType: 'other',
+          lossSn: '',
+          lossNumber: 1, // 关联采购订单号
           expectedOutboundNumber: null,
           outboundReason: '',
           brand: 'WIS',
@@ -152,7 +152,7 @@
           gbOrderSn: [{required: true, message: '必填项', trigger: 'blur'}],
           urgency: [{required: true, message: '必填项', trigger: 'blur'}],
           reissueType: [{required: true, message: '必填项', trigger: 'change'}],
-          lossSn: [{required: true, message: '必填项', trigger: 'change'}],
+          lossSn: [{required: true, message: '必填项', trigger: 'blur'}],
           nextBy: [{required: true, message: '必填项', trigger: 'blur'}],
           outboundReason: [{required: true, message: '必填项', trigger: 'blur'}],
           lossNumber: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
@@ -178,17 +178,15 @@
     },
     watch: {
       ['form.reissueType'](cur) {
-        // if(cur !== '损耗') {
-        //   this.form.lossSn = '-'
-        // }else {
-        //   this.form.lossSn = ''
-        // }
-        this.form.lossSn = cur !== '损耗' ? '-' : ''
+        // this.form.lossSn = cur !== 'loss' ? '-' : ''
         // && (this.form.lossNumber = '-')
       },
       ['form.isReissue'](cur) {
         console.log(cur)
-        cur !== 1 && (this.form.reissueType = '其他')
+        if(cur !== 1) {
+          this.form.reissueType = 'other'
+          this.form.lossSn = ''
+        }
         console.log(this.form.reissueType)
       }
     },
@@ -217,7 +215,7 @@
       },
 
       gbOrderSnChange(){
-        // 获取mkCode
+        // TODO: 调取采购系统的接口 获取mkCode
         console.log(this.form.gbOrderSn)
         this.notFoundText = '加载中...'
         setTimeout(()=> {
@@ -247,9 +245,12 @@
           delete params.applicant
           // TODO: 补发类型 损耗记录单 ('-' 则删除) --- 删除
           for(let key in params) {
-            params[key] === '-' && (params[key] = '')
+            params[key] === '-' && delete params[key]
           }
 
+          if(params.isReissue === 0){
+            params.reissueType = ''
+          }
           if(this.id) {
             params.id = this.id
             apiKey = 'editOutboundLsit'
@@ -284,6 +285,7 @@
           for (let key in res.data) {
             this.form[key] = res.data[key]
           }
+          this.form.isReissue = res.data.isReissue === '是'? 1 : 0
         })
       },
 

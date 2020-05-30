@@ -14,7 +14,7 @@
         <Row>
           <Col span="4">
             <FormItem label="申请时间" style="width: 100%">
-              <Input v-model="detailData.createdAt" disabled/>
+              <Input v-model="detailData.createdAt" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
@@ -114,18 +114,18 @@
         </Row>
         <Row>
           <Col span="4">
-            <FormItem label="出库人员" style="width: 100%"  readonly>
-              <Input v-model="userInfo.realName"/>
+            <FormItem label="出库人员" style="width: 100%">
+              <Input v-model="userInfo.realName" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
-            <FormItem label="实际点货总量" style="width: 100%" readonly>
-              <Input v-model="detailData.urgency"/>
+            <FormItem label="实际点货总量" style="width: 100%">
+              <Input v-model="actualNumberTotal" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
-            <FormItem label="出库单剩余可出库量" style="width: 100%" readonly>
-              <Input v-model="detailData.remainNumTotal"/>
+            <FormItem label="出库单剩余可出库量" style="width: 100%">
+              <Input v-model="detailData.remainNumTotal" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
@@ -154,9 +154,8 @@
               </div>
               <div class="upload-file">
                 <div class="upload-list" v-for="(file, index) in form.fileItems" :key="index">
-                  <a :href="file.url" :download="file.name" class="download-link">
-                    {{file.name}}
-                  </a>
+<!--                  <a :href="file.url" :download="file.name" class="download-link">{{file.name}}</a>-->
+                  <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
                   <Icon type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>
                 </div>
               </div>
@@ -171,10 +170,9 @@
               <div>
                 <div class="necessary margin-bottom-10 font-size-12">导入序列号表格</div>
                 <Upload
-                ref="upload"
-                :format="['jpg','jpeg','png']"
                 :show-upload-list="false"
-                :action="serialCodeDataURL"
+                :format="['xls','xlsx']"
+                :action="fileUploadURL"
                 :headers="fileUploadHeaders"
                 :default-file-list="form.serialCodeData"
                 :on-format-error="(file) => onFormatError(file, '导入序列号')"
@@ -185,14 +183,7 @@
                   <Button icon="ios-cloud-upload-outline" class="margin-bottom-10">Upload files</Button>
                 </Upload>
               </div>
-              <div class="upload-file">
-                <div class="upload-list" v-for="(file, index) in form.serialCodeData" :key="index">
-                  <a :href="file.url" :download="file.name" class="download-link">
-                    {{file.name}}
-                  </a>
-                  <Icon type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '导入序列号')"/>
-                </div>
-              </div>
+              <a style="padding: 43px 0 0 10px" href="javascript:void(0)" class="download-link">{{serialFileName}}</a>
             </div>
           </Col>
           <Col span="4" style="text-align: right; margin-top: 35px">
@@ -201,49 +192,55 @@
         </Row>
 
 <!--   TODO： for serialCodeData     -->
-        <Row >
+        <Row v-for="(serial, index) in this.form.serialCodeData" :key="index">
           <Col span="2">
-            <FormItem label="序号" style="width: 100%">
-              <Input v-model="form.urgency"/>
+            <FormItem :label="index === 0? '序号' : ''" style="width: 100%">
+              <Input v-model="serial.number" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
           <Col span="2">
-            <FormItem label="编号" style="width: 100%">
-              <Input v-model="form.urgency"/>
+            <FormItem :label="index === 0? '编号' : ''"
+                      style="width: 100%"
+                      :prop="'serialCodeData.' + index + '.serial_code_sn'"
+                      :rules="rules.serial_code_sn">
+              <Input v-model="serial.serial_code_sn" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
           <Col span="4">
-            <FormItem label="序列号起止" style="width: 100%;">
-              <Input v-model="form.urgency"/>
+            <FormItem :label="index === 0? '序列号起止' : ''"
+                      style="width: 100%;"
+                      :prop="'serialCodeData.' + index + '.start_number'"
+                      :rules="rules.start_number">
+              <Input v-model="serial.start_number" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
-          <Col span="1" style="padding-top: 34px; text-align: center">——</Col>
+          <Col span="1" :style="index === 0 ? crossStyle : {}">——</Col>
           <Col span="4">
-            <FormItem style="width: 100%; padding-top: 34px">
-              <Input v-model="form.urgency"/>
-            </FormItem>
-          </Col>
-          <Col span="4">
-            <FormItem label="理论出库量" style="width: 100%">
-              <Input v-model="form.urgency"/>
+            <FormItem :style="index === 0 ? endNumStyle : {}">
+              <Input v-model="serial.end_number" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
           <Col span="4">
-            <FormItem label="实际点货量" style="width: 100%">
-              <Input v-model="form.urgency"/>
+            <FormItem :label="index === 0? '理论出库量' : ''" style="width: 100%">
+              <Input :value="(serial.end_number === null || !serial.end_number) ? '' : serial.end_number - serial.start_number" readonly/>
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem :label="index === 0? '实际点货量' : ''" style="width: 100%">
+              <Input v-model="serial.actual_number" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
           <Col span="3">
-            <FormItem label=" " style="width: 100%; padding-top: 34px">
-<!--              <Button shape="circle" icon="md-add" @click="addBatchData" v-if="index === 0"></Button>-->
-              <Button shape="circle" icon="md-remove"></Button>
+            <FormItem :label="index === 0? ' ' : ''" :style="index === 0 ? endNumStyle : {}">
+              <Button shape="circle" icon="md-add" @click="addSerialData" v-if="index === 0"></Button>
+              <Button shape="circle" icon="md-remove" v-else></Button>
             </FormItem>
           </Col>
         </Row>
 
         <Row class="margin-top-10">
           <Col span="2" offset="15"  style=" text-align: right; padding-top: 10px"> 总计 </Col>
-          <Col span="4"><Input v-model="form.urgency"/></Col>
+          <Col span="4"><Input v-model="actualNumberTotal" readonly/></Col>
         </Row>
 
       </Form>
@@ -267,32 +264,31 @@
         fileUploadHeaders: {
           Authorization: Cookies.get('authorization')
         },
-        userInfo: {
-          realName: ''
-        },
+        userInfo: {},
+        serialFileName: '',
+        fileItem: null,
         form: {
           outboundApplyId: 1,
           warehouseSn: '',
-          fileItems: [{
-            url: '/adas/asda',
-            name: 'asda'
-          },{
-            url: '/adas/asda',
-            name: 'asda'
-          },{
-            url: '/adas/asda',
-            name: 'asda'
-          }],
+          fileItems: [],
 
-          serialCodeData: [{
-            url: '/adas/asda',
-            name: 'asda'
-          }],
+          serialCodeData: [
+            {
+              number: null,
+              serial_code_sn: '',
+              start_number: null,
+              end_number: null,
+              actual_number: null,
+              readonly: false,
+            }
+          ],
           serialCodeItems: [],
         },
         rules: {
           gbOrderSn: [{required: true, message: '必填项', trigger: 'blur'}],
           reissueType: [{required: true, message: '必填项', trigger: 'blur'}],
+          serial_code_sn: [{required: true, message: '必填项', trigger: 'blur'}],
+          start_number: [{required: true, message: '必填项', trigger: 'blur'}],
           lossSn: [{required: true, message: '必填项', trigger: 'blur'}],
           lossNumber: [{required: true, message: '必填项', trigger: 'blur'}],
           nextBy: [{required: true, message: '必填项', trigger: 'blur'}],
@@ -320,6 +316,14 @@
           expectedOutboundNumber: '',
           remainNumTotal: '',
         },
+        crossStyle: {
+          'padding-top': '34px',
+          'text-align': 'center'
+        },
+        endNumStyle: {
+          'width': '100%',
+          'padding-top': '34px'
+        }
       }
     },
     methods: {
@@ -334,26 +338,29 @@
       },
 
       beforeUpload(file, type) {
-        console.log(type)
         if(type === '回传单'){
 
         } else {
-          // 单个文件 上传多个会覆盖？
-          const check = /.txt$/.test(file.name)
-          if (check) {
-            this.$Message.warning('请不要上传txt格式的文件')
+          // TODO: 单个文件 会覆盖？ 文件名即出库单号
+          let index = file.name.lastIndexOf('.')
+          let fileName = file.name.substring(0, index)
+          const check = fileName !== this.detailData.outboundOrderSn
+          if(check){
+            this.$Message.error('文件名于入库单号不一致')
+          }else {
+            this.fileItem = file
           }
           return !check;
         }
 
       },
+
       onFormatError(response, type) {
         if(type === '回传单') {
-          this.$Message.error('上传格式有误，只允许图片格式".jsp, .png, .jpeg"')
-        } else {
-          console.log(response)
+          this.$Message.error('请按图片格式上传:".jsp, .png, .jpeg"')
+        }else {
+          this.$Message.error('请按excel文件格式上传')
         }
-
       },
       onsuccess(response, type) {
         if(type === '回传单') {
@@ -364,7 +371,27 @@
             this.$Message.error('上传有误')
           }
         } else {
-          console.log(response)
+          if(response.code !== 0) return
+          this.form.serialCodeItems[0] = response.data.fileUploadVo
+          let formdata = new FormData()
+          formdata.append('file', this.fileItem)
+
+          this.$API.importSerialCodeData(formdata).then(res => {
+            if(res.code !== 0) return
+            let serialCodeData = this.form.serialCodeData
+            let importData = res.data.importData
+            importData.map(items => {
+              items.readonly = true
+              return items
+            })
+            console.log(importData, 'importData')
+
+            let filterData = serialCodeData.filter(items => !items.readonly)
+            this.form.serialCodeData = [...importData, ...filterData]
+
+            this.serialFileName = res.data.fileTitle
+            this.$Message.success('导入完成')
+          })
         }
 
       },
@@ -377,16 +404,40 @@
       onremove(index, type) {
         if(type === '回传单') {
           this.form.fileItems.splice(index, 1)
-        }else {
-          console.log(index)
         }
       },
 
+      addSerialData() {
+        this.form.serialCodeData.push({
+          number: null,
+          serial_code_sn: '',
+          start_number: null,
+          end_number: null,
+          actual_number: null,
+          readonly: false,
+        })
+      },
+
+
       submit() {
+        // this.submintLodaing = true
+        // console.log(this.$refs.form.validate)
+        console.log(this.form)
+        let params = {}
+
+        if(this.form.fileItems.length === 0) return this.$Message.error('请上传出库回传单')
+        // if(this.form.fileItems === 0) return this.$Message.error('请上传出库回传单')
+        //
+        //
+
         this.$refs.form.validate(val => {
           if (!val) return
-          console.log(this.form)
-          // addOutboundLsit
+          this.$API.outboundLsitManual(this.form).then(res => {
+            console.log(res)
+            if(res.code !== 0) return
+
+          })
+
         })
       },
 
@@ -394,11 +445,12 @@
         this.spinShow = true
         this.$API.getOutboundLsitDetail(id).then(res => {
           // console.log(res)
-          // if (res.code !== 0) return
+          if (res.code !== 0) return
           this.spinShow = false
           for (let key in res.data) {
             this.detailData[key] = res.data[key]
           }
+          this.detailData.reissueType = this.switchReiusseType(this.detailData.reissueType)
         })
       },
 
@@ -406,32 +458,61 @@
         console.log(id)
         this.$API.getOutboundApplySnNum(id).then(res => {
           // console.log(res)
-          // if (res.code !== 0) return
-          // 出库单剩余可出库量
-          this.detailData.remainNumTotal = res.data[0] + res.data[1]
+          if (res.code !== 0) return
+          // TODO: 出库单剩余可出库量
+          this.detailData.remainNumTotal = res.data[0]
+          // this.detailData.remainNumTotal = res.data[0] + res.data[1]
         })
       },
 
       exportOutboundtemplate() {
-        this.$API.exportOutboundtemplate().then(res => {
-          console.log(res)
-          // if (res.code !== 0) return
-          this.spinShow = false
-
+        this.$API.exportOutboundtemplate({outboundOrderSn: this.detailData.outboundOrderSn}).then(res => {
+          let data = res
+          // console.log(res)
+          if (typeof window.chrome !== 'undefined') {
+            // Chrome version
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(data);
+            link.click();
+          } else if (typeof window.navigator.msSaveBlob !== 'undefined') {
+            // IE version
+            window.navigator.msSaveBlob(data);
+          } else {
+            // Firefox version
+            var file = new File([data], { type: 'application/force-download' });
+            window.open(URL.createObjectURL(file));
+          }
+          this.$Message.success('模板导出成功')
         })
       },
 
+      switchReiusseType(type) {
+        switch (type) {
+          case 'other' :
+            return '其他'
+            break;
+          case 'loss' :
+            return '补发'
+            break;
+          default:
+            return '-'
+        }
+      }
     },
     computed: {
       // 实际点货量汇总
-      realNumTotal() {
+      actualNumberTotal() {
         // 汇总每个序列号实际点货量
-
+        let serialCodeData = this.form.serialCodeData
+        let total = serialCodeData.reduce((pre, cur) => {
+          let actual_number = cur.actual_number || 0
+          return Number(pre) + Number(actual_number)
+        }, 0)
+        // console.log(total)
+        return total
       },
       // 出库单剩余可出库量
       // remainNumTotal() {},
-      // 理论出库量
-      theoreticalNumTotal() {},
     },
     mounted() {
       let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
