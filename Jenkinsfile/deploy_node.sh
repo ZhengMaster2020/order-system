@@ -78,8 +78,10 @@ rollback_env(){
             exit 123
         fi
     else
+        #获取回滚服务文件名
+        bbb=`ssh -T $leave "ls -t ${releasesdir} | awk 'NR==2{print}' "`
         echo "同步脚本"
-        $rsync -avzP ${srcipts_dir} $leave:${sitebasedir}/current > /dev/null 2>&1
+        $rsync -avzP ${srcipts_dir} $leave:${sitebasedir}/${bbb} > /dev/null 2>&1
     fi
 }
 
@@ -143,9 +145,6 @@ eeooff
 }
 
 rollback_beta_test(){
-    #获取回滚服务文件名
-    bbb=`ssh -T $leave "ls -t ${releasesdir} | awk 'NR==2{print}' "`
-    
     ssh -T $leave << eeooff
     cd ${releasesdir}/${bbb}
 
@@ -168,7 +167,7 @@ rollback_beta_test(){
     fi
 
     #${scripts_name3}脚本作用：先判断服务pid存不存在，存在停掉服务、删掉服务，然后在启动新的服务；不存在直接启动新服务
-    sh ${sitebasedir}/current/${srcipts_dir_name}/${scripts_name3} ${sitename} ${scripts_name1} ${deploy_env} && echo "回滚上一个版本成功" || echo "回滚上一个版本失败"
+    sh ${releasesdir}/${bbb}/${srcipts_dir_name}/${scripts_name3} ${sitename} ${scripts_name1} ${deploy_env} && echo "回滚上一个版本成功" || echo "回滚上一个版本失败"
 
     cd ${releasesdir}
     #直接回滚到上一个版本
