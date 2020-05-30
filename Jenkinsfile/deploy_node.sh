@@ -133,10 +133,10 @@ update_site(){
 
     if [ ${deploy_env} == "product" ];then
         echo "保留版本数"
-        cd ${releasesdir} && ls -t  | awk 'NR==6{print}' | xargs -i rm -rf {} && ls -lt ${releasesdir}
+        cd ${releasesdir} && ls -t  | awk 'NR==7{print}' | xargs -i rm -rf {} && ls -lt ${releasesdir}
     else
         echo "保留版本数"
-        cd ${releasesdir} && ls -t  | awk 'NR==3{print}' | xargs -i rm -rf {} && ls -lt ${releasesdir}
+        cd ${releasesdir} && ls -t  | awk 'NR==4{print}' | xargs -i rm -rf {} && ls -lt ${releasesdir}
     fi
 eeooff
 }
