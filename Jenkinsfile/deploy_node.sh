@@ -78,6 +78,7 @@ rollback_env(){
             exit 123
         fi
     else
+        echo "同步脚本"
         $rsync -avzP ${srcipts_dir} $leave_test:${sitebasedir}/current > /dev/null 2>&1
     fi
 }
