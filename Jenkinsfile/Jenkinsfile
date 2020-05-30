@@ -148,7 +148,7 @@ pipeline {
                     }       
                 }
             }
-    			sh 'sh -x ${srcipts_dir}/${scripts_name2} $status'
+    			sh 'sh ${srcipts_dir}/${scripts_name2} $status'
     		} 
     	}
     }
