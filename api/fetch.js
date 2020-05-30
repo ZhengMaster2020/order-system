@@ -46,20 +46,7 @@ export default function fetch(options) {
     // 请求处理
     instance(options)
       .then((res) => {
-        const data = res.data
-
-        // responseType = blob 时错误信息转回json
-        if (data.__proto__ === Blob.prototype) {
-          var reader = new FileReader();
-          reader.readAsText(data, 'utf-8');
-          reader.onload = function () {
-            res.data = JSON.parse(reader.result)
-            toSuccess(res, resolve, reject)
-          }
-        } else {
-          toSuccess(res, resolve, reject)
-        }
-
+        toSuccess(res, resolve, reject)
         return false
       })
       .catch((error) => {
@@ -121,12 +108,19 @@ export default function fetch(options) {
 function toSuccess (res, resolve, reject) {
   let data = res.data
   if (res.status === 202) {
-    Notice.error({
-      title: '错误代码：' + data.code,
-      desc: data.subMsg || data.msg,
-      duration: 3
-    })
-    reject(data);
+    if (data.__proto__ === Blob.prototype) {
+      var reader = new FileReader();
+      reader.readAsText(data, 'utf-8');
+      reader.onload = function () {
+        data = JSON.parse(reader.result)
+        Notice.error({
+          title: '错误代码：' + data.code,
+          desc: data.subMsg || data.msg,
+          duration: 3
+        })
+        reject(data);
+      }
+    }
     return;
   }
   if (data.code >= 1) {
