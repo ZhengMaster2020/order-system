@@ -1,7 +1,7 @@
 //时间函数
 def createVersion() {
     // 定义一个版本号作为当次构建的版本，输出结果
-    return new Date().format('yyyyMMddHHmmss')
+    return new Date().format('yyyy-MM-dd-HH-mm-ss')
 }
 
 pipeline {
