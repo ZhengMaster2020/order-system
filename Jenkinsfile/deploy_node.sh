@@ -72,14 +72,14 @@ rollback_env(){
         #判断如果该tag没有找到则认为回退的版本不存在
         if [ $tag_num == 1 ];then
             echo "开始回滚操作"
-            $rsync -avzP ${srcipts_dir} $leave_product:${rollback_tag} > /dev/null 2>&1
+            $rsync -avzP ${srcipts_dir} $leave:${rollback_tag} > /dev/null 2>&1
         else
             echo "回滚版本不存在，请确认是否有该版本"
             exit 123
         fi
     else
         echo "同步脚本"
-        $rsync -avzP ${srcipts_dir} $leave_test:${sitebasedir}/current > /dev/null 2>&1
+        $rsync -avzP ${srcipts_dir} $leave:${sitebasedir}/current > /dev/null 2>&1
     fi
 }
 
