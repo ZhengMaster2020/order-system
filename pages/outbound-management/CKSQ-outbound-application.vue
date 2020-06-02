@@ -76,23 +76,23 @@
         <TabPane label="出库记录" name="outboundRecord">
           <!--          Table-->
           <Table border
-                 :columns="outboundList.columns"
-                 :data="outboundList.data"
+                 :columns="outboundRecord.columns"
+                 :data="outboundRecord.data"
                  :loading="tableLoading"
                  :style="currentTab !== 'outboundRecord' ? 'height: 0;': ''"
                  @on-selection-change="selectionChange">
           </Table>
           <!--          Page-->
           <div class="foot-page">
-            共{{outboundList.pageProps.total}}条
+            共{{outboundRecord.pageProps.total}}条
             <Page transfer
-                  :total="outboundList.pageProps.total"
-                  :page-size="outboundList.pageProps.perPage"
+                  :total="outboundRecord.pageProps.total"
+                  :page-size="outboundRecord.pageProps.perPage"
                   size="small"
                   show-elevator
                   show-sizer
-                  @on-change="(page) => { changePage(page, 'outboundList') }"
-                  @on-page-size-change="(size) => { changePageSize(size, 'outboundList') }"/>
+                  @on-change="(page) => { changePage(page, 'outboundRecord') }"
+                  @on-page-size-change="(size) => { changePageSize(size, 'outboundRecord') }"/>
           </div>
         </TabPane>
       </Tabs>
@@ -289,7 +289,7 @@
                    :src="detailData.qrCodeUrl"
                    alt="qrcode">
             </div>
-            <div style="font-size: 12px; text-align: center">条形码编号</div>
+            <div style="font-size: 12px; text-align: center">{{detailData.gbOrderSn}}</div>
           </Col>
         </Row>
 
@@ -409,16 +409,20 @@
             <Row type="flex">
               <div style=" margin-right: 40px">
                 <div style="padding: 10px 0;">出库回传单附件</div>
+<!--                <a :href="file.url" :download="file.name" class="download-link"-->
+<!--                   v-for="(file, index) in detailData.serialCodeItems"-->
+<!--                   :key="index">{{file.name ? file.name : '-'}}</a>-->
+                <a :href="detailData.serialCodeItems.url":download="detailData.serialCodeItems.name"  class="font-size-12">{{detailData.serialCodeItems.name ? detailData.serialCodeItems.name : '-'}}</a>
 
-                <a href="javascript:void(0)" class="font-size-12">点击查看出库点出库记录>></a>
 
               </div>
               <div style=" margin-right: 40px">
                 <div style="padding: 10px 0;">序列号表格</div>
-                <!--                <a :href="file.url" :download="file.name" class="download-link"-->
-                <!--                   v-for="(file, index) in reviewModal.data.fileItems"-->
-                <!--                   :key="index">{{file.name}}</a>-->
-                <a href="javascript:void(0)" class="font-size-12">点击查看出库点出库记录>></a>
+<!--                                <a :href="file.url" :download="file.name" class="download-link"-->
+<!--                                   v-for="(file, index) in detailData.fileItems"-->
+<!--                                   :key="index">{{file.name ? file.name : '-'}}</a>-->
+<!--                <a href="javascript:void(0)" class="font-size-12">点击查看出库点出库记录>></a>-->
+                <a :href="detailData.fileItems.url":download="detailData.fileItems.name"  class="font-size-12">{{detailData.fileItems.name ? detailData.fileItems.name : '-'}}</a>
               </div>
             </Row>
           </Col>
@@ -451,7 +455,7 @@
       <Spin size="large" fix v-if="spinShow"></Spin>
       <div class="modal-footer" slot="footer">
         <Button type="default" @click="confirmModal.modal = false">取消</Button>
-        <Button type="primary" @click="submit('confirmModal', 'outboundLsitReview')">确认</Button>
+        <Button type="primary" @click="submit('confirmModal', 'confirmForm')">确认</Button>
       </div>
     </Modal>
 
@@ -543,13 +547,6 @@
   export default {
     data() {
       return {
-        freeze: Object.freeze({
-          api: 'add',
-          params: {
-            name: 'jsom',
-            age: 10,
-          },
-        }),
         currentTab: 'outboundList',
         tableLoading: false,
         spinShow: false,
@@ -601,28 +598,28 @@
           pageProps: {
             page: 1,
             total: 0,
-            perPage: 10
+            perPage: 2
           },
         },
         outboundRecord: {
           columns: [
             {type: 'selection', width: 60, align: 'center'},
             {title: '序号', type: 'index', width: 70, align: 'center'},
-            {title: '关联出库单号', key: 'name', align: 'center'},
-            {title: '品牌', key: 'name', minWidth: 80, align: 'center'},
-            {title: '灌包订单号', key: 'name', align: 'center'},
-            {title: '出库记录状态', key: 'name', align: 'center'},
-            {title: '实际点货数量', key: 'name', align: 'center'},
-            {title: '出库序列号范围', key: 'name', align: 'center'},
-            {title: '出库时间', key: 'name', align: 'center'},
-            {title: '出库员', key: 'name', align: 'center'},
-            {title: '出库类型', key: 'name', align: 'center'},
-            {title: '出库仓位号', key: 'name', align: 'center'},
-            {title: '供应商', key: 'name', align: 'center'},
-            {title: '慕可代码', key: 'name', align: 'center'},
-            {title: '产品名称', key: 'name', align: 'center'},
-            {title: '下单数量', key: 'name', align: 'center'},
-            {title: '预计本次出库量', key: 'name', align: 'center'}
+            {title: '关联出库单号', key: 'outbound_order_sn', minWidth: 195, align: 'center'},
+            {title: '品牌', key: 'brand', minWidth: 80, align: 'center'},
+            {title: '灌包订单号', key: 'gb_order_sn', minWidth: 195, align: 'center'},
+            {title: '出库记录状态', key: 'status', minWidth: 100, align: 'center'},
+            {title: '实际点货数量', key: 'actual_quantity', minWidth: 100, align: 'center'},
+            {title: '出库序列号范围', key: 'range', minWidth: 100, align: 'center'},
+            {title: '出库时间', key: 'created_at', width: 110, align: 'center'},
+            {title: '出库员', key: 'created_by', width: 110, align: 'center'},
+            {title: '出库类型', key: 'outbound_type', minWidth: 100, align: 'center'},
+            {title: '出库仓位号', key: 'warehouse_sn', minWidth: 100, align: 'center'},
+            {title: '供应商', key: 'supplier', minWidth: 170, align: 'center'},
+            {title: '慕可代码', key: 'mk_code', minWidth: 100, align: 'center'},
+            {title: '产品名称', key: 'product_name', minWidth: 160, align: 'center'},
+            {title: '下单数量', key: 'order_number', minWidth: 100, align: 'center'},
+            {title: '预计本次出库量', key: 'expected_outbound_number', minWidth: 100, align: 'center'}
             // {title: '操作', key: 'action', align: 'center', slot: 'action', width: 130},
           ],
           data: [],
@@ -654,6 +651,8 @@
           qrCodeUrl: '',
           flowingWater: '',
           urgency: '',
+          serialCodeItems: {},
+          fileItems: {},
         },
         reviewModal: {
           show: false,
@@ -719,7 +718,7 @@
           }
         }
         this[cur].pageProps.page = 1
-        this.init()
+        this.init('search')
       }
     },
     methods: {
@@ -773,7 +772,8 @@
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
         let selection = this.selection[this[this.currentTab].pageProps.page][0]
-        if(selection.status !== '待出库' || selection.status !== '部分出库') return this.$Message.error('待出库或者出库中的才可手动出库')
+        const check = selection.status === '待出库' || selection.status === '部分出库'
+        if(!check) return this.$Message.error('待出库或者出库中的才可手动出库')
 
         this.$router.push({
           path: '/outbound-management/outbound-manual',
@@ -785,7 +785,7 @@
 
       search() {
         this[this.currentTab].pageProps.page = 1
-        this.init()
+        this.init('search')
       },
       // table 选项操作
       selectionChange(selection) {
@@ -796,12 +796,12 @@
       },
       // 改变当前分页
       changePage(page, key) {
-        this[key].page = page;
+        this[key].pageProps.page = page;
         this.init();
       },
       // 改变分页size
       changePageSize(pageSize, key) {
-        this[key].perPage = pageSize;
+        this[key].pageProps.perPage = pageSize;
         this.init();
       },
 
@@ -816,6 +816,8 @@
         if(msg) return this.$Message.warning(msg)
         if(title === '出库单审核') {
           if(selection.status !== '待审核') return this.$Message.error('已审核')
+        }else {
+          if(selection.status !== '出库中') return this.$Message.error('非出库中,不允许执行出库完成')
         }
 
         this.getOutboundDetail()
@@ -825,10 +827,22 @@
       },
 
       outboundConfirm() {
-        let msg = this.singelOperate()
-        if(msg) return this.$Message.warning(msg)
+        let selection = this.selection
+        let outboundOrderSn = []
+        let statuss = []
+        this.confirmModal.form.ids = []
+        for (let key in selection) {
+          selection[key].forEach(item => {
+            this.confirmModal.form.ids.push(item.id)
+            outboundOrderSn.push(item.outbound_order_sn)
+            statuss.push(item.status)
+          })
+        }
+        let isSameId = outboundOrderSn.some(id => id !== outboundOrderSn[0])
+        if(isSameId) return this.$Message.warning('请选择同一出库单')
+        if(!statuss.includes('wait_confirmed')) return this.$Message.warning('已出库确认')
 
-        this.getOutboundDetail()
+        this.getOutboundDetail('outboundConfirm')
         this.confirmModal.show = true
       },
 
@@ -855,7 +869,7 @@
           if(res.code !== 0) return
           this.$Message.success(res.msg)
           this.repealModal.show = false
-          this.init()
+          this.init('search')
         })
       },
 
@@ -866,7 +880,16 @@
 
       print() {
         this.$print('#printForm')
+        let currentTab = this.currentTab
+        let pageProps = this[currentTab].pageProps
+        this.$Message.success('打印中')
         // TODO: 打印之后调接口改变状态？
+        this.$API.printOutboundList(this.selection[pageProps.page][0].id).then(res => {
+          if (res.code !== 0) return
+          this.$Message.success(res.msg)
+          this.printModal.show = false
+          this.init('search')
+        })
       },
       submit(modal, form, apiKey = 'outboundLsitReview') {
         let params = {}
@@ -876,7 +899,11 @@
             opinion: this[modal].form.opinion,
           }
           apiKey = 'outboundLsitFinished'
+          this.getOutboundDetail()
         } else {
+          if(modal === 'confirmModal'){
+            apiKey = 'confirmOutbount'
+          }
           params = this[modal].form
         }
 
@@ -888,10 +915,11 @@
             this[modal].show = false
             this.$refs[form].resetFields()
             this[modal + 'ResetFields']()
-            this.init()
+            this.init('search')
           })
         })
       },
+
       reviewModalResetFields() {
         this.reviewModal.form = {
           outboundApplyId: '',
@@ -900,7 +928,15 @@
         }
       },
 
-      init() {
+      confirmModalResetFields() {
+        this.confirmModal.form = {
+          ids: [],
+          isPass: 'yes',
+          opinion: ''
+        }
+      },
+
+      init(type) {
         let currentTab = this.currentTab
         let params = {}
 
@@ -909,6 +945,14 @@
 
         for (let key in form) {
           !!form[key] && (params[key] = form[key])
+        }
+
+        if (type === 'search') {
+          // this.selection[this[currentTab].pageProps.page] = []
+          this.selection = {
+            1: [],
+          }
+          this[currentTab].pageProps.page = 1
         }
         params.page = this[currentTab].pageProps.page
         params.perPage = this[currentTab].pageProps.perPage
@@ -919,9 +963,19 @@
           // console.log(res)
           if (res.code !== 0) return
           let {count, page, list} = res.data
+
+          if (this.selection && this.selection[page] && this.selection[page].length) {
+            list.forEach(items => {
+              let isHas = this.selection[page].find(selectItem => selectItem.id === items.id)
+              if (isHas) {
+                items._checked = true
+              }
+            })
+          }
           this[currentTab].pageProps.page = page
           this[currentTab].pageProps.total = count
           this[currentTab].data = list
+          // console.log(currentTab, this[currentTab].data)
         }).finally(() => {
           this.tableLoading = false
 
@@ -929,11 +983,16 @@
 
       },
 
-      getOutboundDetail() {
+      getOutboundDetail(type) {
         let currentTab = this.currentTab
         let pageProps = this[currentTab].pageProps
-
-        this.$API.getOutboundLsitDetail(this.selection[pageProps.page][0].id).then(res => {
+        let id = ''
+        if(type === 'outboundConfirm') {
+          id = this.selection[pageProps.page][0].outbound_apply_id
+        }else {
+          id = this.selection[pageProps.page][0].id
+        }
+        this.$API.getOutboundLsitDetail(id).then(res => {
           if (res.code !== 0) return
           this.spinShow = false
           for (let key in res.data) {

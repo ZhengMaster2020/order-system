@@ -121,6 +121,31 @@ const repealOutboundRecord = (data) => {
   })
 }
 
+// 出库申请单 - 修改流水号(打印)
+const printOutboundList = (id) => {
+  return fetch({
+    url: `traceability/outbound-apply/update-flowing-water/${id}`,
+    method: 'GET'
+  })
+}
+
+// 出库申请单 - 序列号确认
+const checkSerialcode = (code) => {
+  return fetch({
+    url: `traceability/outbound-apply/check-serialcode/${code}`,
+    method: 'GET'
+  })
+}
+
+// 出库记录 - 确认出库
+const confirmOutbount = (data) => {
+  return fetch({
+    url: `traceability/outbound-log/audit`,
+    method: 'POST',
+    data
+  })
+}
+
 
 
 export default {
@@ -136,5 +161,8 @@ export default {
   getOutboundApplySnNum,
   exportOutboundtemplate,
   importSerialCodeData,
-  repealOutboundRecord
+  repealOutboundRecord,
+  printOutboundList,
+  checkSerialcode,
+  confirmOutbount
 }

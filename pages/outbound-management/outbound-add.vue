@@ -138,7 +138,7 @@
           urgency: '', // 关联采购订单号
           isReissue: 0,
           reissueType: 'other',
-          lossSn: '',
+          lossSn: '-',
           lossNumber: 1, // 关联采购订单号
           expectedOutboundNumber: null,
           outboundReason: '',
@@ -185,6 +185,8 @@
         console.log(cur)
         if(cur !== 1) {
           this.form.reissueType = 'other'
+          this.form.lossSn = '-'
+        }else {
           this.form.lossSn = ''
         }
         console.log(this.form.reissueType)
@@ -251,12 +253,15 @@
           if(params.isReissue === 0){
             params.reissueType = ''
           }
+          if(!params.lossSn){
+            delete params.lossNumber
+          }
           if(this.id) {
             params.id = this.id
             apiKey = 'editOutboundLsit'
           }
 
-          console.log(params)
+          // console.log(params)
           this.$API[apiKey](params).then(res => {
             if (res.code !== 0) return
             this.$Message.success(res.msg)
@@ -279,7 +284,6 @@
 
       getOutboundDetail(id) {
         this.$API.getOutboundLsitDetail(id).then(res => {
-          console.log(res)
           if (res.code !== 0) return
           this.spinShow = false
           for (let key in res.data) {

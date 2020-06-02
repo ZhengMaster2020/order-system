@@ -174,7 +174,6 @@
                 :format="['xls','xlsx']"
                 :action="fileUploadURL"
                 :headers="fileUploadHeaders"
-                :default-file-list="form.serialCodeData"
                 :on-format-error="(file) => onFormatError(file, '导入序列号')"
                 :before-upload="(file) => beforeUpload(file, '导入序列号')"
                 :on-success="(response) => onsuccess(response, '导入序列号')"
@@ -195,45 +194,47 @@
         <Row v-for="(serial, index) in this.form.serialCodeData" :key="index">
           <Col span="2">
             <FormItem :label="index === 0? '序号' : ''" style="width: 100%">
-              <Input v-model="serial.number" :readonly="serial.readonly"/>
+              <Input v-model="serial.number" readonly/>
             </FormItem>
           </Col>
           <Col span="2">
             <FormItem :label="index === 0? '编号' : ''"
                       style="width: 100%"
-                      :prop="'serialCodeData.' + index + '.serial_code_sn'"
-                      :rules="rules.serial_code_sn">
-              <Input v-model="serial.serial_code_sn" :readonly="serial.readonly"/>
+                      :prop="'serialCodeData.' + index + '.serialCodeSn'"
+                      :rules="rules.serialCodeSn">
+              <Input v-model="serial.serialCodeSn" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem :label="index === 0? '序列号起止' : ''"
                       style="width: 100%;"
-                      :prop="'serialCodeData.' + index + '.start_number'"
-                      :rules="rules.start_number">
-              <Input v-model="serial.start_number" :readonly="serial.readonly"/>
+                      :prop="'serialCodeData.' + index + '.startNumber'"
+                      :rules="rules.startNumber">
+<!--              <Input v-model="serial.startNumber" :readonly="serial.readonly"/>-->
+              <InputNumber style="width: 100%;" :min="0" :max="99999999" v-model="serial.startNumber" @on-change="numberChange(index)" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
-          <Col span="1" :style="index === 0 ? crossStyle : {}">——</Col>
+          <Col span="1" :style="index === 0 ? crossStyle : {'text-align': 'center'}">——</Col>
           <Col span="4">
-            <FormItem :style="index === 0 ? endNumStyle : {}">
-              <Input v-model="serial.end_number" :readonly="serial.readonly"/>
+            <FormItem :style="index === 0 ? endNumStyle : {'width' : '100%'}">
+<!--              <Input v-model="serial.endNumber" :readonly="serial.readonly"/>-->
+              <InputNumber style="width: 100%;" :min="0" :max="99999999" v-model="serial.endNumber" @on-change="numberChange(index)" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem :label="index === 0? '理论出库量' : ''" style="width: 100%">
-              <Input :value="(serial.end_number === null || !serial.end_number) ? '' : serial.end_number - serial.start_number" readonly/>
+              <Input :value="(serial.endNumber === null || !serial.endNumber) ? '' : serial.endNumber - serial.startNumber" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem :label="index === 0? '实际点货量' : ''" style="width: 100%">
-              <Input v-model="serial.actual_number" :readonly="serial.readonly"/>
+              <InputNumber style="width: 100%;" :min="0" :max="serial.endNumber - serial.startNumber" v-model="serial.actualQuantity" @on-change="numberChange(index)" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
           <Col span="3">
             <FormItem :label="index === 0? ' ' : ''" :style="index === 0 ? endNumStyle : {}">
               <Button shape="circle" icon="md-add" @click="addSerialData" v-if="index === 0"></Button>
-              <Button shape="circle" icon="md-remove" v-else></Button>
+              <Button shape="circle" icon="md-remove" @click="removeSerialData(index)" v-if="index !== 0 && !serial.readonly"></Button>
             </FormItem>
           </Col>
         </Row>
@@ -260,7 +261,7 @@
         spinShow: false,
         requireDeliveryTime: '',
         fileUploadURL: `${SERVER_BASE_URL}traceability/traceability/upload`,
-        serialCodeDataURL: `${SERVER_BASE_URL}traceability/outbound-apply/data-import`,
+        // serialCodeDataURL: `${SERVER_BASE_URL}traceability/outbound-apply/data-import`,
         fileUploadHeaders: {
           Authorization: Cookies.get('authorization')
         },
@@ -268,17 +269,17 @@
         serialFileName: '',
         fileItem: null,
         form: {
-          outboundApplyId: 1,
+          outboundApplyId: null,
           warehouseSn: '',
           fileItems: [],
 
           serialCodeData: [
             {
-              number: null,
-              serial_code_sn: '',
-              start_number: null,
-              end_number: null,
-              actual_number: null,
+              number: 1,
+              serialCodeSn: '',
+              startNumber: null,
+              endNumber: null,
+              actualQuantity: null,
               readonly: false,
             }
           ],
@@ -287,8 +288,8 @@
         rules: {
           gbOrderSn: [{required: true, message: '必填项', trigger: 'blur'}],
           reissueType: [{required: true, message: '必填项', trigger: 'blur'}],
-          serial_code_sn: [{required: true, message: '必填项', trigger: 'blur'}],
-          start_number: [{required: true, message: '必填项', trigger: 'blur'}],
+          serialCodeSn: [{required: true, message: '必填项', trigger: 'blur', pattern: /^[A-Z]/}],
+          startNumber: [{required: true, type: 'number', message: '必填且须大写字母', trigger: 'change'}],
           lossSn: [{required: true, message: '必填项', trigger: 'blur'}],
           lossNumber: [{required: true, message: '必填项', trigger: 'blur'}],
           nextBy: [{required: true, message: '必填项', trigger: 'blur'}],
@@ -323,7 +324,8 @@
         endNumStyle: {
           'width': '100%',
           'padding-top': '34px'
-        }
+        },
+        numberChange: this.$debonce(this.endNumChange, 1000, 'footer')
       }
     },
     methods: {
@@ -358,6 +360,7 @@
       onFormatError(response, type) {
         if(type === '回传单') {
           this.$Message.error('请按图片格式上传:".jsp, .png, .jpeg"')
+          this.$Message.success('正在上传')
         }else {
           this.$Message.error('请按excel文件格式上传')
         }
@@ -379,16 +382,24 @@
           this.$API.importSerialCodeData(formdata).then(res => {
             if(res.code !== 0) return
             let serialCodeData = this.form.serialCodeData
-            let importData = res.data.importData
-            importData.map(items => {
-              items.readonly = true
-              return items
+            let importData = res.data.importData.map(items => {
+              // items.readonly = true
+              return {
+                readonly: true,
+                number: +items.number,
+                serialCodeSn: items.serial_code_sn,
+                startNumber: +items.start_number,
+                endNumber: +items.end_number,
+                actualQuantity: +items.actual_number
+              }
             })
             console.log(importData, 'importData')
 
-            let filterData = serialCodeData.filter(items => !items.readonly)
+            let filterData = serialCodeData.filter(items => !items.readonly && (items.startNumber || items.endNumber || items.actualQuantity || items.serialCodeSn))
             this.form.serialCodeData = [...importData, ...filterData]
-
+            this.form.serialCodeData.map((items, index) => {
+              items.number = ++index
+            })
             this.serialFileName = res.data.fileTitle
             this.$Message.success('导入完成')
           })
@@ -409,33 +420,55 @@
 
       addSerialData() {
         this.form.serialCodeData.push({
-          number: null,
-          serial_code_sn: '',
-          start_number: null,
-          end_number: null,
-          actual_number: null,
+          number: this.form.serialCodeData.length + 1,
+          serialCodeSn: '',
+          startNumber: null,
+          endNumber: null,
+          actualQuantity: null,
           readonly: false,
         })
       },
 
+      removeSerialData(index) {
+        this.form.serialCodeData.splice(index, 1)
+      },
+
+      endNumChange(index) {
+        let {startNumber, endNumber} = this.form.serialCodeData[index]
+        if(endNumber !== null) {
+          if(startNumber > endNumber) return this.$Message.error('序列号起始值不能大于结束值')
+        }
+      },
 
       submit() {
-        // this.submintLodaing = true
-        // console.log(this.$refs.form.validate)
-        console.log(this.form)
-        let params = {}
-
-        if(this.form.fileItems.length === 0) return this.$Message.error('请上传出库回传单')
-        // if(this.form.fileItems === 0) return this.$Message.error('请上传出库回传单')
-        //
-        //
 
         this.$refs.form.validate(val => {
           if (!val) return
-          this.$API.outboundLsitManual(this.form).then(res => {
+          // this.submintLodaing = true
+
+          let params = JSON.parse(JSON.stringify(this.form))
+          let lgTheoretical = params.serialCodeData.some(items => items.startNumber > items.endNumber)
+
+          if(lgTheoretical) return this.$Message.error('序列号起始值不能大于结束值')
+
+          params.serialCodeData.forEach(items => {
+            items.startNumber = this.formatSerialCode(items.startNumber)
+            items.endNumber = this.formatSerialCode(items.endNumber)
+
+            delete items.readonly
+          })
+          !params.warehouseSn && delete params.warehouseSn
+          !params.serialCodeItems.length > 0 && delete params.serialCodeItems
+
+
+          if(this.form.fileItems.length === 0) return this.$Message.error('请上传出库回传单')
+
+          this.$API.outboundLsitManual(params).then(res => {
             console.log(res)
             if(res.code !== 0) return
-
+            this.$Message.success(res.msg)
+            this.$router.push('/outbound-management/CKSQ-outbound-application')
+            this.submintLodaing = false
           })
 
         })
@@ -455,8 +488,17 @@
       },
 
       getOutboundApplySnNum(id) {
-        console.log(id)
         this.$API.getOutboundApplySnNum(id).then(res => {
+          // console.log(res)
+          if (res.code !== 0) return
+          // TODO: 出库单剩余可出库量
+          this.detailData.remainNumTotal = res.data[0]
+          // this.detailData.remainNumTotal = res.data[0] + res.data[1]
+        })
+      },
+
+      checkSerialcode(code) {
+        this.$API.checkSerialcode(code).then(res => {
           // console.log(res)
           if (res.code !== 0) return
           // TODO: 出库单剩余可出库量
@@ -497,7 +539,18 @@
           default:
             return '-'
         }
-      }
+      },
+      // 序列码格式 编号大写 + 8位数字
+      formatSerialCode(num) {
+        num = num + ''
+        let zeroLength = 8 - num.length
+        let fixZero = ''
+        for(let i = 0; i < zeroLength; i++){
+          fixZero += '0'
+        }
+        return fixZero + num
+      },
+
     },
     computed: {
       // 实际点货量汇总
@@ -505,10 +558,10 @@
         // 汇总每个序列号实际点货量
         let serialCodeData = this.form.serialCodeData
         let total = serialCodeData.reduce((pre, cur) => {
-          let actual_number = cur.actual_number || 0
-          return Number(pre) + Number(actual_number)
+          let actualQuantity = cur.actualQuantity || 0
+          return Number(pre) + Number(actualQuantity)
         }, 0)
-        // console.log(total)
+        console.log(total)
         return total
       },
       // 出库单剩余可出库量
@@ -517,8 +570,8 @@
     mounted() {
       let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
       this.id = this.$route.query.id
+      this.form.outboundApplyId = this.id
       this.userInfo = userInfo
-
       if(this.id) {
         this.getOutboundDetail(this.id)
         this.getOutboundApplySnNum(this.id)
@@ -585,5 +638,6 @@
     visibility: visible;
     cursor: pointer;
   }
+
 
 </style>
