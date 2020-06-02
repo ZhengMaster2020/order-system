@@ -58,7 +58,7 @@ pipeline {
     }
     //参数化构建
     parameters {
-        choice(name: 'status',choices:'beta\ntest\nproduct\nrollback_beta\nrollback_test\nrollback_product',description: 'beta 发布到开发环境\ntest 发布到测试环境\nproduct 线上生产环境\nrollback_beta 开发环境代码回滚\nrollback_test 测试环境代码回滚\nrollback_product 线上生产环境回滚 ')
+        choice(name: 'status',choices:'test\nbeta\nproduct\nrollback_test\nrollback_beta\nrollback_product',description: 'test-150项目发布到测试环境\nbeta-200项目发布到开发的测试环境\nproduct 线上生产环境\nrollback_test-150项目测试环境代码回滚\nrollback_beta-200项目开发环境代码回滚\nrollback_product 线上生产环境回滚 ')
         gitParameter name: 'BRANCH_TAG', 
             type: 'PT_BRANCH_TAG',  //选择类型
             branchFilter: 'origin/(.*)',  //获取远程的所有分支
