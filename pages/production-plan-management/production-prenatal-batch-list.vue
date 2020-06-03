@@ -93,7 +93,7 @@
     <Modal
     v-model="exportModal.modal"
     title="导表处理"
-    width="1000">
+    width="1005">
       <Form inline ref="exportForm" :model="exportModal.form" :rules="rules">
         <div class="title">
           <span class="line"></span>
@@ -717,7 +717,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
-
+    font-weight: 700;
     .title-text {
       flex-shrink: 0;
       padding: 0 10px;

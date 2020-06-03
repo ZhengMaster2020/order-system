@@ -95,7 +95,7 @@
     <Modal
     v-model="reviewModal.modal"
     title="计划审核"
-    width="1000">
+    width="1005">
       <Form inline ref="reviewForm" :model="reviewModal.form" :rules="rules">
         <div class="title">
           <span class="line"></span>
@@ -127,8 +127,9 @@
         <FormItem label="计划名称">
           <Input class="width-180" v-model="reviewModal.data.planName" readonly/>
         </FormItem>
-        <FormItem label="计划文件">
-          <div style="padding-top: 33px">
+        <FormItem>
+          <div>
+            <div>计划文件</div>
             <a :href="file.url" :download="file.name" class="download-link"
                v-for="(file, index) in reviewModal.data.fileItems"
                :key="index">{{file.name}}</a>
@@ -166,7 +167,7 @@
     <Modal
     v-model="finishedModal.modal"
     title="执行完毕"
-    width="1000">
+    width="1005">
       <Form inline ref="finishedForm" :model="finishedModal.form" :rules="rules">
         <div class="title">
           <span class="line"></span>
@@ -198,8 +199,9 @@
         <FormItem label="计划名称">
           <Input class="width-180" v-model="finishedModal.data.planName" readonly/>
         </FormItem>
-        <FormItem label="计划文件">
-          <div style="padding-top: 33px">
+        <FormItem>
+          <div>
+            <div>计划文件</div>
             <a :href="file.url" :download="file.name" class="download-link"
                v-for="(file, index) in finishedModal.data.fileItems"
                :key="index">{{file.name}}</a>
@@ -233,7 +235,7 @@
     <Modal
     v-model="statusDetailModal.modal"
     title="状态详情"
-    width="1000">
+    width="1005">
       <Form inline>
         <div class="title">
           <span class="line"></span>
@@ -855,7 +857,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
-
+    font-weight: 700;
     .title-text {
       flex-shrink: 0;
       padding: 0 10px;
