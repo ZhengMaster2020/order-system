@@ -295,8 +295,8 @@
         rules: {
           gbOrderSn: [{required: true, message: '必填项', trigger: 'blur'}],
           reissueType: [{required: true, message: '必填项', trigger: 'blur'}],
-          serialCodeSn: [{required: true, message: '必填项', trigger: 'blur', pattern: /^[A-Z]/}],
-          startNumber: [{required: true, type: 'number', message: '必填且须大写字母', trigger: 'change'}],
+          serialCodeSn: [{required: true, message: '必填项须大写字母', trigger: 'blur', pattern: /^[A-Z]/}],
+          startNumber: [{required: true, type: 'number', message: '必填且', trigger: 'change'}],
           lossSn: [{required: true, message: '必填项', trigger: 'blur'}],
           lossNumber: [{required: true, message: '必填项', trigger: 'blur'}],
           nextBy: [{required: true, message: '必填项', trigger: 'blur'}],
@@ -487,6 +487,7 @@
           let lgTheoretical = params.serialCodeData.some(items => items.startNumber > items.endNumber)
 
           if(lgTheoretical) return this.$Message.error('序列号起始值不能大于结束值')
+          if(this.form.fileItems.length === 0) return this.$Message.error('请上传出库回传单')
 
           params.serialCodeData.forEach(items => {
             items.startNumber = this.formatSerialCode(items.startNumber)
@@ -497,9 +498,7 @@
           !params.warehouseSn && delete params.warehouseSn
           !params.serialCodeItems.length > 0 && delete params.serialCodeItems
 
-
-          if(this.form.fileItems.length === 0) return this.$Message.error('请上传出库回传单')
-
+          // return console.log(params)
           this.$API.outboundLsitManual(params).then(res => {
             console.log(res)
             if(res.code !== 0) return
@@ -530,7 +529,7 @@
         // this.spinShow = true
         let ids = []
         ids.push(id)
-        this.$API.getOutbountSerialData(ids).then(res => {
+        this.$API.getOutbountSerialData({ids}).then(res => {
           console.log(res)
           if (res.code !== 0) return
         })

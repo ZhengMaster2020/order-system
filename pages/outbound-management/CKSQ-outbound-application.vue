@@ -4,45 +4,82 @@
       <!--      Form-->
       <Form ref="listSearchForm" :model="listSearchForm" inline v-show="currentTab === 'outboundList'">
         <Row>
-          <Input v-model="listSearchForm.brand" placeholder="品牌" class="width-120 margin-bottom-10"/>
-          <Input v-model="listSearchForm.gbOrderSn" placeholder="灌包订单号" class="width-120 margin-bottom-10"/>
-          <Input v-model="listSearchForm.mkCode" placeholder="慕可代码" class="width-120 margin-bottom-10"/>
-          <Input v-model="listSearchForm.productName" placeholder="产品名称" class="width-120 margin-bottom-10"/>
-          <Input v-model="listSearchForm.createdBy" placeholder="申请人" class="width-120 margin-bottom-10"/>
-          <Input v-model="listSearchForm.outboundOrderSn" placeholder="出库单号" class="width-120 margin-bottom-10"/>
-          <Button type="primary" class="margin-bottom-10" @click="search">搜索</Button>
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
+            <Input v-model="listSearchForm.brand" clearable placeholder="品牌"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
+            <Input v-model="listSearchForm.gbOrderSn" clearable placeholder="灌包订单号"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
+            <Input v-model="listSearchForm.mkCode" clearable placeholder="慕可代码"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
+            <Input v-model="listSearchForm.productName" clearable placeholder="产品名称"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
+            <Input v-model="listSearchForm.createdBy" clearable placeholder="申请人"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
+            <Input v-model="listSearchForm.outboundOrderSn" clearable placeholder="出库单号"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
+            <Button type="primary" @click="search">搜索</Button>
+          </Col>
+
         </Row>
-        <Row>
-          <Button type="primary" class="margin-bottom-10" @click="exportOutbountList">导出数据</Button>
-          <Button type="primary" class="margin-bottom-10" @click="$router.push('/outbound-management/outbound-add')">
-            添加出库单
-          </Button>
-          <Button type="primary" class="margin-bottom-10" @click="showReviewModal('出库单审核')">审核</Button>
-          <Button type="primary" class="margin-bottom-10" @click="printOutboundSn">打印出库</Button>
-          <Button type="primary" class="margin-bottom-10" @click="manualOutbound">手动出库</Button>
-          <Button type="primary" class="margin-bottom-10" @click="showReviewModal('完成出库')">完成出库</Button>
-          <Button type="primary" class="margin-bottom-10" @click="editApply">修改</Button>
+        <Row class="margin-top-10">
+          <Button type="primary" @click="exportOutbountList">导出数据</Button>
+          <Button type="primary" @click="$router.push('/outbound-management/outbound-add')">添加出库单</Button>
+          <Button type="primary" @click="showReviewModal('出库单审核')">审核</Button>
+          <Button type="primary" @click="printOutboundSn">打印出库</Button>
+          <Button type="primary" @click="manualOutbound">手动出库</Button>
+          <Button type="primary" @click="showReviewModal('完成出库')">完成出库</Button>
+          <Button type="primary" @click="editApply">修改</Button>
         </Row>
       </Form>
 
       <Form ref="recordSearchForm" :model="recordSearchForm" inline v-show="currentTab === 'outboundRecord'">
         <Row>
-          <Input v-model="recordSearchForm.brand" placeholder="品牌" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.gbOrderSn" placeholder="灌包订单号" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.mkCode" placeholder="慕可代码" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.productName" placeholder="产品名称" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.createdBy" placeholder="出库记录人" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.createdTime" placeholder="出库时间" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.outboundOrderSn" placeholder="出库单号" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.supplier" placeholder="供应商" class="width-120 margin-bottom-10"/>
-          <Input v-model="recordSearchForm.serialCode" placeholder="序列号" class="width-120 margin-bottom-10"/>
-          <Button type="primary" class="margin-bottom-10" @click="search">搜索</Button>
+          <Col :xs="24" :sm="12" :md="6" :lg="2">
+            <Input v-model="recordSearchForm.brand" clearable placeholder="品牌"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
+            <Input v-model="recordSearchForm.gbOrderSn" clearable placeholder="灌包订单号"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="2">
+            <Input v-model="recordSearchForm.mkCode" clearable placeholder="慕可代码"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="2">
+            <Input v-model="recordSearchForm.productName" clearable placeholder="产品名称"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="2">
+            <Input v-model="recordSearchForm.createdBy" clearable placeholder="出库记录人"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
+            <DatePicker  v-model="outboundDate"
+                         clearable
+                         type="date"
+                         placeholder="出库时间"
+                         @on-change="dateChange"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
+            <Input v-model="recordSearchForm.outboundOrderSn" clearable placeholder="出库单号"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="3">
+            <Input v-model="recordSearchForm.supplier" clearable placeholder="供应商"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="2">
+            <Input v-model="recordSearchForm.serialCode" clearable placeholder="序列号"/>
+          </Col>
+          <Col :xs="24" :sm="12" :md="6" :lg="2">
+            <Button type="primary" @click="search">搜索</Button>
+          </Col>
         </Row>
-        <Row>
-          <Button type="primary" class="margin-bottom-10" @click="exportOutbountRecord">导出数据</Button>
-          <Button type="primary" class="margin-bottom-10" @click="outboundConfirm">出库确认</Button>
-          <Button type="primary" class="margin-bottom-10" @click="repeal">作废</Button>
-          <Button type="primary" class="margin-bottom-10" @click="editOutboundConfirm">修改</Button>
+        <Row class="margin-top-10">
+          <Button type="primary" @click="exportOutbountRecord">导出数据</Button>
+          <Button type="primary" @click="outboundConfirm">出库确认</Button>
+          <Button type="primary" @click="repeal">作废</Button>
+          <Button type="primary" @click="editOutboundConfirm">修改</Button>
         </Row>
       </Form>
 
@@ -100,7 +137,7 @@
 
 
     <!-- 申请审核/ 完成出库  -->
-    <Modal class="reivew-modal" v-model="reviewModal.show" :title="reviewModal.title" width="1137">
+    <Modal class="reivew-modal" :mask-closable="false" v-model="reviewModal.show" :title="reviewModal.title" width="1137">
       <Form inline ref="reviewForm" :model="reviewModal.form" :rules="rules">
         <div class="title">
           <span class="line"></span>
@@ -189,13 +226,13 @@
       </Form>
       <Spin size="large" fix v-if="spinShow"></Spin>
       <div class="modal-footer" slot="footer">
-        <Button type="default" @click="reviewModal.modal = false">取消</Button>
+        <Button type="default" @click="reviewModal.show = false">取消</Button>
         <Button type="primary" @click="submit('reviewModal', 'reviewForm','outboundLsitReview')">确认</Button>
       </div>
     </Modal>
 
     <!-- 打印出库单  -->
-    <Modal v-model="printModal.show" title="打印出库单" width="944" footer-hide>
+    <Modal :mask-closable="false" v-model="printModal.show" title="打印出库单" width="944" footer-hide>
       <div id="printForm">
         <h3 style="text-align: center">防伪标出库申请单</h3>
         <div class="sub-title">一、申请出库明细</div>
@@ -328,7 +365,7 @@
     </Modal>
 
     <!-- 出库确认  -->
-    <Modal class="reivew-modal" v-model="confirmModal.show" title="出库确认" width="1152">
+    <Modal :mask-closable="false" class="reivew-modal" v-model="confirmModal.show" title="出库确认" width="1152">
       <Form inline ref="confirmForm" :model="confirmModal.form" :rules="rules">
         <div class="title">
           <span class="line"></span>
@@ -453,14 +490,14 @@
       </Form>
       <Spin size="large" fix v-if="spinShow"></Spin>
       <div class="modal-footer" slot="footer">
-        <Button type="default" @click="confirmModal.modal = false">取消</Button>
+        <Button type="default" @click="confirmModal.show = false">取消</Button>
         <Button type="primary" @click="submit('confirmModal', 'confirmForm')">确认</Button>
       </div>
     </Modal>
 
     <!-- 点货详情  -->
-    <Modal class="reivew-modal" v-model="countGoodsModal.show" width="1137" footer-hide>
-      <Form>
+    <Modal :mask-closable="false" v-model="countGoodsModal.show" width="930">
+      <Form ref="countGoodsForm" style="padding-top: 20px">
         <div slot="header">点货详情</div>
         <div class="title">
           <span class="line"></span>
@@ -468,37 +505,36 @@
           <span class="line"></span>
         </div>
 
-
-        <Row>
+        <Row v-for="(serial, index) in countGoodsModal.form.serialCodeData" :key="index">
           <Col span="2">
             <FormItem label="序号" style="width: 100%">
-              <Input/>
+              <Input v-model="serial.number" readonly/>
             </FormItem>
           </Col>
           <Col span="2">
             <FormItem label="编号" style="width: 100%">
-              <Input/>
+              <Input v-model="serial.number" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem label="序列号起止" style="width: 100%;">
-              <Input/>
+              <Input v-model="serial.number" readonly/>
             </FormItem>
           </Col>
           <Col span="1" style="padding-top: 34px; text-align: center">——</Col>
           <Col span="4">
             <FormItem style="width: 100%; padding-top: 34px">
-              <Input/>
+              <Input v-model="serial.number" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem label="理论出库量" style="width: 100%">
-              <Input/>
+              <Input v-model="serial.number" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem label="实际点货量" style="width: 100%">
-              <Input/>
+              <Input v-model="serial.number" readonly/>
             </FormItem>
           </Col>
           <Col span="3">
@@ -511,8 +547,11 @@
       </Form>
       <Row class="margin-top-10">
         <Col span="2" offset="15" style=" text-align: right; padding-top: 10px"> 总计</Col>
-        <Col span="4"><Input/></Col>
+        <Col span="4"><Input v-model="countGoodsModal.form.total" readonly/></Col>
       </Row>
+      <div class="modal-footer" slot="footer">
+        <Button type="default" @click="countGoodsModal.show = false">返回</Button>
+      </div>
       <Spin size="large" fix v-if="spinShow"></Spin>
     </Modal>
 
@@ -553,7 +592,7 @@
           1: []
         },
         userInfo: {},
-
+        outboundDate: '',
         listSearchForm: {
           gbOrderSn: '',
           mkCode: '',
@@ -587,7 +626,22 @@
             {title: '下单数量', key: 'order_number', minWidth: 100, align: 'center'},
             {title: '出库数量', key: 'expected_outbound_number', minWidth: 100, align: 'center'},
             {title: '出库状态', key: 'status', minWidth: 100, align: 'center'},
-            {title: '已实际出库数量', key: 'confirmed_number', minWidth: 100, align: 'center'},
+            {title: '已实际出库数量', key: 'confirmed_number', minWidth: 100, align: 'center',
+              render: (h, {row}) => {
+                return h('a', {
+                  attrs: {
+                    href: 'javascript:void(0)'
+                  },
+                  on: {
+                    click: () => {
+                      this.currentTab = 'outboundRecord'
+                      this.recordSearchForm.gbOrderSn = row.gb_order_sn
+                      this.recordSearchForm.outboundOrderSn = row.outbound_order_sn
+                    }
+                  }
+                }, row.confirmed_number)
+              }
+            },
             {title: '要求货期', key: 'require_delivery_time', width: 110, align: 'center'},
             {title: '产品类型', key: 'product_type', minWidth: 100, align: 'center'},
             {title: 'OEM供应商', key: 'supplier', minWidth: 170, align: 'center'},
@@ -608,13 +662,28 @@
             {title: '品牌', key: 'brand', minWidth: 80, align: 'center'},
             {title: '灌包订单号', key: 'gb_order_sn', minWidth: 195, align: 'center'},
             {title: '出库记录状态', key: 'status', minWidth: 100, align: 'center'},
-            {title: '实际点货数量', key: 'actual_quantity', minWidth: 100, align: 'center'},
-            {title: '出库序列号范围', key: 'range', minWidth: 100, align: 'center'},
+            {title: '实际点货数量', key: 'actual_quantity', minWidth: 100, align: 'center',
+              render: (h, {row}) => {
+                return h('a', {
+                  attrs: {
+                    href: 'javascript:void(0)'
+                  },
+                  on: {
+                    click: () => {
+                      // bbb
+                      this.getSerialDetail(row.outbound_apply_id)
+                      this.countGoodsModal.show = true
+                    }
+                  }
+                }, row.actual_quantity)
+              }
+            },
+            {title: '出库序列号范围', key: 'range', minWidth: 195, align: 'center'},
             {title: '出库时间', key: 'created_at', width: 110, align: 'center'},
             {title: '出库员', key: 'created_by', width: 110, align: 'center'},
             {title: '出库类型', key: 'outbound_type', minWidth: 100, align: 'center'},
-            {title: '出库仓位号', key: 'warehouse_sn', minWidth: 100, align: 'center'},
-            {title: '供应商', key: 'supplier', minWidth: 170, align: 'center'},
+            {title: '出库仓位号', key: 'warehouse_sn', minWidth: 110, align: 'center'},
+            {title: '供应商', key: 'supplier', minWidth: 210, align: 'center'},
             {title: '慕可代码', key: 'mk_code', minWidth: 100, align: 'center'},
             {title: '产品名称', key: 'product_name', minWidth: 160, align: 'center'},
             {title: '下单数量', key: 'order_number', minWidth: 100, align: 'center'},
@@ -672,7 +741,9 @@
         },
         countGoodsModal: {
           show: false,
-          form: {}
+          form: {
+            serialCodeData: []
+          }
         },
         repealModal: {
           show: false,
@@ -693,31 +764,58 @@
     },
     watch: {
       currentTab(cur) {
-        if (cur === 'outboundList') {
-          this.listSearchForm = {
-            gbOrderSn: '',
-            mkCode: '',
-            productName: '',
-            createdBy: '',
-            createTime: '',
-            outboundOrderSn: '',
-            brand: ''
-          }
-        } else {
-          this.recordSearchForm = {
-            gbOrderSn: '',
-            mkCode: '',
-            productName: '',
-            createdBy: '',
-            createdTime: '',
-            outboundOrderSn: '',
-            supplier: '',
-            serialCode: '',
-            brand: ''
-          }
-        }
+        // if (cur === 'outboundList') {
+        //   this.listSearchForm = {
+        //     gbOrderSn: '',
+        //     mkCode: '',
+        //     productName: '',
+        //     createdBy: '',
+        //     createTime: '',
+        //     outboundOrderSn: '',
+        //     brand: ''
+        //   }
+        // } else {
+        //   this.recordSearchForm = {
+        //     gbOrderSn: '',
+        //     mkCode: '',
+        //     productName: '',
+        //     createdBy: '',
+        //     createdTime: '',
+        //     outboundOrderSn: '',
+        //     supplier: '',
+        //     serialCode: '',
+        //     brand: ''
+        //   }
+        // }
         this[cur].pageProps.page = 1
         this.init('search')
+      },
+      // aaa
+      ['reivewModal.show'](cur) {
+        if(!cur) {
+          this.reviewModal.form = {
+            outboundApplyId: '',
+            isPass: 'yes',
+            opinion: ''
+          }
+          this.$refs.reviewForm.resetFields()
+        }
+      },
+      ['confirmModal.show'](cur) {
+        if(!cur) {
+          this.confirmModal.form = {
+            ids: [],
+            isPass: 'yes',
+            opinion: ''
+          }
+        }
+        this.$refs.confirmForm.resetFields()
+      },
+      ['countGoodsModal.show'](cur) {
+        if(!cur) {
+          this.countGoodsModal.form = {}
+          this.$refs.countGoodsForm.resetFields()
+        }
       }
     },
     methods: {
@@ -742,7 +840,7 @@
         if(msg) return this.$Message.warning(msg)
         let selection = this.selection[this[this.currentTab].pageProps.page][0]
         // console.log(selection.status)
-        if(selection.created_by !== this.userInfo.realName) return this.$Message.error('非创建人无法修改')
+        if(selection.created_by !== this.userInfo.realName) return this.$Message.warning('非创建人无法修改')
         if(selection.status === '待审核' || selection.status === '已驳回') {
           this.$router.push({
             path: '/outbound-management/outbound-add',
@@ -751,7 +849,7 @@
             }
           })
         }else{
-          this.$Message.error('该状态下无法修改')
+          this.$Message.warning('该状态下无法修改')
         }
       },
 
@@ -779,7 +877,7 @@
         if(msg) return this.$Message.warning(msg)
         let selection = this.selection[this[this.currentTab].pageProps.page][0]
         const check = selection.status === '待出库' || selection.status === '部分出库'
-        if(!check) return this.$Message.error('待出库或者出库中的才可手动出库')
+        if(!check) return this.$Message.warning('待出库或者出库中的才可手动出库')
 
         this.$router.push({
           path: '/outbound-management/outbound-manual',
@@ -809,6 +907,10 @@
       changePageSize(pageSize, key) {
         this[key].pageProps.perPage = pageSize;
         this.init();
+      },
+      dateChange(date) {
+        console.log(date)
+        this.recordSearchForm.createdTime = date
       },
 
       toOutbountRecord(modal = '') {
@@ -861,9 +963,9 @@
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
         if(title === '出库单审核') {
-          if(selection.status !== '待审核') return this.$Message.error('已审核')
+          if(selection.status !== '待审核') return this.$Message.warning('已审核')
         }else {
-          if(selection.status !== '出库中') return this.$Message.error('非出库中,不允许执行出库完成')
+          if(selection.status !== '出库中') return this.$Message.warning('非出库中,不允许执行出库完成')
         }
 
         this.getOutboundDetail()
@@ -896,7 +998,7 @@
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
         let selection = this.selection[this[this.currentTab].pageProps.page][0]
-        if(selection.status !== '待打印') return this.$Message.error('待打印状态下才能打印')
+        if(selection.status !== '待打印') return this.$Message.warning('待打印状态下才能打印')
 
         this.getOutboundDetail()
         this.printModal.show = true
@@ -1041,16 +1143,41 @@
         }else {
           id = this.selection[pageProps.page][0].id
         }
+        this.getDetail(id)
+      },
+
+      getDetail(id) {
+        this.spinShow = true
         this.$API.getOutboundLsitDetail(id).then(res => {
           if (res.code !== 0) return
           this.spinShow = false
           for (let key in res.data) {
             this.detailData[key] = res.data[key]
           }
-
           this.detailData.reissueType = this.switchReiusseType(this.detailData.reissueType)
         })
       },
+
+      getSerialDetail(id) {
+        // this.spinShow = true
+        // this.$API.getOutboundLsitDetail(id).then(res => {
+        //   if (res.code !== 0) return
+        //   this.spinShow = false
+        //   for (let key in res.data) {
+        //     this.detailData[key] = res.data[key]
+        //   }
+        //   this.detailData.reissueType = this.switchReiusseType(this.detailData.reissueType)
+        // })
+        let ids = []
+        ids.push(id)
+        this.$API.getOutbountSerialData({ids}).then(res => {
+          console.log(res)
+          if (res.code !== 0) return
+          // this.spinShow = false
+
+        })
+      },
+
       switchReiusseType(type) {
         switch (type) {
           case 'other' :
