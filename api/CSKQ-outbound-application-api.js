@@ -146,6 +146,44 @@ const confirmOutbount = (data) => {
   })
 }
 
+// 出库记录 - 修改
+const editOutbountRecord = (data) => {
+  return fetch({
+    url: `traceability/outbound-log/modify`,
+    method: 'POST',
+    data
+  })
+}
+
+// 出库记录 - 选择相同出库单号和待确认状态的出库记录(序列码)
+const getOutbountSerialData = (data) => {
+  return fetch({
+    url: `traceability/outbound-log/select`,
+    method: 'POST',
+    data
+  })
+}
+
+// 申请 - 导出数据
+const exportOutbountList = (params) => {
+  return fetch({
+    url: `traceability/outbound-apply/export`,
+    method: 'GET',
+    responseType: 'blob',
+    params
+  })
+}
+
+// 记录 - 导出数据
+const exportOutbountRecord = (params) => {
+  return fetch({
+    url: `traceability/outbound-log/export`,
+    method: 'GET',
+    responseType: 'blob',
+    params
+  })
+}
+
 
 
 export default {
@@ -164,5 +202,9 @@ export default {
   repealOutboundRecord,
   printOutboundList,
   checkSerialcode,
-  confirmOutbount
+  confirmOutbount,
+  editOutbountRecord,
+  getOutbountSerialData,
+  exportOutbountList,
+  exportOutbountRecord
 }

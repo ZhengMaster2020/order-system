@@ -13,7 +13,7 @@
           <Button type="primary" class="margin-bottom-10" @click="search">搜索</Button>
         </Row>
         <Row>
-          <Button type="primary" class="margin-bottom-10" @click="addPlan">导出数据</Button>
+          <Button type="primary" class="margin-bottom-10" @click="exportOutbountList">导出数据</Button>
           <Button type="primary" class="margin-bottom-10" @click="$router.push('/outbound-management/outbound-add')">
             添加出库单
           </Button>
@@ -39,7 +39,7 @@
           <Button type="primary" class="margin-bottom-10" @click="search">搜索</Button>
         </Row>
         <Row>
-          <Button type="primary" class="margin-bottom-10">导出数据</Button>
+          <Button type="primary" class="margin-bottom-10" @click="exportOutbountRecord">导出数据</Button>
           <Button type="primary" class="margin-bottom-10" @click="outboundConfirm">出库确认</Button>
           <Button type="primary" class="margin-bottom-10" @click="repeal">作废</Button>
           <Button type="primary" class="margin-bottom-10" @click="editOutboundConfirm">修改</Button>
@@ -731,11 +731,11 @@
       },
 
       // Form 操作
-      addPlan() {
-        let currentTab = this.currentTab
-        let pageProps = this[currentTab].pageProps
-        if (this.selection[pageProps.page].length > 1) return this.$Message.warning('一次只能操作一条数据')
-      },
+      // addPlan() {
+      //   let currentTab = this.currentTab
+      //   let pageProps = this[currentTab].pageProps
+      //   if (this.selection[pageProps.page].length > 1) return this.$Message.warning('一次只能操作一条数据')
+      // },
 
       editApply() {
         let msg = this.singelOperate()
@@ -758,13 +758,20 @@
       editOutboundConfirm() {
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
+        let selection = this.selection[this[this.currentTab].pageProps.page][0]
 
-        this.$router.push({
-          path: '/outbound-management/outbound-manual',
-          query: {
-            id: this.selection[this[this.currentTab].pageProps.page][0].id
-          }
-        })
+        if(selection.status === '待确认' || selection.status === '已驳回') {
+          this.$router.push({
+            path: '/outbound-management/outbound-manual',
+            query: {
+              id: selection.id,
+              outbound_apply_id: selection.outbound_apply_id
+            }
+          })
+        }else{
+          this.$Message.error('该状态下无法修改')
+        }
+
       },
 
       manualOutbound() {
@@ -807,6 +814,46 @@
       toOutbountRecord(modal = '') {
         this.currentTab = 'outboundRecord'
         modal && (this[modal].show = false)
+      },
+
+      exportOutbountList() {
+        console.log('exportOutbountList')
+        let params = JSON.parse(JSON.stringify(this.listSearchForm))
+        params.perPage = this[this.currentTab].pageProps.perPage
+        params.page = this[this.currentTab].pageProps.page
+
+        this.$API.exportOutbountList(params).then(res => {
+          this.handelExportData(res)
+        })
+      },
+
+      exportOutbountRecord() {
+        console.log('exportOutbountRecord')
+        let params = JSON.parse(JSON.stringify(this.listSearchForm))
+        params.perPage = this[this.currentTab].pageProps.perPage
+        params.page = this[this.currentTab].pageProps.page
+
+        this.$API.exportOutbountRecord(params).then(res => {
+          this.handelExportData(res)
+        })
+      },
+
+      handelExportData(data) {
+        // console.log(res)
+        if (typeof window.chrome !== 'undefined') {
+          // Chrome version
+          var link = document.createElement('a');
+          link.href = window.URL.createObjectURL(data);
+          link.click();
+        } else if (typeof window.navigator.msSaveBlob !== 'undefined') {
+          // IE version
+          window.navigator.msSaveBlob(data);
+        } else {
+          // Firefox version
+          var file = new File([data], { type: 'application/force-download' });
+          window.open(URL.createObjectURL(file));
+        }
+        this.$Message.success('导出成功')
       },
 
       showReviewModal(title) {
@@ -860,6 +907,7 @@
         if(msg) return this.$Message.warning(msg)
         let selection = this.selection[this[this.currentTab].pageProps.page][0]
         if(selection.status === '作废') return this.$Message.error('已作废')
+        if(selection.status !== '待确认') return this.$Message.error('待确认状态下才可作废记录')
 
         this.repealModal.show = true
         this.repealModal.form.id = selection.id

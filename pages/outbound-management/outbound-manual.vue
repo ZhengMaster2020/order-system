@@ -130,7 +130,7 @@
           </Col>
           <Col span="4">
             <FormItem label="出库仓位号" style="width: 100%">
-              <Input v-model="form.warehouseSn"/>
+              <Input v-model="form.warehouseSn" :readonly="id ? true : false"/>
             </FormItem>
           </Col>
           <Col span="8">
@@ -154,8 +154,8 @@
               </div>
               <div class="upload-file">
                 <div class="upload-list" v-for="(file, index) in form.fileItems" :key="index">
-<!--                  <a :href="file.url" :download="file.name" class="download-link">{{file.name}}</a>-->
-                  <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
+                  <a :href="file.url" :download="file.name" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
+<!--                  <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
                   <Icon type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>
                 </div>
               </div>
@@ -182,7 +182,13 @@
                   <Button icon="ios-cloud-upload-outline" class="margin-bottom-10">Upload files</Button>
                 </Upload>
               </div>
-              <a style="padding: 43px 0 0 10px" href="javascript:void(0)" class="download-link">{{serialFileName}}</a>
+<!--              <div class="upload-list" v-for="(file, index) in form.fileItems" :key="index">-->
+<!--                <a :href="file.url" :download="file.name" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
+<!--                &lt;!&ndash;                  <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>&ndash;&gt;-->
+<!--                <Icon type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>-->
+<!--              </div>-->
+              <a v-for="(file, index) in form.serialCodeItems" :key="index" href="javascript:void(0)" class="serialdata download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
+<!--              <a v-for="(file, index) in form.fileItems" :key="index" style="padding: 43px 0 0 10px" href="javascript:void(0)" class="download-link">{{serialFileName}}</a>-->
             </div>
           </Col>
           <Col span="4" style="text-align: right; margin-top: 35px">
@@ -257,6 +263,7 @@
   export default {
     data() {
       return {
+        id: '',
         submintLodaing: false,
         spinShow: false,
         requireDeliveryTime: '',
@@ -340,6 +347,10 @@
       },
 
       beforeUpload(file, type) {
+        if(this.outbound_apply_id) {
+          this.$Message.error('文件无法更改')
+          return false
+        }
         if(type === '回传单'){
 
         } else {
@@ -393,7 +404,7 @@
                 actualQuantity: +items.actual_number
               }
             })
-            console.log(importData, 'importData')
+            // console.log(importData, 'importData')
 
             let filterData = serialCodeData.filter(items => !items.readonly && (items.startNumber || items.endNumber || items.actualQuantity || items.serialCodeSn))
             this.form.serialCodeData = [...importData, ...filterData]
@@ -445,8 +456,34 @@
         this.$refs.form.validate(val => {
           if (!val) return
           // this.submintLodaing = true
+          let params = {}
 
-          let params = JSON.parse(JSON.stringify(this.form))
+          if(this.outbound_apply_id) {
+            params = JSON.parse(JSON.stringify(this.form.serialCodeData))
+
+            let editLgTheoretical = params.some(items => items.startNumber > items.endNumber)
+
+            if(editLgTheoretical) return this.$Message.error('序列号起始值不能大于结束值')
+
+            params.forEach(items => {
+              items.startNumber = this.formatSerialCode(items.startNumber)
+              items.endNumber = this.formatSerialCode(items.endNumber)
+
+              delete items.readonly
+            })
+
+            this.$API.editOutbountRecord(params).then(res => {
+              console.log(res)
+              if(res.code !== 0) return
+              this.$Message.success(res.msg)
+              this.$router.push('/outbound-management/CKSQ-outbound-application')
+              this.submintLodaing = false
+            })
+
+            return
+          }
+
+          params = JSON.parse(JSON.stringify(this.form))
           let lgTheoretical = params.serialCodeData.some(items => items.startNumber > items.endNumber)
 
           if(lgTheoretical) return this.$Message.error('序列号起始值不能大于结束值')
@@ -483,7 +520,19 @@
           for (let key in res.data) {
             this.detailData[key] = res.data[key]
           }
+          this.form.fileItems = this.detailData.fileItems
+          this.form.serialCodeItems = this.detailData.serialCodeItems
           this.detailData.reissueType = this.switchReiusseType(this.detailData.reissueType)
+        })
+      },
+
+      getOutbountSerialData(id) {
+        // this.spinShow = true
+        let ids = []
+        ids.push(id)
+        this.$API.getOutbountSerialData(ids).then(res => {
+          console.log(res)
+          if (res.code !== 0) return
         })
       },
 
@@ -501,7 +550,7 @@
         this.$API.checkSerialcode(code).then(res => {
           // console.log(res)
           if (res.code !== 0) return
-          // TODO: 出库单剩余可出库量
+          // TODO：验证序列号
           this.detailData.remainNumTotal = res.data[0]
           // this.detailData.remainNumTotal = res.data[0] + res.data[1]
         })
@@ -570,11 +619,13 @@
     mounted() {
       let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
       this.id = this.$route.query.id
+      this.outbound_apply_id = this.$route.query.outbound_apply_id
       this.form.outboundApplyId = this.id
       this.userInfo = userInfo
       if(this.id) {
-        this.getOutboundDetail(this.id)
-        this.getOutboundApplySnNum(this.id)
+        this.getOutboundDetail(this.outbound_apply_id)
+        this.getOutbountSerialData(this.id)
+        this.getOutboundApplySnNum(this.outbound_apply_id)
       }
     }
   }
@@ -619,7 +670,7 @@
     margin-bottom: 3px;
   }
 
-  .upload-list:hover {
+  .upload-list:hover, .serialdata:hover {
     background-color: #f3f3f3;
   }
 
@@ -639,5 +690,9 @@
     cursor: pointer;
   }
 
+  .serialdata {
+    margin: 43px 0 0 10px;
+
+  }
 
 </style>

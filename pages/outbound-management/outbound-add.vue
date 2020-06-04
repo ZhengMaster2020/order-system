@@ -290,6 +290,8 @@
             this.form[key] = res.data[key]
           }
           this.form.isReissue = res.data.isReissue === '是'? 1 : 0
+          this.form.reissueType = res.data.reissueType ? res.data.reissueType : 'other'
+          this.form.lossSn = this.form.lossSn ? this.form.lossSn : '-'
         })
       },
 
