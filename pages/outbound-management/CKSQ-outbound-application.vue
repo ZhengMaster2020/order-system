@@ -406,25 +406,24 @@
             </div>
           </Col>
           <Col span="12">
-            <Row type="flex">
-              <div style=" margin-right: 40px">
+            <div class="file-wrap">
+              <Col style=" margin-right: 40px" span="8">
                 <div style="padding: 10px 0;">出库回传单附件</div>
-<!--                <a :href="file.url" :download="file.name" class="download-link"-->
-<!--                   v-for="(file, index) in detailData.serialCodeItems"-->
-<!--                   :key="index">{{file.name ? file.name : '-'}}</a>-->
-                <a :href="detailData.serialCodeItems.url":download="detailData.serialCodeItems.name"  class="font-size-12">{{detailData.serialCodeItems.name ? detailData.serialCodeItems.name : '-'}}</a>
+                <a :href="file.url" :download="file.name" class="download-link"
+                   v-for="(file, index) in detailData.fileItems"
+                   :key="index">{{file.name ? file.name : '-'}}</a>
+<!--                <a :href="detailData.fileItems.url":download="detailData.fileItems.name"  class="font-size-12">{{detailData.fileItems.name ? detailData.fileItems.name : '-'}}</a>-->
 
 
-              </div>
-              <div style=" margin-right: 40px">
+              </Col>
+              <Col style=" margin-right: 40px" span="16">
                 <div style="padding: 10px 0;">序列号表格</div>
-<!--                                <a :href="file.url" :download="file.name" class="download-link"-->
-<!--                                   v-for="(file, index) in detailData.fileItems"-->
-<!--                                   :key="index">{{file.name ? file.name : '-'}}</a>-->
-<!--                <a href="javascript:void(0)" class="font-size-12">点击查看出库点出库记录>></a>-->
-                <a :href="detailData.fileItems.url":download="detailData.fileItems.name"  class="font-size-12">{{detailData.fileItems.name ? detailData.fileItems.name : '-'}}</a>
-              </div>
-            </Row>
+                                <a :href="file.url" :download="file.name" class="download-link"
+                                   v-for="(file, index) in detailData.serialCodeItems"
+                                   :key="index">{{file.name ? file.name : '-'}}</a>
+<!--                <a :href="detailData.serialCodeItems.url":download="detailData.serialCodeItems.name"  class="font-size-12">{{detailData.serialCodeItems.name ? detailData.serialCodeItems.name : '-'}}</a>-->
+              </Col>
+            </div>
           </Col>
         </Row>
 
@@ -840,7 +839,7 @@
         }
         let isSameId = outboundOrderSn.some(id => id !== outboundOrderSn[0])
         if(isSameId) return this.$Message.warning('请选择同一出库单')
-        if(!statuss.includes('wait_confirmed')) return this.$Message.warning('已出库确认')
+        if(!statuss.includes('待确认')) return this.$Message.warning('已出库确认')
 
         this.getOutboundDetail('outboundConfirm')
         this.confirmModal.show = true
@@ -859,9 +858,11 @@
       repeal() {
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
+        let selection = this.selection[this[this.currentTab].pageProps.page][0]
+        if(selection.status === '作废') return this.$Message.error('已作废')
 
         this.repealModal.show = true
-        this.repealModal.form.id = this.selection[this.currentTab.pageProps.page][0].id
+        this.repealModal.form.id = selection.id
       },
 
       repealOutboundRecord() {
@@ -1135,4 +1136,16 @@
     line-height: 40px;
     border-bottom: 1px solid #5d5d5d;
   }
+
+  .file-wrap {
+    display: flex;
+  }
+
+  .download-link {
+    margin-right: 10px;
+    &:hover {
+      background-color: #f3f3f3;
+    }
+  }
+
 </style>
