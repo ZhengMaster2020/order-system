@@ -267,8 +267,9 @@
         <FormItem label="计划名称">
           <Input class="width-180" v-model="statusDetailModal.form.base.planName" readonly/>
         </FormItem>
-        <FormItem label="计划文件">
-          <div style="padding-top: 33px">
+        <FormItem>
+          <div>
+            <div>计划文件</div>
             <a :href="file.url" :download="file.name"
                v-for="(file, index) in statusDetailModal.form.base.fileItems"
                :key="index" class="download-link">{{file.name}}</a>
