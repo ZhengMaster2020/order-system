@@ -114,16 +114,16 @@
           <Input class="width-180" v-model="exportModal.form.packageName" readonly/>
         </FormItem>
         <FormItem label="生产供应商">
-          <Input class="width-180" v-model="exportModal.form.supplier" readonly/>
+          <Input style="width: 210px" v-model="exportModal.form.supplier" readonly/>
         </FormItem>
         <FormItem label="下单数量">
-          <Input class="width-180" v-model="exportModal.form.orderQuantity" readonly/>
+          <Input style="width: 150px" v-model="exportModal.form.orderQuantity" readonly/>
         </FormItem>
         <FormItem label="已处理数量">
           <Input class="width-180" v-model="exportModal.form.processedNum" readonly/>
         </FormItem>
         <FormItem label="意见" prop="opinion">
-          <Input style="width: 572px" v-model="exportModal.form.opinion"/>
+          <Input style="width: 600px" v-model="exportModal.form.opinion"/>
         </FormItem>
 
         <div class="title">
@@ -241,12 +241,12 @@
           columns: [
             {type: 'selection', width: 60, align: 'center'},
             {title: '序号', type: 'index', width: 70, align: 'center'},
-            {title: '批号创建人', key: 'created_by', align: 'center', minWidth: 100},
+            {title: '批号创建人', key: 'created_by', align: 'center', minWidth: 110},
             {
               title: '创建时间',
               key: 'created_at',
               align: 'center',
-              minWidth: 100,
+              minWidth: 110,
               render: (h, {row}) => h('span', {}, this.$format(row.created_at, 'yyyy-MM-dd hh:mm:ss'))
             },
             {title: '所属计划名称', key: 'plan_name', align: 'center', minWidth: 160},
@@ -257,7 +257,7 @@
               minWidth: 80,
               render: (h, {row}) => h('span', {}, this.getBrand(row.brand))
             },
-            {title: '生产批次号', key: 'batch_number', align: 'center', minWidth: 170},
+            {title: '生产批次号', key: 'batch_number', align: 'center', minWidth: 180},
             {
               title: '生产数量', key: 'num', align: 'center', minWidth: 100,
               render: (h, {row}) => h('span', {}, (row.num + '').replace(/\B(?=(?:\d{3})+\b)/g, ','))
@@ -313,7 +313,7 @@
               minWidth: 100,
               render: (h, {row}) => h('span', {}, row.enable_status === 'disabled' ? '未激活' : '已激活')
             },
-            {title: '下单编号', key: 'supplier_order_number', align: 'center', minWidth: 160},
+            {title: '下单编号', key: 'supplier_order_number', align: 'center', minWidth: 180},
             {title: '生产供应商', key: 'supplier', align: 'center', minWidth: 150},
             {
               title: '生产类型',
