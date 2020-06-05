@@ -446,10 +446,11 @@
             <div class="file-wrap">
               <Col style=" margin-right: 40px" span="8">
                 <div style="padding: 10px 0;">出库回传单附件</div>
-                <a :href="file.url" :download="file.name" class="download-link"
-                   v-for="(file, index) in detailData.fileItems"
-                   :key="index">{{file.name ? file.name : '-'}}</a>
-<!--                <a :href="detailData.fileItems.url":download="detailData.fileItems.name"  class="font-size-12">{{detailData.fileItems.name ? detailData.fileItems.name : '-'}}</a>-->
+                 <div v-for="(file, index) in detailData.fileItems">
+<!--                   <a :href="file.url" :download="file.name" class="download-link"-->
+<!--                      :key="index">{{file.name ? file.name : '-'}}</a>-->
+                <a href="javascript:void(0)" class="font-size-12" @click="showImageModal(file.url)">{{file.name ? file.name : '-'}}</a>
+                 </div>
 
 
               </Col>
@@ -508,46 +509,40 @@
         <Row v-for="(serial, index) in countGoodsModal.form.serialCodeData" :key="index">
           <Col span="2">
             <FormItem label="序号" style="width: 100%">
-              <Input v-model="serial.number" readonly/>
+              <Input :value="index + 1" readonly/>
             </FormItem>
           </Col>
           <Col span="2">
             <FormItem label="编号" style="width: 100%">
-              <Input v-model="serial.number" readonly/>
+              <Input v-model="serial.serialCodeSn" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem label="序列号起止" style="width: 100%;">
-              <Input v-model="serial.number" readonly/>
+              <Input v-model="serial.startNumber" readonly/>
             </FormItem>
           </Col>
           <Col span="1" style="padding-top: 34px; text-align: center">——</Col>
           <Col span="4">
             <FormItem style="width: 100%; padding-top: 34px">
-              <Input v-model="serial.number" readonly/>
+              <Input v-model="serial.endNumber" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem label="理论出库量" style="width: 100%">
-              <Input v-model="serial.number" readonly/>
+              <Input :value="(serial.endNumber === null || !serial.endNumber) ? '' : serial.endNumber - serial.startNumber" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem label="实际点货量" style="width: 100%">
-              <Input v-model="serial.number" readonly/>
-            </FormItem>
-          </Col>
-          <Col span="3">
-            <FormItem label=" " style="width: 100%; padding-top: 34px">
-              <!--              <Button shape="circle" icon="md-add" @click="addBatchData" v-if="index === 0"></Button>-->
-              <Button shape="circle" icon="md-remove"></Button>
+              <Input v-model="serial.actualQuantity" readonly/>
             </FormItem>
           </Col>
         </Row>
       </Form>
       <Row class="margin-top-10">
         <Col span="2" offset="15" style=" text-align: right; padding-top: 10px"> 总计</Col>
-        <Col span="4"><Input v-model="countGoodsModal.form.total" readonly/></Col>
+        <Col span="4"><Input v-model="actualNumberTotal" readonly/></Col>
       </Row>
       <div class="modal-footer" slot="footer">
         <Button type="default" @click="countGoodsModal.show = false">返回</Button>
@@ -577,6 +572,11 @@
           <Input v-model="repealModal.form.opinion"/>
         </FormItem>
       </Form>
+    </Modal>
+
+<!--  回传单预览  -->
+    <Modal title="回传单附件" v-model="imageModal.show" footer-hide>
+      <img :src="imageModal.imgUrl" v-if="imageModal.show" style="width: 100%">
     </Modal>
   </div>
 </template>
@@ -664,18 +664,21 @@
             {title: '出库记录状态', key: 'status', minWidth: 100, align: 'center'},
             {title: '实际点货数量', key: 'actual_quantity', minWidth: 100, align: 'center',
               render: (h, {row}) => {
-                return h('a', {
-                  attrs: {
-                    href: 'javascript:void(0)'
-                  },
-                  on: {
-                    click: () => {
-                      // bbb
-                      this.getSerialDetail(row.outbound_apply_id)
-                      this.countGoodsModal.show = true
+                if(row.status !== '待确认'){
+                  return h('span', {}, row.actual_quantity)
+                }else {
+                  return h('a', {
+                    attrs: {
+                      href: 'javascript:void(0)'
+                    },
+                    on: {
+                      click: () => {
+                        this.getSerialDetail(row.id)
+                        this.countGoodsModal.show = true
+                      }
                     }
-                  }
-                }, row.actual_quantity)
+                  }, row.actual_quantity)
+                }
               }
             },
             {title: '出库序列号范围', key: 'range', minWidth: 195, align: 'center'},
@@ -756,6 +759,10 @@
           show: false,
           data: []
         },
+        imageModal: {
+          show: false,
+          imgUrl: ''
+        },
         rules: {
           isPass: [{required: true, message: '必填项', trigger: 'change'}],
           opinion: [{required: true, message: '必填项', trigger: 'blur'}]
@@ -790,8 +797,7 @@
         this[cur].pageProps.page = 1
         this.init('search')
       },
-      // aaa
-      ['reivewModal.show'](cur) {
+      ['reviewModal.show'](cur) {
         if(!cur) {
           this.reviewModal.form = {
             outboundApplyId: '',
@@ -799,6 +805,21 @@
             opinion: ''
           }
           this.$refs.reviewForm.resetFields()
+          // if(this.reviewModal.title !== '完成出库'){
+          //   this.reviewModal.form = {
+          //     outboundApplyId: '',
+          //     isPass: 'yes',
+          //     opinion: ''
+          //   }
+          //   this.$refs.reviewForm.resetFields()
+          // }else {
+          //   this.reviewModal.form = {
+          //     outboundApplyId: '',
+          //     isPass: 'yes',
+          //     opinion: ''
+          //   }
+          //   this.$refs.reviewForm.resetFields()
+          // }
         }
       },
       ['confirmModal.show'](cur) {
@@ -813,10 +834,25 @@
       },
       ['countGoodsModal.show'](cur) {
         if(!cur) {
-          this.countGoodsModal.form = {}
+          this.countGoodsModal.form = {
+            serialCodeData: []
+          }
           this.$refs.countGoodsForm.resetFields()
         }
       }
+    },
+    computed: {
+      // 实际点货量汇总
+      actualNumberTotal() {
+        // 汇总每个序列号实际点货量
+        let serialCodeData = this.countGoodsModal.form.serialCodeData
+        let total = serialCodeData.reduce((pre, cur) => {
+          let actualQuantity = cur.actualQuantity || 0
+          return Number(pre) + Number(actualQuantity)
+        }, 0)
+        // console.log(total)
+        return total
+      },
     },
     methods: {
       // 单条数据操作
@@ -882,7 +918,7 @@
         this.$router.push({
           path: '/outbound-management/outbound-manual',
           query: {
-            id: selection.id
+            outbound_apply_id: selection.id
           }
         })
       },
@@ -1087,6 +1123,11 @@
         }
       },
 
+      showImageModal(imgUrl) {
+        this.imageModal.show = true
+        this.imageModal.imgUrl = imgUrl
+      },
+
       init(type) {
         let currentTab = this.currentTab
         let params = {}
@@ -1154,6 +1195,7 @@
           for (let key in res.data) {
             this.detailData[key] = res.data[key]
           }
+          this.detailData.lossSn = this.detailData.lossSn ? this.detailData.lossSn : '-'
           this.detailData.reissueType = this.switchReiusseType(this.detailData.reissueType)
         })
       },
@@ -1174,7 +1216,7 @@
           console.log(res)
           if (res.code !== 0) return
           // this.spinShow = false
-
+          this.countGoodsModal.form.serialCodeData = res.data
         })
       },
 

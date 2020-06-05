@@ -112,6 +112,8 @@
 <script>
   import Cookies from 'js-cookie'
   import {SERVER_BASE_URL} from '../../api/config'
+  import ENV from "../../api/env";
+  import axios from "axios";
 
   export default {
     data() {
@@ -139,7 +141,7 @@
           isReissue: 0,
           reissueType: 'other',
           lossSn: '-',
-          lossNumber: 1, // 关联采购订单号
+          lossNumber: '-', // 关联采购订单号
           expectedOutboundNumber: null,
           outboundReason: '',
           brand: 'WIS',
@@ -155,7 +157,7 @@
           lossSn: [{required: true, message: '必填项', trigger: 'blur'}],
           nextBy: [{required: true, message: '必填项', trigger: 'blur'}],
           outboundReason: [{required: true, message: '必填项', trigger: 'blur'}],
-          lossNumber: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
+          lossNumber: [{required: true, message: '必填项', trigger: 'change'}],
           isReissue: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
           expectedOutboundNumber: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
         },
@@ -220,18 +222,21 @@
         // TODO: 调取采购系统的接口 获取mkCode
         console.log(this.form.gbOrderSn)
         this.notFoundText = '加载中...'
-        setTimeout(()=> {
-          if(this.form.gbOrderSn === 'MK-GB-20051184191'){
-            this.mkCodeList = [
-              { value: 'MK60001', label: 'MK60001'},
-            ]
-            this.notFoundText = ''
-            this.form.mkCode = this.mkCodeList[0].value
-          }else{
-            this.notFoundText = '无匹配数据'
-          }
-
-        }, 1000)
+        // setTimeout(()=> {
+        //   if(this.form.gbOrderSn === 'MK-GB-20051184191'){
+        //     this.mkCodeList = [
+        //       { value: 'MK60001', label: 'MK60001'},
+        //     ]
+        //     this.notFoundText = ''
+        //     this.form.mkCode = this.mkCodeList[0].value
+        //   }else{
+        //     this.notFoundText = '无匹配数据'
+        //   }
+        //
+        // }, 1000)
+        this.getSupplyInfo({order_no: this.form.gbOrderSn}).then(res => {
+          console.log(res, '采购')
+        })
 
         this.getOutboundOrderNum()
       },
@@ -270,7 +275,31 @@
           })
         })
       },
+
+
+      // 采购系统api
+      supplyInstance() {
+        // const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com'
+        const BASE_URL = 'http://serach.api-supplybeta.fandow.com'
+        this.instance = axios.create({
+          baseURL: BASE_URL,
+          timeout: 20000,
+          headers: {'Authorization': 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X'}
+        });
+      },
+
+      getSupplyInfo(params) {
+        return this.instance.get('/v1/search/search-order-bagging', {params})
+          .then(res => {
+            return res.data
+          }).catch(err => {
+            if (err) return console.log(err.message)
+          })
+      },
+
+      // TODO: 输入灌包订单号获取
       getOutboundOrderNum() {
+        // 获取统计灌包订单未确认+已确认出库数量
         let params = {
           gbOrderSn: this.form.gbOrderSn || '1321231412414'
         }
@@ -280,6 +309,17 @@
         //   this.gbOrderSnNum = Number(res.data[0]) + Number(res.data[1])
         // })
         this.gbOrderSnNum = 500
+      },
+
+      getOutboundApplySnNum(id) {
+        // 获取出库申请单待确认出库+已确认出库数量
+        this.$API.getOutboundApplySnNum(id).then(res => {
+          // console.log(res)
+          if (res.code !== 0) return
+          // this.gbOrderSnNum = Number(res.data[0]) + Number(res.data[1])
+          this.gbOrderSnNum = Number(res.data[0])
+        })
+        // this.gbOrderSnNum = 500
       },
 
       getOutboundDetail(id) {
@@ -292,6 +332,7 @@
           this.form.isReissue = res.data.isReissue === '是'? 1 : 0
           this.form.reissueType = res.data.reissueType ? res.data.reissueType : 'other'
           this.form.lossSn = this.form.lossSn ? this.form.lossSn : '-'
+          this.form.lossNumber = this.form.lossNumber + ''
         })
       },
 
@@ -300,8 +341,12 @@
       let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
       this.id = this.$route.query.id
       this.form.applicant = userInfo.realName
+      this.supplyInstance()
       // alert(this.$route.query.id)
-      this.id && this.getOutboundDetail(this.id)
+      if(this.id) {
+        this.getOutboundApplySnNum(this.id)
+        this.getOutboundDetail(this.id)
+      }
     }
   }
 </script>
