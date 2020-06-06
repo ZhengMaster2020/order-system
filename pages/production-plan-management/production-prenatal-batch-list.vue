@@ -388,6 +388,11 @@
         if (cur) return
         this.$refs.exportForm.resetFields()
         this.resetExportData()
+      },
+      'cancelProductModal.modal': function (cur) {
+        if (cur) return
+        this.$refs.cancelProductForm.resetFields()
+        this.cancelProductModal.form.opinion = ''
       }
     },
     mounted() {
@@ -410,9 +415,9 @@
 
         if (selection.length < 1) return this.$Message.warning('请选择批次')
         if (selection.length > 1) return this.$Message.warning('一次只能撤销一个批次')
-        let isCheck = selection[0].produce_status === 'generated' && selection[0].process_status === 'notExported'
+        // let isCheck = selection[0].produce_status === 'generated' && selection[0].process_status === 'notExported'
 
-        if (!isCheck) return this.$Message.warning('已生成且未处理的才可撤销')
+        // if (!isCheck) return this.$Message.warning('已生成且未处理的才可撤销')
 
         this.cancelProductModal.modal = true
         this.cancelProductModal.title = `撤销生产批次号：${selection[0].batch_number}`
