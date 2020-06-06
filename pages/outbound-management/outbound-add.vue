@@ -8,7 +8,7 @@
       <Form :model="form" ref="form" inline :rules="rules">
         <Row>
           <FormItem label="申请人">
-            <Input class="width-200" v-model="form.applicant" disabled/>
+            <Input class="width-200" v-model="form.applicant" readonly/>
           </FormItem>
           <FormItem label="品牌">
             <Select v-model="form.brand" placeholder="品牌" class="width-200">
@@ -16,10 +16,10 @@
             </Select>
           </FormItem>
           <FormItem label="灌包订单号" prop="gbOrderSn">
-            <Input class="width-200" v-model="form.gbOrderSn" @on-change="change"/>
+            <Input style="width: 220px" v-model="form.gbOrderSn" @on-change="change"/>
           </FormItem>
           <FormItem label="慕可代码">
-            <Select v-model="form.mkCode" class="width-200">
+            <Select v-model="form.mkCode" class="width-200" @on-change="mkCodeChange">
               <Option v-for="mkCode in mkCodeList"
                       :key="mkCode.label"
                       :value="mkCode.label"
@@ -40,15 +40,12 @@
             <Input class="width-200" v-model="form.productType" readonly/>
           </FormItem>
 
+
+          <FormItem label="供应商名称">
+            <Input style="width: 220px" v-model="form.supplier" readonly/>
+          </FormItem>
           <FormItem label="要求期货">
             <Input class="width-200" v-model="form.requireDeliveryTime" readonly/>
-            <!--            <DatePicker type="date"-->
-            <!--                        class="width-200"-->
-            <!--                        v-model="requireDeliveryTime"-->
-            <!--                        @on-change="date => {requireDeliveryTime = date}"></DatePicker>-->
-          </FormItem>
-          <FormItem label="供应商名称">
-            <Input class="width-200" v-model="form.supplier" readonly/>
           </FormItem>
           <FormItem label="紧急程度" prop="urgency">
             <Input class="width-200" v-model="form.urgency"/>
@@ -72,12 +69,10 @@
             </Select>
           </FormItem>
           <FormItem label="损耗记录单" prop="lossSn">
-            <Input class="width-200"
-                   v-model="form.lossSn" :disabled="form.isReissue === 1 ? false : true"/>
+            <Input class="width-200" v-model.trim="form.lossSn" :disabled="form.isReissue === 1 ? false : true"/>
           </FormItem>
           <FormItem label="损耗数量" prop="lossNumber">
-            <Input class="width-200"
-                   v-model="form.lossNumber" disabled/>
+            <Input style="width: 220px" v-model="form.lossNumber" disabled/>
           </FormItem>
           <FormItem label="下级经办人" prop="nextBy">
             <Input class="width-200" v-model="form.nextBy" disabled/>
@@ -99,7 +94,7 @@
                          v-model="form.expectedOutboundNumber"/>
           </FormItem>
           <FormItem label="出库理由" prop="outboundReason">
-            <Input style="width: 633px" v-model="form.outboundReason"/>
+            <Input style="width: 633px" v-model.trim="form.outboundReason"/>
           </FormItem>
         </Row>
 
@@ -122,26 +117,20 @@
         spinShow: false,
         gbOrderSnNum: '',
         notFoundText: '无匹配数据',
-        mkCodeList: [
-          // MK-GB-20052338251
-          { value: 'MK60003', label: 'MK60003'},
-          { value: 'MK60004', label: 'MK60004'},
-          { value: 'MK61071', label: 'MK61071'},
-          { value: 'MK60001', label: 'MK60001'},
-        ],
+        mkCodeList: [],
         form: {
-          orderNumber: 10000,
-          gbOrderSn: 'MK-GB-20052338251', // 关联采购订单号
-          mkCode: 'MK60003', // 关联采购订单号
-          productName: '+WIS+黑头导出精华液', // 关联采购订单号
-          productType: '单品', // 关联采购订单号
-          requireDeliveryTime: '2020-05-23', // 关联采购订单号
-          supplier: '广州仟智生物科技有限公司', // 关联采购订单号
-          urgency: '', // 关联采购订单号
+          orderNumber: null,
+          gbOrderSn: '',
+          mkCode: '',
+          productName: '',
+          productType: '',
+          requireDeliveryTime: '',
+          supplier: '',
+          urgency: '',
           isReissue: 0,
           reissueType: 'other',
           lossSn: '-',
-          lossNumber: '-', // 关联采购订单号
+          lossNumber: '-',
           expectedOutboundNumber: null,
           outboundReason: '',
           brand: 'WIS',
@@ -154,7 +143,7 @@
           gbOrderSn: [{required: true, message: '必填项', trigger: 'blur'}],
           urgency: [{required: true, message: '必填项', trigger: 'blur'}],
           reissueType: [{required: true, message: '必填项', trigger: 'change'}],
-          lossSn: [{required: true, message: '必填项', trigger: 'blur'}],
+          lossSn: [{required: true, message: '必填项', trigger: 'change'}],
           nextBy: [{required: true, message: '必填项', trigger: 'blur'}],
           outboundReason: [{required: true, message: '必填项', trigger: 'blur'}],
           lossNumber: [{required: true, message: '必填项', trigger: 'change'}],
@@ -172,6 +161,9 @@
           {value: '墨雪', label: '墨雪'},
         ],
 
+        supplyInfo: [],
+        hasInfo: false,
+
         change: this.$debonce(this.gbOrderSnChange, 500, 'footer')
 
       }
@@ -184,20 +176,18 @@
         // && (this.form.lossNumber = '-')
       },
       ['form.isReissue'](cur) {
-        console.log(cur)
         if(cur !== 1) {
           this.form.reissueType = 'other'
           this.form.lossSn = '-'
         }else {
-          this.form.lossSn = ''
+          this.form.lossSn = ' '
         }
-        console.log(this.form.reissueType)
       }
     },
     computed: {
       remainNum() {
         // 下单数量 - 汇总该灌包订单在出库记录中【待确认】+【已确认】的数量
-        return this.form.orderNumber - this.gbOrderSnNum
+        return this.hasInfo ? this.form.orderNumber - this.gbOrderSnNum : null
       },
       expectedMaxNum() {
         let max = null
@@ -208,7 +198,10 @@
           max = Number(this.remainNum)
         }
 
-        this.form.expectedOutboundNumber = this.form.expectedOutboundNumber > max ? max : this.form.expectedOutboundNumber
+        if(this.hasInfo){
+          this.form.expectedOutboundNumber = this.form.expectedOutboundNumber > max ? max : this.form.expectedOutboundNumber
+        }
+
         // console.log(max)
         return max
       }
@@ -222,28 +215,59 @@
         // TODO: 调取采购系统的接口 获取mkCode
         console.log(this.form.gbOrderSn)
         this.notFoundText = '加载中...'
-        // setTimeout(()=> {
-        //   if(this.form.gbOrderSn === 'MK-GB-20051184191'){
-        //     this.mkCodeList = [
-        //       { value: 'MK60001', label: 'MK60001'},
-        //     ]
-        //     this.notFoundText = ''
-        //     this.form.mkCode = this.mkCodeList[0].value
-        //   }else{
-        //     this.notFoundText = '无匹配数据'
-        //   }
-        //
-        // }, 1000)
+
         this.getSupplyInfo({order_no: this.form.gbOrderSn}).then(res => {
-          console.log(res, '采购')
+          if(res.code !== 200 || res.data.length === 0) return this.notFoundText = '无匹配数据'
+
+          this.supplyInfo = res.data
+          let mkCodeList = res.data.map(items => {
+            this.notFoundText = ''
+            return items.mk_code
+          })
+          this.mkCodeList = [...new Set(mkCodeList)].map(items => ({value: items, label: items}))
+
+        }).catch(err => {
+          console.log(err)
         })
 
         this.getOutboundOrderNum()
       },
+
+      mkCodeChange() {
+        let {mkCode, gbOrderSn} = this.form
+        if(!gbOrderSn) return
+        console.log(mkCode, gbOrderSn)
+
+        let info = this.supplyInfo.find(items => mkCode === items.mk_code && gbOrderSn === items.order_no)
+        if(info) {
+          this.form.productName = info.product
+          this.form.productType = this.switchProType(info.type) // product_type
+          this.form.orderNumber = info.amount
+          this.form.supplier = info.supplier
+          this.form.requireDeliveryTime = info.demand_delivery == 0 ? '' : info.demand_delivery
+          this.hasInfo = true
+          console.log(info.demand_delivery)
+        }else {
+          this.hasInfo = false
+          this.$Message.warning('请确认灌包订单号，慕可代码是否正确')
+        }
+      },
+
+      switchProType(type) {
+        let productType = {
+          1: '新品',
+          2: '优化品',
+          3: '常规品'
+        }
+        return productType[type]
+      },
+
       submit() {
         // this.submintLodaing = true
         this.$refs.form.validate(val => {
           if (!val) return
+
+          if(!this.form.mkCode) return this.$Message.error('请选择慕可代码')
 
           let apiKey = 'addOutboundLsit'
           let params = JSON.parse(JSON.stringify(this.form))

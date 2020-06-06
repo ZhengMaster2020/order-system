@@ -1034,7 +1034,7 @@
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
         let selection = this.selection[this[this.currentTab].pageProps.page][0]
-        if(selection.status !== '待打印') return this.$Message.warning('待打印状态下才能打印')
+        // if(selection.status !== '待打印') return this.$Message.warning('待打印状态下才能打印')
 
         this.getOutboundDetail()
         this.printModal.show = true
@@ -1066,10 +1066,12 @@
       },
 
       print() {
+        console.log('打印')
         this.$print('#printForm')
-        let currentTab = this.currentTab
-        let pageProps = this[currentTab].pageProps
-        this.$Message.success('打印中')
+        console.log('打印结束')
+        // let currentTab = this.currentTab
+        // let pageProps = this[currentTab].pageProps
+        // this.$Message.success('打印中')
         // TODO: 打印之后调接口改变状态？
         this.$API.printOutboundList(this.selection[pageProps.page][0].id).then(res => {
           if (res.code !== 0) return
