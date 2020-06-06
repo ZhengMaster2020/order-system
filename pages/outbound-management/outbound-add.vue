@@ -69,10 +69,10 @@
             </Select>
           </FormItem>
           <FormItem label="损耗记录单" prop="lossSn">
-            <Input class="width-200" v-model.trim="form.lossSn" :disabled="form.isReissue === 1 ? false : true"/>
+            <Input style="width: 220px" v-model.trim="form.lossSn" :disabled="form.isReissue === 1 ? false : true"/>
           </FormItem>
           <FormItem label="损耗数量" prop="lossNumber">
-            <Input style="width: 220px" v-model="form.lossNumber" disabled/>
+            <Input class="width-200" v-model="form.lossNumber" disabled/>
           </FormItem>
           <FormItem label="下级经办人" prop="nextBy">
             <Input class="width-200" v-model="form.nextBy" disabled/>
@@ -201,8 +201,6 @@
         if(this.hasInfo){
           this.form.expectedOutboundNumber = this.form.expectedOutboundNumber > max ? max : this.form.expectedOutboundNumber
         }
-
-        // console.log(max)
         return max
       }
     },
@@ -217,7 +215,11 @@
         this.notFoundText = '加载中...'
 
         this.getSupplyInfo({order_no: this.form.gbOrderSn}).then(res => {
-          if(res.code !== 200 || res.data.length === 0) return this.notFoundText = '无匹配数据'
+          if(res.code !== 200 || res.data.length === 0) {
+            this.notFoundText = '无匹配数据'
+            this.mkCodeList = []
+            return
+          }
 
           this.supplyInfo = res.data
           let mkCodeList = res.data.map(items => {
@@ -226,11 +228,13 @@
           })
           this.mkCodeList = [...new Set(mkCodeList)].map(items => ({value: items, label: items}))
 
+        }).then(() => {
+          this.getOutboundOrderNum()
         }).catch(err => {
           console.log(err)
         })
 
-        this.getOutboundOrderNum()
+
       },
 
       mkCodeChange() {
@@ -246,7 +250,6 @@
           this.form.supplier = info.supplier
           this.form.requireDeliveryTime = info.demand_delivery == 0 ? '' : info.demand_delivery
           this.hasInfo = true
-          console.log(info.demand_delivery)
         }else {
           this.hasInfo = false
           this.$Message.warning('请确认灌包订单号，慕可代码是否正确')
@@ -303,8 +306,7 @@
 
       // 采购系统api
       supplyInstance() {
-        // const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com'
-        const BASE_URL = 'http://serach.api-supplybeta.fandow.com'
+        const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com' : 'http://serach.api-supplybeta.fandow.com'
         this.instance = axios.create({
           baseURL: BASE_URL,
           timeout: 20000,
@@ -327,11 +329,11 @@
         let params = {
           gbOrderSn: this.form.gbOrderSn || '1321231412414'
         }
-        // this.$API.getGBOrderSnNum(params).then(res => {
-        //   console.log(res)
-        //   if (res.code !== 0) return
-        //   this.gbOrderSnNum = Number(res.data[0]) + Number(res.data[1])
-        // })
+        this.$API.getGBOrderSnNum(params).then(res => {
+          console.log(res)
+          if (res.code !== 0) return
+          this.gbOrderSnNum = Number(res.data[0]) + Number(res.data[1])
+        })
         this.gbOrderSnNum = 500
       },
 

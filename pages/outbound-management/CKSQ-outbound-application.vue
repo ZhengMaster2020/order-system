@@ -355,6 +355,7 @@
         </Row>
       </div>
       <div style="text-align: right">
+        <Button @click="printModal.show = false">取消</Button>
         <Button type="primary" @click="print">打印</Button>
       </div>
       <Spin size="large" fix v-if="spinShow"></Spin>
@@ -1034,7 +1035,8 @@
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
         let selection = this.selection[this[this.currentTab].pageProps.page][0]
-        // if(selection.status !== '待打印') return this.$Message.warning('待打印状态下才能打印')
+        let check = selection.status === '待打印' || selection.status === '出库中'
+        if(!check) return this.$Message.warning('待打印或出库中才能打印')
 
         this.getOutboundDetail()
         this.printModal.show = true
