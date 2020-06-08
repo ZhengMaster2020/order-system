@@ -29,6 +29,15 @@ export default [
       { path: 'inquire-anomaly-tracking/channel-store-settings', title: '渠道和店铺设置', name: 'inquire-anomaly-tracking/channel-store-settings' }
     ]
   },
+  {
+    path: '/storage-management',
+    icon: 'ios-book',
+    name: '/storage-management',
+    title: '入库管理',
+    children: [
+      { path: 'storage-management/storage-application', title: '入库申请单', name: 'storage-management/storage-application' }
+    ]
+  },
   // {
   //   path: '/anti-channel-conflict',
   //   icon: 'ios-book',
