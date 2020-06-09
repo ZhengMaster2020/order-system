@@ -83,15 +83,20 @@
             <Input v-model="detailData.isReissue" readonly/>
           </FormItem>
         </Col>
-        <Col span="12">
+        <Col :span="isManualStorage ? 12 : 4">
           <FormItem label="送货单文件" style="width: 100%">
 <!--            <Input v-model="detailData.reissueType" readonly/>-->
             <div style="padding-top: 33px; margin-top: 1px">
 <!--              <a :href="file.url" :download="file.name" class="download-link"-->
 <!--                 v-for="(file, index) in reviewModal.data.fileItems"-->
 <!--                 :key="index">{{file.name}}</a>-->
-              <a href="#">ga防守打法森岛帆高十大歌手帝国时代</a>
+              <a href="#">送货单文件</a>
             </div>
+          </FormItem>
+        </Col>
+        <Col span="4" v-if="!isManualStorage">
+          <FormItem label="剩余可入库量" style="width: 100%">
+            <Input v-model="detailData.reissueType" readonly/>
           </FormItem>
         </Col>
       </Row>
@@ -99,8 +104,8 @@
 
       <Row class="margin-bottom-10">
         <Col >
-          <span class="title">手动出库</span>
-          <a style="font-size: 12px" href="javascript:void(0)" @click="toStorageRecord">&nbsp;&nbsp;&nbsp;查看入库记录</a>
+          <span class="title">{{subTitle}}</span>
+          <a style="font-size: 12px" href="javascript:void(0)" @click="toStorageRecord" v-if="isManualStorage">&nbsp;&nbsp;&nbsp;查看入库记录</a>
         </Col>
       </Row>
       <Row>
@@ -109,12 +114,12 @@
             <Input v-model="userInfo.realName" readonly/>
           </FormItem>
         </Col>
-        <Col span="4">
+        <Col span="4" v-if="isManualStorage">
           <FormItem label="入库单剩余可入库量" style="width: 100%">
             <Input v-model="actualNumberTotal" readonly/>
           </FormItem>
         </Col>
-        <Col span="8">
+        <Col span="8" v-if="isManualStorage">
           <div class="upload-list-wrap">
             <div>
               <div class="necessary margin-bottom-10 font-size-12">上传装箱单</div>
@@ -146,7 +151,7 @@
 
       <!--   TODO： for batchData     -->
       <Row v-for="(serial, index) in this.form.batchData" :key="index">
-        <Col span="2">
+        <Col span="2" v-if="isManualStorage">
           <FormItem :label="index === 0? '序号' : ''" style="width: 100%">
             <Input v-model="serial.number" readonly/>
           </FormItem>
@@ -154,7 +159,7 @@
         <Col span="4">
           <FormItem :label="index === 0? '生产批次号' : ''" style="width: 100%" :prop="'batchData.' + index + '.batchNumber'" :rules="rules.batchNumber">
 <!--            <Input v-model="serial.batchNumber" :readonly="serial.readonly"/>-->
-            <Select>
+            <Select  v-model="serial.batchNumber">
               <Option v-for="(items, index) in batchList" :key="index" :value="items.value" :label="items.lang" />
             </Select>
           </FormItem>
@@ -175,16 +180,26 @@
           </FormItem>
         </Col>
         <Col span="3">
-          <FormItem :label="index === 0? '剩余入库量' : ''" style="width: 100%">
+          <FormItem :label="index === 0? '剩余可入库量' : ''" style="width: 100%">
             <Input v-model="serial.number" readonly/>
           </FormItem>
         </Col>
-        <Col span="3">
+        <Col span="3" v-show="isManualStorage">
           <FormItem :label="index === 0? '本次入库数量' : ''" style="width: 100%">
             <Input v-model="serial.currentQuantity"/>
           </FormItem>
         </Col>
-        <Col span="3">
+        <Col span="3" v-show="!isManualStorage">
+          <FormItem :label="index === 0? '已实际入库量' : ''" style="width: 100%">
+            <Input v-model="serial.currentQuantity"/>
+          </FormItem>
+        </Col>
+        <Col span="3" v-show="!isManualStorage">
+          <FormItem :label="index === 0? '修改本次入库数量' : ''" style="width: 100%">
+            <Input v-model="serial.currentQuantity"/>
+          </FormItem>
+        </Col>
+        <Col span="3" v-if="isManualStorage">
           <FormItem :label="index === 0? ' ' : ''" :class="index === 0 ? 'endNumStyle' : ''">
             <Button shape="circle" icon="md-add"  v-if="index === 0"></Button>
             <Button shape="circle" icon="md-remove"  v-if="index !== 0 && !serial.readonly"></Button>
@@ -192,7 +207,8 @@
         </Col>
       </Row>
 
-      <Row class="margin-top-10">
+      <!--        TODO: 修改是隐藏-->
+      <Row class="margin-top-10" v-if="isManualStorage">
         <Col span="2" offset="16"  style=" text-align: right; padding-top: 10px"> 总计 </Col>
         <Col span="3"><Input v-model="actualNumberTotal" readonly/></Col>
       </Row>
@@ -214,6 +230,7 @@
     data() {
       return {
         spinShow: false,
+        subTitle: '手动入库',
         fileUploadURL: `${SERVER_BASE_URL}traceability/traceability/upload`,
         // serialCodeDataURL: `${SERVER_BASE_URL}traceability/outbound-apply/data-import`,
         fileUploadHeaders: {
@@ -273,6 +290,12 @@
         this.form.fileItems.splice(index, 1)
       },
     },
+    mounted() {
+      this.id = this.$route.query.id
+      if(this.id) {
+        this.subTitle = '修改入库记录'
+      }
+    },
     computed: {
       // 实际点货量汇总
       actualNumberTotal() {
@@ -284,6 +307,10 @@
         }, 0)
         // console.log(total)
         return total
+      },
+      isManualStorage() {
+        console.log('computed')
+        return this.subTitle === '手动入库'
       }
     },
 
