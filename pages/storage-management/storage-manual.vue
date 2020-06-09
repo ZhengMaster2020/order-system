@@ -14,32 +14,32 @@
       <Row>
         <Col span="4">
           <FormItem label="申请人" style="width: 100%">
-            <Input v-model="detailData.brand" readonly/>
+            <Input v-model="detailData.created_by" readonly/>
           </FormItem>
         </Col>
         <Col span="4">
           <FormItem label="申请时间" style="width: 100%">
-            <Input v-model="detailData.createdAt" readonly/>
+            <Input v-model="detailData.created_at" readonly/>
           </FormItem>
         </Col>
         <Col span="4">
           <FormItem label="入库单号" style="width: 100%">
-            <Input v-model="detailData.outboundOrderSn" readonly/>
+            <Input v-model="detailData.storage_number" readonly/>
           </FormItem>
         </Col>
         <Col span="4">
           <FormItem label="下单编号" style="width: 100%">
-            <Input v-model="detailData.gbOrderSn" readonly/>
+            <Input v-model="detailData.supplier_order_number" readonly/>
           </FormItem>
         </Col>
         <Col span="4">
           <FormItem label="订单数量" style="width: 100%">
-            <Input v-model="detailData.orderNumber" readonly/>
+            <Input v-model="detailData.amount" readonly/>
           </FormItem>
         </Col>
         <Col span="4">
           <FormItem label="剩余可入库量" style="width: 100%">
-            <Input v-model="detailData.expectedOutboundNumber" readonly/>
+            <Input v-model="detailData.remain_number" readonly/>
           </FormItem>
         </Col>
       </Row>
@@ -47,32 +47,32 @@
       <Row>
         <Col span="4">
           <FormItem label="下单时间" style="width: 100%">
-            <Input v-model="detailData.orderNumber" readonly/>
+            <Input v-model="detailData.order_time" readonly/>
           </FormItem>
         </Col>
         <Col span="4">
           <FormItem label="生产供应商" style="width: 100%">
-            <Input v-model="detailData.requireDeliveryTime" readonly/>
-          </FormItem>
-        </Col>
-        <Col span="4">
-          <FormItem label="包材名称" style="width: 100%">
             <Input v-model="detailData.supplier" readonly/>
           </FormItem>
         </Col>
         <Col span="4">
+          <FormItem label="包材名称" style="width: 100%">
+            <Input v-model="detailData.packing" readonly/>
+          </FormItem>
+        </Col>
+        <Col span="4">
           <FormItem label="类型" style="width: 100%">
-            <Input v-model="detailData.mkCode" readonly/>
+            <Input v-model="detailData.packing_type" readonly/>
           </FormItem>
         </Col>
         <Col span="4">
           <FormItem label="本次预计入库量" style="width: 100%">
-            <Input v-model="detailData.productName" readonly/>
+            <Input v-model="detailData.expected_quantity" readonly/>
           </FormItem>
         </Col>
         <Col span="4">
           <FormItem label="入库仓位号" style="width: 100%">
-            <Input v-model="detailData.urgency" readonly/>
+            <Input v-model="detailData.position_number" readonly/>
           </FormItem>
         </Col>
       </Row>
@@ -80,7 +80,7 @@
       <Row>
         <Col span="12">
           <FormItem label="备注" style="width: 100%">
-            <Input v-model="detailData.isReissue" readonly/>
+            <Input v-model="detailData.remark" readonly/>
           </FormItem>
         </Col>
         <Col :span="isManualStorage ? 12 : 4">
@@ -88,7 +88,7 @@
 <!--            <Input v-model="detailData.reissueType" readonly/>-->
             <div style="padding-top: 33px; margin-top: 1px">
 <!--              <a :href="file.url" :download="file.name" class="download-link"-->
-<!--                 v-for="(file, index) in reviewModal.data.fileItems"-->
+<!--                 v-for="(file, index) in detailData.delivery_file"-->
 <!--                 :key="index">{{file.name}}</a>-->
               <a href="#">送货单文件</a>
             </div>
@@ -135,14 +135,14 @@
               :on-success="(response) => onsuccess(response, '回传单')"
               :on-error="(error) => onerror(error, '回传单')"
               >
-                <Button icon="ios-cloud-upload-outline" class="margin-bottom-10" :disabled="id ? true : false">Upload files</Button>
+                <Button icon="ios-cloud-upload-outline" class="margin-bottom-10">Upload files</Button>
               </Upload>
             </div>
             <div class="upload-file">
               <div class="upload-list" v-for="(file, index) in form.boxItems" :key="index">
 <!--                <a href="javascript:void(0)" class="download-link" >{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
                                   <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
-                <Icon v-if="id ? false : true" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>
+                <Icon type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>
               </div>
             </div>
           </div>
@@ -248,7 +248,10 @@
             }
           ],
         },
-        detailData: {},
+        detailData: {
+          detailData: [],
+          batchData: [],
+        },
         rules: {
           batchNumber: [{required: true, message: '须大写字母', trigger: 'blur'}],
           currentQuantity: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
@@ -289,11 +292,22 @@
       onremove(index) {
         this.form.fileItems.splice(index, 1)
       },
+
+      // 详情
+      getStorageDetail(id) {
+        this.spinShow = true
+        // this.$API.getStorageDetail(id).then(res => {
+        //   console.log(res)
+        //   this.spinShow = false
+        // })
+      }
     },
     mounted() {
+      this.userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
       this.id = this.$route.query.id
       if(this.id) {
         this.subTitle = '修改入库记录'
+        // this.getStorageDetail(this.id)
       }
     },
     computed: {
@@ -309,7 +323,6 @@
         return total
       },
       isManualStorage() {
-        console.log('computed')
         return this.subTitle === '手动入库'
       }
     },

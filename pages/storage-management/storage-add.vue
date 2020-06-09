@@ -75,7 +75,7 @@
           </Col>
           <Col span="4">
             <FormItem label="下级经办人" style="width: 100%">
-              <Input v-model="form.remark" disabled/>
+              <Input value="IT开发部主管" disabled/>
             </FormItem>
           </Col>
         </Row>
@@ -204,7 +204,7 @@
       submit() {
         this.$refs.form.validate(val => {
           if (val) {
-            if (this.form.fileItems.length <= 0) return this.$Message.error('请上送货单文件')
+            if (this.form.fileItems.length <= 0) return this.$Message.error('请上传供应商送货副联单')
             // return console.log(this.form)
             // this.submintLodaing = true
             if (this.id) {
@@ -259,17 +259,7 @@
       getProductionPlanDetail(id) {
         // this.spinShow = true
         // this.$API.getProductionPlanDetail({id}).then(res => {
-        //   if (res.code === 0) {
-        //     let data = res.data
-        //     let year = data.planNumber.match(/\d{4}/g)[0]
-        //     this.form.year = year
-        //     this.applicant = data.createdBy
-        //     for (let key in this.form) {
-        //       if (data[key]) {
-        //         this.form[key] = data[key]
-        //       }
-        //     }
-        //   }
+
         // }).finally(() => {
         //   this.spinShow = false
         // })
@@ -332,7 +322,7 @@
         // 剩余 + 本次预计 < 下单数
         let amount = this.form.amount
         let remainNumber = this.remainNumber
-        console.log(Number(amount) - Number(remainNumber), 'com')
+        // console.log(Number(amount) - Number(remainNumber), 'com')
         return Number(amount) - Number(remainNumber)
       },
       remainNumber() {

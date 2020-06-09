@@ -134,45 +134,45 @@
         </div>
 
         <FormItem label="申请人">
-          <Input class="width-180" v-model="reviewModal.data.createdBy" readonly/>
+          <Input class="width-180" v-model="detailData.created_by" readonly/>
         </FormItem>
         <FormItem label="申请时间">
-          <Input class="width-180" v-model="reviewModal.data.createdAt" readonly/>
+          <Input class="width-180" v-model="detailData.created_at" readonly/>
         </FormItem>
         <FormItem label="入库单号">
-          <Input class="width-180" v-model="reviewModal.data.planNumber" readonly/>
+          <Input class="width-180" v-model="detailData.storage_number" readonly/>
         </FormItem>
         <FormItem label="下单编号">
-          <Input class="width-180" v-model="reviewModal.data.brand" readonly/>
+          <Input class="width-180" v-model="detailData.supplier_order_number" readonly/>
         </FormItem>
         <FormItem label="订单数量">
-          <Input class="width-180" v-model="reviewModal.data.generationCount" readonly/>
+          <Input class="width-180" v-model="detailData.amount" readonly/>
         </FormItem>
         <FormItem label="下单时间">
-          <Input class="width-180" v-model="reviewModal.data.quarter" readonly/>
+          <Input class="width-180" v-model="detailData.order_time" readonly/>
         </FormItem>
         <FormItem label="生产供应商">
-          <Input class="width-180" v-model="reviewModal.data.isFillPlan" readonly/>
+          <Input class="width-180" v-model="detailData.supplier" readonly/>
         </FormItem>
         <FormItem label="包材名称">
-          <Input class="width-180" v-model="reviewModal.data.planName" readonly/>
+          <Input class="width-180" v-model="detailData.packing" readonly/>
         </FormItem>
         <FormItem label="类型">
-          <Input class="width-180" v-model="reviewModal.data.planName" readonly/>
+          <Input class="width-180" v-model="detailData.packing_type" readonly/>
         </FormItem>
         <FormItem label="本次预计入库量">
-          <Input class="width-180" v-model="reviewModal.data.planName" readonly/>
+          <Input class="width-180" v-model="detailData.expected_quantity" readonly/>
         </FormItem>
         <FormItem label="入库仓位号">
-          <Input class="width-180" v-model="reviewModal.data.planName" readonly/>
+          <Input class="width-180" v-model="detailData.position_number" readonly/>
         </FormItem>
         <FormItem label="备注">
-          <Input class="width-180" v-model="reviewModal.data.planName" readonly/>
+          <Input class="width-180" v-model="detailData.delivery_file" readonly/>
         </FormItem>
         <FormItem label="送货单文件">
           <div style="padding-top: 33px">
             <a :href="file.url" :download="file.name" class="download-link"
-               v-for="(file, index) in reviewModal.data.fileItems"
+               v-for="(file, index) in detailData.delivery_file"
                :key="index">{{file.name}}</a>
           </div>
         </FormItem>
@@ -186,9 +186,9 @@
           <Input class="width-180" v-model="reviewModal.reivewer" readonly/>
         </FormItem>
         <FormItem label="审核" prop="planStatus">
-          <RadioGroup v-model="reviewModal.form.planStatus" class="width-120">
-            <Radio label="pendingExecuted">通过</Radio>
-            <Radio label="overrule">驳回</Radio>
+          <RadioGroup v-model="reviewModal.form.isPass" class="width-120">
+            <Radio label="yes">通过</Radio>
+            <Radio label="no">驳回</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem label="审核意见" prop="opinion">
@@ -199,7 +199,7 @@
       </Form>
       <Spin size="large" fix v-if="spinShow"></Spin>
       <div class="modal-footer" slot="footer">
-        <Button type="default" @click="reviewModal.modal = false">取消</Button>
+        <Button type="default" @click="reviewModal.show = false">取消</Button>
         <Button type="primary" @click="submit('reviewModal', 'reviewForm')">确认</Button>
       </div>
     </Modal>
@@ -252,14 +252,14 @@
         <FormItem label="送货单文件">
           <div style="padding-top: 33px">
             <a :href="file.url" :download="file.name" class="download-link"
-               v-for="(file, index) in detailData.fileItems"
+               v-for="(file, index) in detailData.delivery_file"
                :key="index">{{file.name}}送货单文件</a>
           </div>
         </FormItem>
         <FormItem label="装箱单">
           <div style="padding-top: 33px">
             <a :href="file.url" :download="file.name" class="download-link"
-               v-for="(file, index) in detailData.fileItems"
+               v-for="(file, index) in detailData.delivery_file"
                :key="index">{{file.name}}装箱单</a>
           </div>
         </FormItem>
@@ -375,6 +375,10 @@
           application: {},
           record: {}
         },
+        selection: {
+          application: {},
+          record: {}
+        },
         applicationColumns: [
             { type: 'selection', width: 60, align: 'center' },
             { title: '序号', type: 'index', width: 70, align: 'center' },
@@ -437,7 +441,7 @@
           },
 
         detailData: {
-          fileItems: [],
+          delivery_file: [],
           batchData: [
             {
               batchNumber: null,
@@ -466,7 +470,7 @@
           },
           form: {
             id: '',
-            planStatus: 'overrule',
+            isPass: 'yes',
             opinion: ''
           }
         },
@@ -575,7 +579,20 @@
         this.searchForm[this.currentTab].createdTime = date
         // this.getList();
       },
-      submit() {},
+      submit(modal, form) {
+
+        this.$refs[form].validate(val => {
+          if (!val) return
+
+          let params = this[modal].form
+          // console.log(params)
+          this.$API.reviewStorage(params).then(res => {
+            if (res.code !== 0) return
+            this[modal].show = false
+          })
+        })
+
+      },
       // 申请列表
       getStorageList() {
         let params = this.searchForm[this.currentTab]
@@ -588,6 +605,15 @@
           this[this.currentTab + 'Data'] = res.data.list
           this[this.currentTab + 'PageProps'].page = res.data.pageCount
         })
+      },
+      // 详情
+      getStorageDetail() {
+        let selectionId = this.selection[this.currentTab][0].id
+        this.spinShow = true
+        // this.$API.getStorageDetail(selectionId).then(res => {
+        //   console.log(res)
+        //   this.spinShow = false
+        // })
       }
     },
     mounted() {
