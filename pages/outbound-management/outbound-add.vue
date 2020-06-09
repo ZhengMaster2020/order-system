@@ -47,7 +47,7 @@
           <FormItem label="要求期货">
             <Input class="width-200" v-model="form.requireDeliveryTime" readonly/>
           </FormItem>
-          <FormItem label="紧急程度" prop="urgency">
+          <FormItem label="紧急程度">
             <Input class="width-200" v-model="form.urgency"/>
           </FormItem>
         </Row>
@@ -245,7 +245,7 @@
         let info = this.supplyInfo.find(items => mkCode === items.mk_code && gbOrderSn === items.order_no)
         if(info) {
           this.form.productName = info.product
-          this.form.productType = this.switchProType(info.type) // product_type
+          this.form.productType = this.switchProType(info.product_type) // product_type
           this.form.orderNumber = info.amount
           this.form.supplier = info.supplier
           this.form.requireDeliveryTime = info.demand_delivery == 0 ? '' : info.demand_delivery
