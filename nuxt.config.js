@@ -26,7 +26,7 @@ module.exports = {
   /*
    ** Global CSS
    */
-  css: ['iview/dist/styles/iview.css'],
+  css: ['view-design/dist/styles/iview.css'],
   /*
    ** Plugins to load before mounting the App
    */
@@ -38,6 +38,7 @@ module.exports = {
     },
     '@/plugins/api',
     '@/plugins/format',
+    '@/plugins/routerAuth' // 路由守卫
   ],
   /*
    ** Nuxt.js modules

@@ -9,6 +9,26 @@ export default [
       { path: 'security-code/search-code', title: '防伪码查询', name: 'security-code/search-code' }
     ]
   },
+  {
+    path: '/production-plan-management',
+    icon: 'ios-book',
+    name: '/production-plan-list',
+    title: '生产计划管理',
+    children: [
+      { path: 'production-plan-management/production-plan-list', title: '生产计划列表', name: 'production-plan-management/production-plan-list' },
+      { path: 'production-plan-management/production-prenatal-batch-list', title: '生产批次列表', name: 'production-plan-management/production-prenatal-batch-list' }
+    ]
+  },
+  {
+    path: '/inquire-anomaly-tracking',
+    icon: 'ios-book',
+    name: '/inquire-anomaly-tracking',
+    title: '查询及异常追踪',
+    children: [
+      { path: 'inquire-anomaly-tracking/FQA-setting', title: '常见问题设置', name: 'inquire-anomaly-tracking/FQA-setting' },
+      { path: 'inquire-anomaly-tracking/channel-store-settings', title: '渠道和店铺设置', name: 'inquire-anomaly-tracking/channel-store-settings' }
+    ]
+  },
   // {
   //   path: '/anti-channel-conflict',
   //   icon: 'ios-book',

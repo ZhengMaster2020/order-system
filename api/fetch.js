@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import iView, { Notice } from 'iview'
+import iView, { Notice } from 'view-design'
 // import { router } from 'vue-router'
 import { SERVER_BASE_URL } from './config'
 
@@ -46,20 +46,40 @@ export default function fetch(options) {
     // 请求处理
     instance(options)
       .then((res) => {
-        const data = res.data
-
-        // responseType = blob 时错误信息转回json
-        if (data.__proto__ === Blob.prototype) {
-          var reader = new FileReader();
-          reader.readAsText(data, 'utf-8');
-          reader.onload = function () {
-            res.data = JSON.parse(reader.result)
-            toSuccess(res, resolve, reject)
+        let data = res.data
+        if (res.status === 202) {
+          if (data.__proto__ === Blob.prototype) {
+            var reader = new FileReader();
+            reader.readAsText(data, 'utf-8');
+            reader.onload = function () {
+              data = JSON.parse(reader.result)
+              Notice.error({
+                title: '错误代码：' + data.code,
+                desc: data.subMsg || data.msg,
+                duration: 3
+              })
+              reject(data);
+            }
+          }
+          return;
+        } else if (data.code >= 1) {
+          if (data.__proto__ === Blob.prototype) {
+            var reader = new FileReader();
+            reader.readAsText(data, 'utf-8');
+            reader.onload = function () {
+              data = JSON.parse(reader.result)
+              let title = data.subMsg || data.message
+              data.data = data.data || []
+              Notice.warning({
+                title: 'code: ' + data.code,
+                desc: title
+              })
+              reject(data);
+            }
           }
         } else {
-          toSuccess(res, resolve, reject)
+          resolve(data)
         }
-
         return false
       })
       .catch((error) => {
@@ -115,27 +135,4 @@ export default function fetch(options) {
         reject(error)
       })
   })
-}
-
-// 成功返回
-function toSuccess (res, resolve, reject) {
-  let data = res.data
-  if (res.status === 202) {
-    Notice.error({
-      title: '错误代码：' + data.code,
-      desc: data.subMsg || data.msg,
-      duration: 3
-    })
-    reject(data);
-    return;
-  }
-  if (data.code >= 1) {
-    let title = data.subMsg || data.message
-    data.data = data.data || []
-    Notice.warning({
-      title: 'code: ' + data.code,
-      desc: title
-    })
-  }
-  resolve(data)
 }
