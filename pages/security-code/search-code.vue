@@ -500,6 +500,17 @@
           })
         })
       }
+    },
+    watch: {
+      isShowExportModal(cur) {
+        if(!cur){
+          this.$refs.exportForm.resetFields()
+          this.exportForm = {
+            verifyCode: null,
+            remark: ''
+          }
+        }
+      }
     }
   }
 </script>
