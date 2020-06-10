@@ -73,6 +73,15 @@ const getOldSecurityCodeLog = (params) => {
   })
 }
 
+// 出库记录-列表
+const getOutboundLog = (params) => {
+  return fetch({
+    url: `traceability/outbound-log/index`,
+    method: 'GET',
+    params
+  })
+}
+
 export default {
   getSecurityHistoryNewList,
   getSecurityHistoryOldList,
@@ -81,5 +90,6 @@ export default {
   exportNewSecurityList,
   exportOldSecurityList,
   getNewSecurityCodeLog,
-  getOldSecurityCodeLog
+  getOldSecurityCodeLog,
+  getOutboundLog
 }

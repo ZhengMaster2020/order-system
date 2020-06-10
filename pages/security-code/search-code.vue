@@ -216,7 +216,7 @@
           </Col>
           <Col span="4">
             <FormItem label="是否失效">
-              <Input :value="logModal.traceData.link" readonly />
+              <Input :value="logModal.traceData.queried >= 5 ? '失效' : '有效'" readonly />
             </FormItem>
           </Col>
           <Col span="4">
@@ -398,9 +398,16 @@
                     this.logModal.show = true
                     this.$API.getNewSecurityCodeLog({brand, masterId, serialCode, securityCode, uniqueCode})
                     .then(res => {
-                      this.spinShow = false
                       this.logModal.list = res.data.list
                       this.logModal.traceData = res.data.traceData
+                    })
+                    .then(() => {
+                      this.$API.getOutboundLog({brand, serialCode, page: 1, perPage: 10}).then(res => {
+                        this.spinShow = false
+                        console.log(res)
+                        if(res.code !==0) return
+
+                      })
                     })
                   }
                 }
