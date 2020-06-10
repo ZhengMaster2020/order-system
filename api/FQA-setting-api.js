@@ -1,12 +1,15 @@
 /* 常见问题设置 */
-
+import ENV from './env'
 import fetch from './fetch'
+
+let baseURL = ENV ==='production' ?  'http://api.fandow.com/' : 'http://kongtest.fandow.com/'
 
 // 列表
 const getFQAlist = (params) => {
   return fetch({
-    url: `traceability/FAQ`,
+    url: `FAQ`,
     method: 'GET',
+    baseURL,
     params
   })
 }
@@ -23,8 +26,9 @@ const addFQAlist = ({data}) => {
 // 详情
 const getFQAlistDetail = ({id}) => {
   return fetch({
-    url: `traceability/FAQ/${id}`,
+    url: `FAQ/${id}`,
     method: 'GET',
+    baseURL,
   })
 }
 
