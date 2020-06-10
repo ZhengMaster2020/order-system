@@ -156,7 +156,7 @@
                 <div class="upload-list" v-for="(file, index) in form.fileItems" :key="index">
                   <a href="javascript:void(0)" class="download-link" @click="showImageModal(file.url)">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
 <!--                  <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
-                  <Icon v-if="id ? false : true" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>
+<!--                  <Icon v-if="id ? false : true" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>-->
                 </div>
               </div>
             </div>
@@ -164,10 +164,8 @@
         </Row>
         <Row class="margin-bottom-10">
           <Col span="20">
-<!--            <Button icon="ios-cloud-upload-outline">导入序列号表格</Button>-->
-<!--            &nbsp;&nbsp;&nbsp;<a href="javascript:void(0)">xxxx.xlsx</a>-->
             <div class="upload-list-wrap">
-              <div>
+              <div class="margin-right-10">
                 <div class="necessary margin-bottom-10 font-size-12">导入序列号表格</div>
                 <Upload
                 :show-upload-list="false"
@@ -182,12 +180,11 @@
                   <Button icon="ios-cloud-upload-outline" class="margin-bottom-10" :disabled="id ? true : false">Upload files</Button>
                 </Upload>
               </div>
-<!--              <div class="upload-list" v-for="(file, index) in form.fileItems" :key="index">-->
-<!--                <a :href="file.url" :download="file.name" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
-<!--                &lt;!&ndash;                  <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>&ndash;&gt;-->
-<!--                <Icon type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>-->
-<!--              </div>-->
-              <a v-for="(file, index) in form.serialCodeItems" :key="index" :href="file.url" class="serialdata download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
+              <div class="upload-list serialdata" v-for="(file, index) in form.serialCodeItems">
+                <a :key="index" :href="file.url" :download="file.name" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
+                <Icon v-if="id ? false : true" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '导入序列号')"/>
+              </div>
+<!--              <a v-for="(file, index) in form.serialCodeItems" :key="index" :href="file.url" class="serialdata download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
 <!--              <a v-for="(file, index) in form.fileItems" :key="index" style="padding: 43px 0 0 10px" href="javascript:void(0)" class="download-link">{{serialFileName}}</a>-->
             </div>
           </Col>
@@ -240,7 +237,7 @@
           <Col span="3">
             <FormItem :label="index === 0? ' ' : ''" :style="index === 0 ? endNumStyle : {}">
               <Button shape="circle" icon="md-add" @click="addSerialData" v-if="index === 0"></Button>
-              <Button shape="circle" icon="md-remove" @click="removeSerialData(index)" v-if="index !== 0 && !serial.readonly"></Button>
+              <Button style="margin-left: 12px" shape="circle" icon="md-remove" @click="removeSerialData(index)" v-if="index !== 0 && !serial.readonly"></Button>
             </FormItem>
           </Col>
         </Row>
@@ -341,6 +338,7 @@
           'width': '100%',
           'padding-top': '34px'
         },
+        importData: [],
         numberChange: this.$debonce(this.endNumChange, 1000, 'footer')
       }
     },
@@ -398,16 +396,19 @@
           }
         } else {
           if(response.code !== 0) return
-          this.form.serialCodeItems[0] = response.data.fileUploadVo
+          response.data.fileUploadVo.uid = this.fileItem.uid
+
           let formdata = new FormData()
           formdata.append('file', this.fileItem)
 
           this.$API.importSerialCodeData(formdata).then(res => {
             if(res.code !== 0) return
             let serialCodeData = this.form.serialCodeData
+
             let importData = res.data.importData.map(items => {
               // items.readonly = true
               return {
+                uid: this.fileItem.uid,
                 readonly: true,
                 number: +items.number,
                 serialCodeSn: items.serial_code_sn,
@@ -416,15 +417,19 @@
                 actualQuantity: +items.actual_number
               }
             })
-            // console.log(importData, 'importData')
 
+            this.importData = [...importData, ...this.importData]
             let filterData = serialCodeData.filter(items => !items.readonly && (items.startNumber || items.endNumber || items.actualQuantity || items.serialCodeSn))
-            this.form.serialCodeData = [...importData, ...filterData]
+
+            this.form.serialCodeData = [...this.importData, ...filterData]
+
             this.form.serialCodeData.map((items, index) => {
               items.number = ++index
             })
             this.serialFileName = res.data.fileTitle
+            this.form.serialCodeItems.push(response.data.fileUploadVo)
             this.$Message.success('导入完成')
+
           })
         }
 
@@ -438,6 +443,17 @@
       onremove(index, type) {
         if(type === '回传单') {
           this.form.fileItems.splice(index, 1)
+        }else {
+          let removeItem = this.form.serialCodeItems.splice(index, 1)
+          console.log(removeItem[0].uid)
+          this.form.serialCodeData = this.form.serialCodeData.filter(items => items.uid !== removeItem[0].uid)
+          this.importData = this.importData.filter(items => items.uid !== removeItem[0].uid)
+          this.form.serialCodeData.map((items, index) => {
+            items.number = ++index
+          })
+          if(this.form.serialCodeData.length === 0 ) {
+            this.addSerialData()
+          }
         }
       },
 
@@ -514,15 +530,24 @@
 
           if(lgTheoretical) return this.$Message.error('序列号起始值不能大于结束值')
           if(this.form.fileItems.length === 0) return this.$Message.error('请上传出库回传单')
+          if(this.actualNumberTotal > this.detailData.remainNumTotal ) return this.$Message.error('实际点货总量不能大于出库单剩余可出库量')
 
           params.serialCodeData.forEach(items => {
             items.startNumber = this.formatSerialCode(items.startNumber)
             items.endNumber = this.formatSerialCode(items.endNumber)
 
             delete items.readonly
+            items.uid && delete items.uid
           })
           !params.warehouseSn && delete params.warehouseSn
-          !params.serialCodeItems.length > 0 && delete params.serialCodeItems
+          if(!params.serialCodeItems.length > 0){
+            delete params.serialCodeItems
+          }else{
+            params.serialCodeItems = params.serialCodeItems.map(items => {
+              delete items.uid
+              return items
+            })
+          }
 
           // return console.log(params)
           this.$API.outboundLsitManual(params).then(res => {
@@ -696,10 +721,9 @@
   }
 
   .upload-list {
-    flex: 1;
+    /*flex: 1;*/
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    /*align-items: center;*/
     padding: 3px 4px;
     margin-bottom: 3px;
   }
@@ -725,7 +749,7 @@
   }
 
   .serialdata {
-    margin: 43px 0 0 10px;
+    margin-top: 43px;
 
   }
 
