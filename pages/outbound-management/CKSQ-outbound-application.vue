@@ -7,7 +7,7 @@
           <Col :xs="24" :sm="12" :md="6" :lg="3">
 <!--            <Input v-model="listSearchForm.brand" clearable placeholder="品牌"/>-->
             <Select  v-model="listSearchForm.brand" clearable placeholder="品牌">
-              <Option v-for="(brand, index) in brandList" :value="brand.value" :label="brand.label"/>
+              <Option v-for="(brand, index) in brandList" :key="index" :value="brand.value" :label="brand.label"/>
             </Select>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="3">
@@ -140,7 +140,7 @@
 
 
     <!-- 申请审核/ 完成出库  -->
-    <Modal class="reivew-modal" :mask-closable="false" v-model="reviewModal.show" :title="reviewModal.title" width="1137">
+    <Modal class="reivew-modal" v-model="reviewModal.show" :title="reviewModal.title" width="1137">
       <Form inline ref="reviewForm" :model="reviewModal.form" :rules="rules">
         <div class="title">
           <span class="line"></span>
@@ -235,7 +235,7 @@
     </Modal>
 
     <!-- 打印出库单  -->
-    <Modal :mask-closable="false" v-model="printModal.show" title="打印出库单" width="944" footer-hide>
+    <Modal v-model="printModal.show" title="打印出库单" width="944" footer-hide>
       <div id="printForm">
         <h3 style="text-align: center">防伪标出库申请单</h3>
         <div class="sub-title">一、申请出库明细</div>
@@ -369,7 +369,7 @@
     </Modal>
 
     <!-- 出库确认  -->
-    <Modal :mask-closable="false" class="reivew-modal" v-model="confirmModal.show" title="出库确认" width="1152">
+    <Modal class="reivew-modal" v-model="confirmModal.show" title="出库确认" width="1152">
       <Form inline ref="confirmForm" :model="confirmModal.form" :rules="rules">
         <div class="title">
           <span class="line"></span>
@@ -432,25 +432,33 @@
         </div>
         <Row>
           <Col span="12">
-            <FormItem label="出库人员">
-              <Input class="width-170" v-model="detailData.handleBy" readonly/>
-            </FormItem>
-            <FormItem label="实际点货量" prop="isPass">
-              <Input class="width-170" v-model="detailData.confirmedNumber" readonly/>
-            </FormItem>
-            <FormItem label="出库仓位号">
-              <Input class="width-170" v-model="detailData.expectedOutboundNumber" readonly/>
-            </FormItem>
-            <div style="text-align: center">
-              <a href="javascript:void(0)" class="font-size-12"
-                 @click="toOutbountRecord('confirmModal')">点击查看出库点出库记录>></a>
-            </div>
+            <Row>
+              <Col v-for="(data, index) in countGoodsModal.form.serialCodeData" :key="index">
+                <FormItem label="出库人员">
+                  <Input class="width-160" v-model="detailData.outboundBy" readonly/>
+                </FormItem>
+                <FormItem label="实际点货量" prop="isPass">
+                  <Input class="width-160" v-model="data.actualQuantity" readonly/>
+                </FormItem>
+                <FormItem label="出库仓位号">
+                  <Input class="width-160" v-model="data.warehouseSn" readonly/>
+                </FormItem>
+
+              </Col>
+              <Col>
+                <div style="text-align: center">
+                  <a href="javascript:void(0)" class="font-size-12"
+                     @click="toOutbountRecord('confirmModal')">点击查看出库点出库记录>></a>
+                </div>
+              </Col>
+            </Row>
+
           </Col>
           <Col span="12">
             <div class="file-wrap">
               <Col style=" margin-right: 40px" span="8">
                 <div style="padding: 10px 0;">出库回传单附件</div>
-                 <div v-for="(file, index) in detailData.fileItems">
+                 <div v-for="(file, index) in detailData.fileItems" :key="index">
 <!--                   <a :href="file.url" :download="file.name" class="download-link"-->
 <!--                      :key="index">{{file.name ? file.name : '-'}}</a>-->
                 <a href="javascript:void(0)" class="font-size-12" @click="showImageModal(file.url)">{{file.name ? file.name : '-'}}</a>
@@ -501,7 +509,7 @@
     </Modal>
 
     <!-- 点货详情  -->
-    <Modal :mask-closable="false" v-model="countGoodsModal.show" width="930">
+    <Modal v-model="countGoodsModal.show" width="930">
       <Form ref="countGoodsForm" style="padding-top: 20px">
         <div slot="header">点货详情</div>
         <div class="title">
@@ -648,7 +656,7 @@
             },
             {title: '要求货期', key: 'require_delivery_time', width: 110, align: 'center'},
             {title: '产品类型', key: 'product_type', minWidth: 100, align: 'center'},
-            {title: 'OEM供应商', key: 'supplier', minWidth: 170, align: 'center'},
+            {title: 'OEM供应商', key: 'supplier', minWidth: 210, align: 'center'},
             // {title: '操作', key: 'action', align: 'center', slot: 'action', width: 130},
           ],
           data: [],
@@ -916,7 +924,7 @@
             }
           })
         }else{
-          this.$Message.error('该状态下无法修改')
+          this.$Message.warning('该状态下无法修改')
         }
 
       },
@@ -1035,11 +1043,12 @@
             statuss.push(item.status)
           })
         }
-        let isSameId = outboundOrderSn.some(id => id !== outboundOrderSn[0])
+        let isSameId = outboundOrderSn.some(orderSn => orderSn !== outboundOrderSn[0])
         if(isSameId) return this.$Message.warning('请选择同一出库单')
-        if(!statuss.includes('待确认')) return this.$Message.warning('已出库确认')
+        if(!statuss.includes('待确认')) return this.$Message.warning('请选择待确认出库单')
 
         this.getOutboundDetail('outboundConfirm')
+        this.getSerialDetail(this.confirmModal.form.ids)
         this.confirmModal.show = true
       },
 
@@ -1058,8 +1067,8 @@
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
         let selection = this.selection[this[this.currentTab].pageProps.page][0]
-        if(selection.status === '作废') return this.$Message.error('已作废')
-        if(selection.status !== '待确认') return this.$Message.error('待确认状态下才可作废记录')
+        if(selection.status === '作废') return this.$Message.warning('已作废')
+        if(selection.status !== '待确认') return this.$Message.warning('待确认状态下才可作废记录')
 
         this.repealModal.show = true
         this.repealModal.form.id = selection.id
@@ -1153,7 +1162,6 @@
         }
 
         if (type === 'search') {
-          // this.selection[this[currentTab].pageProps.page] = []
           this.selection = {
             1: [],
           }
@@ -1165,7 +1173,6 @@
         this.tableLoading = true
 
         this.$API[apiKey](params).then(res => {
-          // console.log(res)
           if (res.code !== 0) return
           let {count, page, list} = res.data
 
@@ -1180,7 +1187,6 @@
           this[currentTab].pageProps.page = page
           this[currentTab].pageProps.total = count
           this[currentTab].data = list
-          // console.log(currentTab, this[currentTab].data)
         }).finally(() => {
           this.tableLoading = false
 
@@ -1214,21 +1220,11 @@
       },
 
       getSerialDetail(id) {
-        // this.spinShow = true
-        // this.$API.getOutboundLsitDetail(id).then(res => {
-        //   if (res.code !== 0) return
-        //   this.spinShow = false
-        //   for (let key in res.data) {
-        //     this.detailData[key] = res.data[key]
-        //   }
-        //   this.detailData.reissueType = this.switchReiusseType(this.detailData.reissueType)
-        // })
         let ids = []
-        ids.push(id)
+        typeof id === 'string' ? ids.push(id) : ids = id
+
         this.$API.getOutbountSerialData({ids}).then(res => {
-          console.log(res)
           if (res.code !== 0) return
-          // this.spinShow = false
           this.countGoodsModal.form.serialCodeData = res.data
         })
       },
@@ -1261,6 +1257,10 @@
 
   .width-170 {
     width: 170px;
+  }
+
+  .width-160 {
+    width: 160px;
   }
 
   .font-size-12 {
