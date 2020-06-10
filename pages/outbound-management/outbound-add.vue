@@ -187,6 +187,7 @@
     computed: {
       remainNum() {
         // 下单数量 - 汇总该灌包订单在出库记录中【待确认】+【已确认】的数量
+        console.log(this.form.orderNumber, this.gbOrderSnNum)
         return this.hasInfo ? this.form.orderNumber - this.gbOrderSnNum : null
       },
       expectedMaxNum() {
@@ -323,18 +324,13 @@
           })
       },
 
-      // TODO: 输入灌包订单号获取
       getOutboundOrderNum() {
         // 获取统计灌包订单未确认+已确认出库数量
-        let params = {
-          gbOrderSn: this.form.gbOrderSn || '1321231412414'
-        }
-        this.$API.getGBOrderSnNum(params).then(res => {
+        this.$API.getGBOrderSnNum({ gbOrderSn: this.form.gbOrderSn }).then(res => {
           console.log(res)
           if (res.code !== 0) return
-          this.gbOrderSnNum = Number(res.data[0]) + Number(res.data[1])
+          this.gbOrderSnNum = Number(res.data[0])
         })
-        this.gbOrderSnNum = 500
       },
 
       getOutboundApplySnNum(id) {
@@ -352,6 +348,7 @@
         this.$API.getOutboundLsitDetail(id).then(res => {
           if (res.code !== 0) return
           this.spinShow = false
+          this.hasInfo = true
           for (let key in res.data) {
             this.form[key] = res.data[key]
           }

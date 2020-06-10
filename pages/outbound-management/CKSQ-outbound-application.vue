@@ -5,7 +5,10 @@
       <Form ref="listSearchForm" :model="listSearchForm" inline v-show="currentTab === 'outboundList'">
         <Row>
           <Col :xs="24" :sm="12" :md="6" :lg="3">
-            <Input v-model="listSearchForm.brand" clearable placeholder="品牌"/>
+<!--            <Input v-model="listSearchForm.brand" clearable placeholder="品牌"/>-->
+            <Select  v-model="listSearchForm.brand" clearable placeholder="品牌">
+              <Option v-for="(brand, index) in brandList" :value="brand.value" :label="brand.label"/>
+            </Select>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="3">
             <Input v-model="listSearchForm.gbOrderSn" clearable placeholder="灌包订单号"/>
@@ -214,7 +217,7 @@
           <Input class="width-170" v-model="detailData.expectedOutboundNumber" readonly/>
         </FormItem>
         <FormItem label="已实际出库数量" v-show="reviewModal.title === '完成出库'">
-          <Input class="width-170" v-model="detailData.expectedOutboundNumber" readonly/>
+          <Input class="width-170" v-model="detailData.confirmedNumber" readonly/>
         </FormItem>
         <FormItem label="审核意见" prop="opinion">
           <Input style="width: 413px" v-model="reviewModal.form.opinion"/>
@@ -433,7 +436,7 @@
               <Input class="width-170" v-model="detailData.handleBy" readonly/>
             </FormItem>
             <FormItem label="实际点货量" prop="isPass">
-              <Input class="width-170" v-model="detailData.expectedOutboundNumber" readonly/>
+              <Input class="width-170" v-model="detailData.confirmedNumber" readonly/>
             </FormItem>
             <FormItem label="出库仓位号">
               <Input class="width-170" v-model="detailData.expectedOutboundNumber" readonly/>
@@ -652,7 +655,7 @@
           pageProps: {
             page: 1,
             total: 0,
-            perPage: 2
+            perPage: 10
           },
         },
         outboundRecord: {
@@ -768,6 +771,15 @@
           isPass: [{required: true, message: '必填项', trigger: 'change'}],
           opinion: [{required: true, message: '必填项', trigger: 'blur'}]
         },
+        brandList: [
+          {label: 'WIS', value: 'WIS'},
+          {label: '柏菲娜', value: '柏菲娜'},
+          {label: 'IRY', value: 'IRY'},
+          {label: 'MVE', value: 'MVE'},
+          {label: '魔渍', value: '魔渍'},
+          {label: 'KONO', value: 'KONO'},
+          {label: '墨雪', value: '墨雪'}
+        ]
       }
     },
     watch: {
@@ -913,7 +925,7 @@
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
         let selection = this.selection[this[this.currentTab].pageProps.page][0]
-        const check = selection.status === '待出库' || selection.status === '部分出库'
+        const check = selection.status === '待出库' || selection.status === '出库中'
         if(!check) return this.$Message.warning('待出库或者出库中的才可手动出库')
 
         this.$router.push({
@@ -1068,13 +1080,10 @@
       },
 
       print() {
-        console.log('打印')
         this.$print('#printForm')
-        console.log('打印结束')
-        // let currentTab = this.currentTab
-        // let pageProps = this[currentTab].pageProps
-        // this.$Message.success('打印中')
-        // TODO: 打印之后调接口改变状态？
+        let currentTab = this.currentTab
+        let pageProps = this[currentTab].pageProps
+
         this.$API.printOutboundList(this.selection[pageProps.page][0].id).then(res => {
           if (res.code !== 0) return
           this.$Message.success(res.msg)

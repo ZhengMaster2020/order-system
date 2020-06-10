@@ -208,7 +208,7 @@
                       style="width: 100%"
                       :prop="'serialCodeData.' + index + '.serialCodeSn'"
                       :rules="rules.serialCodeSn">
-              <Input v-model="serial.serialCodeSn" :readonly="serial.readonly"/>
+              <Input v-model="serial.serialCodeSn" maxlength="1" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
           <Col span="4">
@@ -234,7 +234,7 @@
           </Col>
           <Col span="4">
             <FormItem :label="index === 0? '实际点货量' : ''" style="width: 100%">
-              <InputNumber style="width: 100%;" :min="0" :max="serial.endNumber - serial.startNumber" v-model="serial.actualQuantity" @on-change="numberChange(index)" :readonly="serial.readonly"/>
+              <InputNumber style="width: 100%;" :min="1" :max="serial.endNumber - serial.startNumber" v-model="serial.actualQuantity" @on-change="numberChange(index)" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
           <Col span="3">
