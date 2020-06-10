@@ -237,6 +237,7 @@
           Authorization: Cookies.get('authorization')
         },
         userInfo: {},
+        batchList: [],
         form: {
           id: null,
           boxItems: [],
