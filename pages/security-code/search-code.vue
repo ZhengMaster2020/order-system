@@ -216,7 +216,7 @@
           </Col>
           <Col span="4">
             <FormItem label="是否失效">
-              <Input :value="logModal.traceData.queried >= 5 ? '失效' : '有效'" readonly />
+              <Input :value="!logModal.traceData.queried ? '' : logModal.traceData.queried >= 5 ? '失效' : '有效'" readonly />
             </FormItem>
           </Col>
           <Col span="4">
@@ -238,17 +238,20 @@
         <Row>
           <Col span="4">
             <FormItem label="出库时间">
-              <Input :value="logModal.traceData.supplier" readonly />
+              <Input :value="logModal.traceData.created_at" readonly />
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem label="出库序列号范围">
-              <Input :value="logModal.traceData.supplier" readonly />
+<!--              <Input :value="logModal.traceData.range" readonly />-->
+              <Select :value="logModal.traceData.firstRange" placeholder="">
+                <Option v-for="(range, index) in rangeList" :key="index" :value="range.value" :label="range.Label"/>
+              </Select>
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem label="所属灌包订单号">
-              <Input :value="logModal.traceData.supplier" readonly />
+              <Input :value="logModal.traceData.gb_order_sn" readonly />
             </FormItem>
           </Col>
           <Col span="4">
@@ -258,12 +261,12 @@
           </Col>
           <Col span="4">
             <FormItem label="慕可代码">
-              <Input :value="logModal.traceData.supplier" readonly />
+              <Input :value="logModal.traceData.mk_code" readonly />
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem label="产品名称">
-              <Input :value="logModal.traceData.supplier" readonly />
+              <Input :value="logModal.traceData.product_name" readonly />
             </FormItem>
           </Col>
         </Row>
@@ -322,7 +325,7 @@
       <div class="modal-footer" slot="footer">
         <Button type="default" @click="logModal.show = false">取消</Button>
       </div>
-      <Spin fix v-if="exportListLoading"></Spin>
+      <Spin fix v-if="spinShow"></Spin>
     </Modal>
   </div>
 </template>
@@ -336,6 +339,7 @@
     data () {
       return {
         selectTab: 'new', // tab的name  new/old
+        rangeList: [],
         newBrandList: [
           {label: 'WIS', value: 'WIS'},
           {label: '柏菲娜', value: 'BOOFINA'},
@@ -399,14 +403,22 @@
                     this.$API.getNewSecurityCodeLog({brand, masterId, serialCode, securityCode, uniqueCode})
                     .then(res => {
                       this.logModal.list = res.data.list
-                      this.logModal.traceData = res.data.traceData
+                      this.logModal.traceData = Array.isArray(res.data.traceData) ? {} : res.data.traceData
                     })
                     .then(() => {
+                      let rangeStr = 'A00000001-A00000003'
+
+                      console.log(this.rangeList)
                       this.$API.getOutboundLog({brand, serialCode, page: 1, perPage: 10}).then(res => {
                         this.spinShow = false
-                        console.log(res)
+                        // console.log(res)
                         if(res.code !==0) return
-
+                        // 取第一条 按理说：序列号查找到的会是单条数据
+                        this.traceData = {...this.traceData, ...res.data.list[0]}
+                        // 序列号范围
+                        if(res.data.list.length > 0){
+                          this.getRangeList(res.data.list[0].range)
+                        }
                       })
                     })
                   }
@@ -439,7 +451,7 @@
                 on: {
                   click: () => {
                     let {brand, securityCode} = row
-                    // TODO: 品牌参数转换
+                    // 品牌参数转换
                     this.oldBrandList.forEach(items => {
                       if(items.label === brand){
                         brand = items.value
@@ -447,10 +459,23 @@
                     })
                     this.spinShow = true
                     this.logModal.show = true
+                    // 没有出库信息
                     this.$API.getOldSecurityCodeLog({brand, code: securityCode})
                       .then(res => {
-                        this.logModal.list = res.data.list
-                        this.logModal.traceData = res.data.traceData
+                        this.logModal.list = res.data.list.map(items => {
+                          items.purchaseChannels = items.channel
+                          items.shop = items.keyword
+                          // items.wechatNickname = items.wechatNickname // 没有微信名
+                          return items
+                        })
+                        let traceData = res.data.traceData
+                        if(Array.isArray(traceData)) {
+                          this.logModal.traceData = {}
+                        }else {
+                          traceData.securityCode = traceData.code
+                          traceData.scodeBuildTime = traceData.scodeBuildTime == 0 ? '' : this.$format(traceData.scodeBuildTime, 'yyyy-MM-dd')
+                          this.logModal.traceData = traceData
+                        }
                         this.spinShow = false
                       })
                   }
@@ -491,9 +516,10 @@
         spinShow: false,
         logModal: {
           show: false,
-          list: [1],
+          list: [],
           traceData: {
-            link: ''
+            link: '',
+            queried: ''
           }
         }
       }
@@ -553,6 +579,37 @@
             this.isTableLoading = false;
           })
       },
+      getRangeList(rangeStr){
+        let rangeArr = rangeStr.split('-')
+        let start = parseInt(rangeArr[0].substr(1))
+        let end = parseInt(rangeArr[1].substr(1))
+        let list = []
+        list.push(rangeArr[0])
+        for(let i = 0; i < end - start; i++){
+          // console.log(++start)
+          list.push(this.formatSerialCode(rangeStr.substr(0, 1), ++start + ''))
+        }
+        list.push(rangeArr[1])
+
+        list.forEach(items => {
+          this.rangeList.push({
+            value: items,
+            label: items
+          })
+        })
+        this.traceData.firstRange = rangeArr[0]
+      },
+      // 序列码格式 编号大写 + 8位数字
+      formatSerialCode(letter, num) {
+        num = num + ''
+        let zeroLength = 8 - num.length
+        let fixZero = ''
+        for(let i = 0; i < zeroLength; i++){
+          fixZero += '0'
+        }
+        return letter + fixZero + num
+      },
+
       // 改变tab
       changeTab (name) {
         if (!this[name + 'Data'].length) {
@@ -726,6 +783,14 @@
             this.isExportLoading = false;
           })
         })
+      }
+    },
+    watch: {
+      ['logModal.show'](cur) {
+        if(!cur) {
+          this.logModal.list = []
+          this.logModal.traceData = {}
+        }
       }
     }
   }
