@@ -156,7 +156,7 @@
                 <div class="upload-list" v-for="(file, index) in form.fileItems" :key="index">
                   <a href="javascript:void(0)" class="download-link" @click="showImageModal(file.url)">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
 <!--                  <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
-<!--                  <Icon v-if="id ? false : true" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>-->
+                  <Icon v-if="file.uid" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>
                 </div>
               </div>
             </div>
@@ -182,7 +182,7 @@
               </div>
               <div class="upload-list serialdata" v-for="(file, index) in form.serialCodeItems">
                 <a :key="index" :href="file.url" :download="file.name" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
-                <Icon v-if="id ? false : true" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '导入序列号')"/>
+                <Icon v-if="file.uid" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '导入序列号')"/>
               </div>
 <!--              <a v-for="(file, index) in form.serialCodeItems" :key="index" :href="file.url" class="serialdata download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
 <!--              <a v-for="(file, index) in form.fileItems" :key="index" style="padding: 43px 0 0 10px" href="javascript:void(0)" class="download-link">{{serialFileName}}</a>-->
@@ -390,6 +390,7 @@
         if(type === '回传单') {
           if (response.code === 0) {
             this.$Message.success(response.msg)
+            response.data.fileUploadVo.uid = Date.now()
             this.form.fileItems.push(response.data.fileUploadVo)
           } else {
             this.$Message.error('上传有误')
@@ -505,14 +506,6 @@
                 actualQuantity: items.actualQuantity,
               }
             })
-            //
-            //
-            // params.forEach(items => {
-            //   items.startNumber = this.formatSerialCode(items.startNumber)
-            //   items.endNumber = this.formatSerialCode(items.endNumber)
-            //
-            //   delete items.readonly
-            // })
 
             this.$API.editOutbountRecord(params).then(res => {
               console.log(res)
@@ -543,11 +536,14 @@
           if(!params.serialCodeItems.length > 0){
             delete params.serialCodeItems
           }else{
-            params.serialCodeItems = params.serialCodeItems.map(items => {
-              delete items.uid
-              return items
+            // aaa
+            params.serialCodeItems = params.serialCodeItems.forEach(items => {
+              items.uid && delete items.uid
             })
           }
+          params.fileItems = params.fileItems.forEach(items => {
+            items.uid && delete items.uid
+          })
 
           // return console.log(params)
           this.$API.outboundLsitManual(params).then(res => {
