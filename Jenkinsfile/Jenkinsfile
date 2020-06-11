@@ -1,0 +1,4 @@
+#!groovy
+@Library('jenkins-shared-librarie') _
+
+Jenkinsfile_f_t1(currentBuild.getNumber())
