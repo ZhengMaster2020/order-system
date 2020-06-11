@@ -307,7 +307,7 @@
 
       // 采购系统api
       supplyInstance() {
-        const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com' : 'http://serach.api-supplybeta.fandow.com'
+        const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com'
         this.instance = axios.create({
           baseURL: BASE_URL,
           timeout: 20000,
