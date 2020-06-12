@@ -2,7 +2,7 @@
   <div>
   <Card>
     <Row type="flex" justify="end" style="padding-bottom: 24px; margin-bottom: 24px; border-bottom: 1px solid #ccc; ">
-      <Button type="primary" >确认提交</Button>
+      <Button type="primary" @click="submit" :loading="submitLoading">确认提交</Button>
     </Row>
 
     <Form :model="form" ref="form" inline :rules="rules">
@@ -85,12 +85,10 @@
         </Col>
         <Col :span="isManualStorage ? 12 : 4">
           <FormItem label="送货单文件" style="width: 100%">
-<!--            <Input v-model="detailData.reissueType" readonly/>-->
             <div style="padding-top: 33px; margin-top: 1px">
-<!--              <a :href="file.url" :download="file.name" class="download-link"-->
-<!--                 v-for="(file, index) in detailData.delivery_file"-->
-<!--                 :key="index">{{file.name}}</a>-->
-              <a href="#">送货单文件</a>
+              <a :href="file.url" :download="file.name" class="download-link"
+                 v-for="(file, index) in detailData.delivery_file"
+                 :key="index">{{file.name}}</a>
             </div>
           </FormItem>
         </Col>
@@ -116,7 +114,7 @@
         </Col>
         <Col span="4" v-if="isManualStorage">
           <FormItem label="入库单剩余可入库量" style="width: 100%">
-            <Input v-model="actualNumberTotal" readonly/>
+            <Input v-model="remainNumber" readonly/>
           </FormItem>
         </Col>
         <Col span="8" v-if="isManualStorage">
@@ -125,15 +123,12 @@
               <div class="necessary margin-bottom-10 font-size-12">上传装箱单</div>
               <Upload
               ref="upload"
-              :format="['jpg','jpeg','png']"
               :show-upload-list="false"
               :action="fileUploadURL"
               :headers="fileUploadHeaders"
-              :default-file-list="form.fileItems"
-              :on-format-error="(file) => onFormatError(file, '回传单')"
-              :before-upload="(file) => beforeUpload(file, '回传单')"
-              :on-success="(response) => onsuccess(response, '回传单')"
-              :on-error="(error) => onerror(error, '回传单')"
+              :before-upload="(file) => beforeUpload(file)"
+              :on-success="(response) => onsuccess(response)"
+              :on-error="(error) => onerror(error)"
               >
                 <Button icon="ios-cloud-upload-outline" class="margin-bottom-10">Upload files</Button>
               </Upload>
@@ -150,59 +145,66 @@
       </Row>
 
       <!--   TODO： for batchData     -->
-      <Row v-for="(serial, index) in this.form.batchData" :key="index">
+      <Row v-for="(batch, index) in this.form.batchData" :key="index">
         <Col span="2" v-if="isManualStorage">
           <FormItem :label="index === 0? '序号' : ''" style="width: 100%">
-            <Input v-model="serial.number" readonly/>
+            <Input :value="index + 1" readonly/>
           </FormItem>
         </Col>
         <Col span="4">
           <FormItem :label="index === 0? '生产批次号' : ''" style="width: 100%" :prop="'batchData.' + index + '.batchNumber'" :rules="rules.batchNumber">
-<!--            <Input v-model="serial.batchNumber" :readonly="serial.readonly"/>-->
-            <Select  v-model="serial.batchNumber">
-              <Option v-for="(items, index) in batchList" :key="index" :value="items.value" :label="items.lang" />
+<!--            <Input v-model="batch.batchNumber" :readonly="batch.readonly"/>-->
+            <Select
+              filterable
+              remote
+              clearable
+              :remote-method="query => remoteMethod(query,index)"
+              v-model="batch.batchNumber"
+              @on-change="batchNumberChange(batch.batchNumber, index)">
+              <Option v-for="(items, index) in batch.options" :key="index" :value="items.value" :label="items.label" />
             </Select>
           </FormItem>
         </Col>
         <Col span="4">
           <FormItem :label="index === 0? '所属计划名称' : ''" style="width: 100%">
-            <Input v-model="serial.number" readonly/>
+            <Input v-model="batch.plan_name" readonly/>
           </FormItem>
         </Col>
         <Col span="2">
           <FormItem :label="index === 0? '标类型' : ''" style="width: 100%">
-            <Input v-model="serial.number" readonly/>
+            <Input v-model="batch.mark_type" readonly/>
           </FormItem>
         </Col>
         <Col span="3">
           <FormItem :label="index === 0? '生产数量' : ''" style="width: 100%">
-            <Input v-model="serial.number" readonly/>
+            <Input v-model="batch.num" readonly/>
           </FormItem>
         </Col>
         <Col span="3">
           <FormItem :label="index === 0? '剩余可入库量' : ''" style="width: 100%">
-            <Input v-model="serial.number" readonly/>
+            <Input v-model="batch.remainNum" readonly/>
           </FormItem>
         </Col>
         <Col span="3" v-show="isManualStorage">
-          <FormItem :label="index === 0? '本次入库数量' : ''" style="width: 100%">
-            <Input v-model="serial.currentQuantity"/>
+          <FormItem :label="index === 0? '本次入库数量' : ''" style="width: 100%" :prop="'batchData.' + index + '.currentQuantity'" :rules="rules.currentQuantity">
+<!--            <Input v-model="batch.currentQuantity"/>-->
+            <InputNumber style="width: 100%;" :min="0" v-model="batch.currentQuantity"/>
           </FormItem>
         </Col>
         <Col span="3" v-show="!isManualStorage">
           <FormItem :label="index === 0? '已实际入库量' : ''" style="width: 100%">
-            <Input v-model="serial.currentQuantity"/>
+            <Input v-model="batch.currentQuantity"/>
           </FormItem>
         </Col>
         <Col span="3" v-show="!isManualStorage">
           <FormItem :label="index === 0? '修改本次入库数量' : ''" style="width: 100%">
-            <Input v-model="serial.currentQuantity"/>
+            <Input v-model="batch.currentQuantity"/>
           </FormItem>
         </Col>
         <Col span="3" v-if="isManualStorage">
           <FormItem :label="index === 0? ' ' : ''" :class="index === 0 ? 'endNumStyle' : ''">
-            <Button shape="circle" icon="md-add"  v-if="index === 0"></Button>
-            <Button shape="circle" icon="md-remove"  v-if="index !== 0 && !serial.readonly"></Button>
+            <Button shape="circle" icon="md-add" v-if="index === 0" @click="addBatchData"></Button>
+            <Button shape="circle" icon="md-remove" v-else style="margin-left: 12px"></Button>
           </FormItem>
         </Col>
       </Row>
@@ -230,9 +232,9 @@
     data() {
       return {
         spinShow: false,
+        submitLoading: false,
         subTitle: '手动入库',
         fileUploadURL: `${SERVER_BASE_URL}traceability/traceability/upload`,
-        // serialCodeDataURL: `${SERVER_BASE_URL}traceability/outbound-apply/data-import`,
         fileUploadHeaders: {
           Authorization: Cookies.get('authorization')
         },
@@ -243,46 +245,50 @@
           boxItems: [],
           batchData: [
             {
+              num: null,
+              mark_type: '',
+              plan_name: '',
+              remainNum: null,
               batchNumber: null,
               currentQuantity: null,
-              batchList: [],
+              options: []
             }
           ],
         },
         detailData: {
-          detailData: [],
-          batchData: [],
+          expected_quantity: null
         },
         rules: {
-          batchNumber: [{required: true, message: '须大写字母', trigger: 'blur'}],
+          batchNumber: [{required: true, message: '必填项', trigger: 'change'}],
           currentQuantity: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
         },
-
+        numberByapplyId: null,
       }
     },
     methods: {
 
       toStorageRecord() {
         this.$router.push({
-          path: '/storage-management/storage-application',
-          tab: 'record'
+          name: 'storage-management/storage-application',
+          params: {
+            tab: 'record',
+            supplierOrderNumber: this.form.supplierOrderNumber
+          }
         })
       },
 
       beforeUpload(file) {
-
-      },
-      onFormatError(response, type) {
-        if(type === '回传单') {
-          this.$Message.error('请按图片格式上传:".jsp, .png, .jpeg"')
-        }else {
-          this.$Message.error('请按excel文件格式上传')
+        const check = /.txt$/.test(file.name)
+        // this.$Message.info('正在上传')
+        if (check) {
+          this.$Message.warning('请不要上传txt格式的文件')
         }
+        return !check;
       },
       onsuccess(response) {
         if (response.code === 0) {
           this.$Message.success(response.msg)
-          this.form.fileItems.push(response.data.fileUploadVo)
+          this.form.boxItems.push(response.data.fileUploadVo)
         } else {
           this.$Message.error('上传有误')
         }
@@ -294,21 +300,143 @@
         this.form.fileItems.splice(index, 1)
       },
 
-      // 详情
-      getStorageDetail(id) {
-        this.spinShow = true
-        // this.$API.getStorageDetail(id).then(res => {
-        //   console.log(res)
-        //   this.spinShow = false
-        // })
+      remoteMethod(query, index) {
+        if(!query) return
+          this.$API.getProductionBatch({batchNumber: query, page: 1, perPage: 1000}).then(res => {
+          if(res.code !== 0) return
+          let {list} = res.data
+          this.form.batchData[index].options = list.map(items => {
+            items.label = items.batch_number
+            items.value = items.batch_number
+            return items
+          })
+        })
+      },
+
+      batchNumberChange(batchNumber, index) {
+        if(!batchNumber) {
+          this.form.batchData[index].num = null
+          this.form.batchData[index].mark_type = ''
+          this.form.batchData[index].plan_name = ''
+          this.form.batchData[index].remainNum = null
+          return
+        }
+        console.log(768)
+        this.$API.getProductionBatch({batchNumber, page: 1, perPage: 1000}).then(res => {
+          if(res.code !== 0) return
+          let {list} = res.data
+          this.form.batchData[index].num = list[0].num
+          this.form.batchData[index].mark_type = !list[0].mark_type ? '-' : list[0].mark_type === 'P' ? '平标' : '卷标'
+          this.form.batchData[index].plan_name = list[0].plan_name
+
+          this.$API.getStorageBatchNumber({batchNumber}).then(res => {
+            if(res.code !== 0) return
+            // console.log(this.form.batchData[index].remainNum, this.form.batchData[index].num - res.data[0])
+            this.form.batchData[index].remainNum = this.form.batchData[index].num - res.data[0]
+          })
+        })
+
+
+      },
+
+      addBatchData() {
+        this.form.batchData.push({
+          num: null,
+          mark_type: '',
+          plan_name: '',
+          remainNum: null,
+          batchNumber: null,
+          currentQuantity: null,
+          options: []
+        })
+      },
+
+      submit() {
+        let params = JSON.parse(JSON.stringify(this.form))
+        // this.submitLoading = true
+        if(this.applyId){
+          if(params.boxItems.length === 0) return this.$Message.warning('请上传装箱单')
+          params.batchData = params.batchData.map(items => {
+            return {
+              batchNumber: items.batchNumber,
+              currentQuantity: items.currentQuantity,
+            }
+          })
+          console.log(this.form)
+          console.log(params, 'params')
+          this.$API.manualStotageApply(params).then(res => {
+            console.log(res)
+            if(res.code !==0) return
+            this.submitLoading = false
+            this.$Message.success(res.msg)
+            this.$router.push('/storage-management/storage-application')
+          })
+        }else {
+
+        }
+
+      },
+
+      // 获取申请详情
+      getDetail(id) {
+        // this.spinShow = true
+        this.$API.getStorageDetail(id).then(res => {
+          if (res.code !== 0) return
+          let data = res.data
+
+          this.form.boxItems = data.box_file
+          this.detailData = data
+          this.detailData.delivery_file = [data.delivery_file]
+          this.spinShow = false
+        })
+      },
+
+      // 获取记录详情
+      getRecordDetail(id) {
+        // this.spinShow = true
+        this.$API.getStorageRecordDetail(id).then(res => {
+          if (res.code !== 0) return
+          let data = res.data
+          this.detailData = {
+            created_by: data.createdBy,
+            created_at: data.createdAt,
+            storage_number: data.storageNumber,
+            supplier_order_number: data.supplierOrderNumber,
+            amount: data.amount,
+            expected_quantity: data.expectedQuantity,
+            order_time: data.orderTime,
+            supplier: data.supplier,
+            packing: data.packing,
+            packing_type: data.packingType,
+            position_number: data.positionNumber,
+            remark: data.remark,
+          }
+          this.detailData.delivery_file = [data.fileItems]
+          this.spinShow = false
+        })
+      },
+
+      // 通过入库申请id获取入库数量(待确认+已确认)
+      getNumberByApplyId(id) {
+        // this.spinShow = true
+        this.$API.getNumberByApplyId(id).then(res => {
+          if (res.code !== 0) return
+          this.numberByapplyId = res.data[0]
+        })
       }
     },
     mounted() {
       this.userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
-      this.id = this.$route.query.id
-      if(this.id) {
+      this.applyId = this.$route.query.applyId
+      this.recordId = this.$route.query.recordId
+      if(this.$route.query.recordId) {
         this.subTitle = '修改入库记录'
-        // this.getStorageDetail(this.id)
+        this.form.id = this.recordId
+        this.getRecordDetail(this.recordId)
+      }else {
+        this.form.id = this.applyId
+        this.getDetail(this.applyId)
+        this.getNumberByApplyId(this.applyId)
       }
     },
     computed: {
@@ -317,15 +445,22 @@
         // 汇总每个序列号实际点货量
         let batchData = this.form.batchData
         let total = batchData.reduce((pre, cur) => {
-          let actualQuantity = cur.actualQuantity || 0
-          return Number(pre) + Number(actualQuantity)
+          let currentQuantity = cur.currentQuantity || 0
+          return Number(pre) + Number(currentQuantity)
         }, 0)
         // console.log(total)
         return total
       },
+
       isManualStorage() {
         return this.subTitle === '手动入库'
+      },
+
+      remainNumber() {
+        // 剩余可入库 < 入库记录待确认 + 已确认 TODO: 接口待定
+        return this.detailData.expected_quantity - this.numberByapplyId
       }
+
     },
 
   }

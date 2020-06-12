@@ -14,7 +14,7 @@
           </Col>
           <Col span="4">
             <FormItem label="下单编号" style="width: 100%" prop="supplierOrderNumber">
-              <Input v-model="form.supplierOrderNumber" @on-change="orderChange"/>
+              <Input v-model.trim="form.supplierOrderNumber" @on-change="orderChange"/>
             </FormItem>
           </Col>
           <Col span="4">
@@ -86,7 +86,6 @@
           :show-upload-list="false"
           :action="fileUploadURL"
           :headers="fileUploadHeaders"
-          :default-file-list="form.fileItems"
           :before-upload="beforeUpload"
           :on-success="onsuccess"
           :on-remove="onremove"
@@ -94,12 +93,12 @@
           >
             <Button icon="ios-cloud-upload-outline" class="margin-bottom-10">Upload files</Button>
           </Upload>
+        <div style="color: #ff0000; font-size: 12px; margin-top: -10px">请上传供应商送货副联单</div>
           <div class="upload-list" v-for="(file, index) in form.fileItems" :key="index">
             <a :href="file.url" :download="file.name" class="download-link">{{file.name}}</a>
             <Icon type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index)"/>
           </div>
         </div>
-        <div style="color: #ff0000; font-size: 12px">请上传供应商送货副联单</div>
       </Form>
       <Spin size="large" fix v-if="spinShow"></Spin>
     </Card>
@@ -132,9 +131,9 @@
           mkCode: '',
           orderTime: '',
           packing: '',
-          supplierId: '李时达',
+          supplierId: null,
           supplier: '',
-          amount: '',
+          amount: null,
           packingType: '',
           expectedQuantity: null,
           positionNumber: '',
@@ -155,7 +154,8 @@
 
       orderChange() {
         // TODO: 调取采购系统的接口 获取mkCode
-        console.log(this.form.supplierOrderNumber)
+        // console.log(this.form.supplierOrderNumber)
+        this.mkCodeList = []
         this.notFoundText = '加载中...'
 
         this.getSupplyInfo({order_no: this.form.supplierOrderNumber}).then(res => {
@@ -183,13 +183,13 @@
       mkCodeChange() {
         let {mkCode, supplierOrderNumber} = this.form
         if(!supplierOrderNumber) return
-        console.log(mkCode, supplierOrderNumber)
+        // console.log(mkCode, supplierOrderNumber)
 
         let info = this.supplyInfo.find(items => mkCode === items.mk_code && supplierOrderNumber === items.order_no)
         if(info) {
           this.form.packing = info.packing
           this.form.packingType = info.type // product_type
-          this.form.amount = info.amount
+          this.form.amount = +info.amount
           this.form.supplier = info.supplier
           this.form.supplierId = info.supplier_id
           this.form.orderTime = info.created_at == 0 ? '' : info.created_at
@@ -204,37 +204,30 @@
       submit() {
         this.$refs.form.validate(val => {
           if (val) {
+            console.log(this.form)
             if (this.form.fileItems.length <= 0) return this.$Message.error('请上传供应商送货副联单')
             // return console.log(this.form)
             // this.submintLodaing = true
+            let params = JSON.parse(JSON.stringify(this.form))
+            let api = 'addStorageApply'
             if (this.id) {
-              let param = {
-                id: this.id,
-                params: this.form
-              }
-              // this.$API.editProductionPlan(param).then(res => {
-              //   if (res.code === 0) {
-              //     this.$Message.success('编辑成功')
-              //     this.$router.push('/production-plan-management/production-plan-list')
-              //   }
-              // }).finally(() => {
-              //   this.submintLodaing = false
-              // })
-              return
+              params.id = this.id
+              api = 'editStorageApply'
             }
-            // this.$API.addProductionPlan(this.form).then(res => {
-            //   if (res.code === 0) {
-            //     this.$Message.success('添加成功')
-            //     this.$router.push('/production-plan-management/production-plan-list')
-            //   }
-            // }).finally(() => {
-            //   this.submintLodaing = false
-            // })
+            this.$API[api](params).then(res => {
+              if (res.code === 0) {
+                this.$Message.success(res.msg)
+                this.$router.push('/storage-management/storage-application')
+              }
+            }).finally(() => {
+              this.submintLodaing = false
+            })
           }
         })
       },
       beforeUpload(file) {
         const check = /.txt$/.test(file.name)
+        // this.$Message.info('正在上传')
         if (check) {
           this.$Message.warning('请不要上传txt格式的文件')
         }
@@ -243,6 +236,7 @@
       onsuccess(response) {
         if (response.code === 0) {
           this.$Message.success(response.msg)
+          console.log(response)
           this.form.fileItems.push(response.data.fileUploadVo)
         } else {
           this.$Message.error('上传有误')
@@ -256,13 +250,29 @@
       },
 
       // 获取详情
-      getProductionPlanDetail(id) {
+      getDetail(id) {
         // this.spinShow = true
-        // this.$API.getProductionPlanDetail({id}).then(res => {
-
-        // }).finally(() => {
-        //   this.spinShow = false
-        // })
+        this.$API.getStorageDetail(id).then(res => {
+          console.log(res)
+            if(res.code !== 0) return
+              let data = res.data
+              this.form =  {
+                supplierOrderNumber: data.supplier_order_number,
+                mkCode: data.mk_code,
+                orderTime: data.order_time,
+                packing: data.packing,
+                supplierId: data.supplier_id,
+                supplier: data.supplier,
+                amount: data.amount,
+                packingType: data.packing_type,
+                expectedQuantity: data.expected_quantity,
+                positionNumber: data.position_number,
+                remark: data.remark,
+                fileItems: [data.delivery_file],
+              },
+              this.orderChange()
+              this.spinShow = false
+        })
       },
       // 获取 统计包材订单待确认入库量+已实际入库量
       getNumberByOrder() {
@@ -312,9 +322,11 @@
       let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
       this.id = this.$route.query.id
       this.applicant = userInfo.realName
+
+      console.log(this.$route.query)
       this.supplyInstance()
       if (this.id) {
-        // this.getProductionPlanDetail(this.id)
+        this.getDetail(this.id)
       }
     },
     computed: {
