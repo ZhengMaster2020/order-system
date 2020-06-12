@@ -422,7 +422,7 @@
               }
             },
             { title: '申请状态', key: 'applyStatus', width: 100, align: 'center' },
-            { title: '生产供应商', key: 'supplier', width: 140, align: 'center' },
+            { title: '生产供应商', key: 'supplier', width: 180, align: 'center' },
             { title: '申请人', key: 'createdBy', width: 120, align: 'center' },
             { title: '申请时间', key: 'createdAt', width: 110, align: 'center' }
           ],
@@ -540,6 +540,12 @@
         if(selection.length === 0) return this.$Message.warning('请选择')
         if(selection.length > 1) return this.$Message.warning('只能审核一项')
 
+        let status = selection[0].applyStatus
+
+        if(status !== '已驳回') return this.$Message.warning('已驳回无法审核')
+        if(status !== '待确认') return this.$Message.warning('已审核')
+
+
         this.getStorageDetail(selection[0].id).then(code => {
           code === 0 && (this.spinShow = false)
         })
@@ -556,6 +562,8 @@
         if(selection.length === 0) return this.$Message.warning('请选择')
         if(selection.length > 1) return this.$Message.warning('只能审核一项')
 
+        let status = selection[0].applyStatus
+        if(status !== '待入库' && status !== '入库中') return this.$Message.warning('待入库或入库中才可以手动入库')
 
         let id = selection[0].id
 
@@ -570,8 +578,11 @@
         let page = this[currentTab + 'PageProps'].page
         let selection = this[selectName][page]
 
-        // if(selection.length === 0) return this.$Message.warning('请选择')
-        // if(selection.length > 1) return this.$Message.warning('只能审核一项')
+        if(selection.length === 0) return this.$Message.warning('请选择')
+        if(selection.length > 1) return this.$Message.warning('只能审核一项')
+
+        let status = selection[0].applyStatus
+        if(status !== '入库中') return this.$Message.warning('请确认入库申请单的状态')
 
         this.getStorageDetail(selection[0].id).then(code => {
           code === 0 && (this.spinShow = false)
@@ -583,7 +594,6 @@
         this.finishedModal.title = '完成入库'
         this.finishedModal.subTitle = '已确认入库记录'
         this.finishedModal.checkTitle = '完成入库'
-        // if(this.application.selection.length > 1) return this.$Message.error('一次只能操作一条数据')
       },
       confirmStorage() {
         let currentTab = this.currentTab
@@ -596,7 +606,6 @@
           })
         }
 
-        console.log(this[selectName])
         if(selection.length === 0) return this.$Message.warning('请选择')
 
         let applyIds = []
@@ -610,10 +619,10 @@
         })
 
         let isSameApplyId = applyIds.some(id => id !== applyIds[0])
-        // if(isSameApplyId) return this.$Message.warning('请选择同一申请入库单')
+        if(isSameApplyId) return this.$Message.warning('请选择同一入库申请单')
 
-        // let isPendingConfirme = storageStatus.some(status => status !== '待确认')
-        // if(isPendingConfirme) return this.$Message.warning('请选择待确认')
+        let isPendingConfirme = storageStatus.some(status => status !== '待确认')
+        if(isPendingConfirme) return this.$Message.warning('请选择待确认状态的入库申请单')
 
         this.finishedModal.form.storageRecordIds = recordIds
 
