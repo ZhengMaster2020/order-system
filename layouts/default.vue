@@ -78,6 +78,7 @@
 </template>
 
 <script>
+import ENV from '../api/env'
 import Cookies from 'js-cookie'
 import router from '~/plugins/router'
 import shrinkableMenu from '~/components/shrinkable-menu/shrinkable-menu.vue'
@@ -131,14 +132,40 @@ export default {
     }
   },
   mounted() {
-    this.menuList = router
+    // this.menuList = router
     // console.log(this.$router.options.routes, router)
     // this.$nextTick(() => {
     //   this.$nuxt.$loading.start()
     //   setTimeout(() => this.$nuxt.$loading.finish(), 600)
     // })
+    let powerEnum = {
+      'FD-0001': '超级管理员',
+      'FD-7724': '李时达',
+      'FD-13059': '谢绮玲',
+      'FD-11271': '李锐钊',
+      'FD-2202': '吴马红',
+      'FD-17494': '刘金梁',
+    }
+    if (ENV === 'production') {
+      delete powerEnum['FD-0001']
+    }
     this.$API.getUserInfo()
       .then((res) => {
+        if (res.code === 0) {
+          if (powerEnum[res.data.username]) {
+            // 包含在里面 显示全部路由
+            this.menuList = router
+          } else {
+            // 不包含在里面  只显示防伪码查询
+            let searchCodeGroup = router.filter(item => item.name === '/security-code')
+            searchCodeGroup.forEach((items, index) => {
+              items.children = items.children.filter(item => item.path = 'security-code/search-code')
+            })
+            console.log(searchCodeGroup)
+            this.menuList = searchCodeGroup
+          }
+        }
+        window.localStorage.setItem('userInfo', JSON.stringify(res.data))
         this.userInfo = res.data;
       })
   },
@@ -172,6 +199,10 @@ export default {
     fullscreenChange(isFullScreen) {
       // console.log(isFullScreen);
     }
+  },
+  beforeRouteEnter:(to,from,next) => {
+    console.log(to)
+    next()
   }
 }
 </script>
