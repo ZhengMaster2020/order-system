@@ -1000,6 +1000,7 @@
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
         if(title === '出库单审核') {
+          if(selection.status === '已驳回') return this.$Message.warning('已驳回无法审核')
           if(selection.status !== '待审核') return this.$Message.warning('已审核')
         }else {
           if(selection.status !== '出库中') return this.$Message.warning('非出库中,不允许执行出库完成')
@@ -1036,8 +1037,8 @@
         let msg = this.singelOperate()
         if(msg) return this.$Message.warning(msg)
         let selection = this.selection[this[this.currentTab].pageProps.page][0]
-        let check = selection.status === '待打印' || selection.status === '出库中'
-        if(!check) return this.$Message.warning('待打印或出库中才能打印')
+        let check = selection.status === '待打印' || selection.status === '出库中' || selection.status === '待出库'
+        if(!check) return this.$Message.warning('待打印或待出库或出库中才能打印')
 
         this.getOutboundDetail()
         this.printModal.show = true
