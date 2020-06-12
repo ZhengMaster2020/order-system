@@ -154,7 +154,7 @@
               </div>
               <div class="upload-file">
                 <div class="upload-list" v-for="(file, index) in form.fileItems" :key="index">
-                  <a href="javascript:void(0)" class="download-link" @click="showImageModal(file.url)">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
+                  <a href="javascript:void(0)" class="download-link" @click="showImageModal(file.url)">{{file.name}}</a>
 <!--                  <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
                   <Icon v-if="file.uid" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>
                 </div>
@@ -181,7 +181,7 @@
                 </Upload>
               </div>
               <div class="upload-list serialdata" v-for="(file, index) in form.serialCodeItems">
-                <a :key="index" :href="file.url" :download="file.name" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
+                <a :key="index" :href="file.url" :download="file.name" class="download-link">{{file.name}}</a>
                 <Icon v-if="file.uid" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '导入序列号')"/>
               </div>
 <!--              <a v-for="(file, index) in form.serialCodeItems" :key="index" :href="file.url" class="serialdata download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->

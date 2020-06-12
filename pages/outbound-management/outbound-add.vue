@@ -8,7 +8,7 @@
       <Form :model="form" ref="form" inline :rules="rules">
         <Row>
           <FormItem label="申请人">
-            <Input class="width-200" v-model="form.applicant" readonly/>
+            <Input class="width-200 readonly-color" v-model="form.applicant" readonly/>
           </FormItem>
           <FormItem label="品牌">
             <Select v-model="form.brand" placeholder="品牌" class="width-200">
@@ -27,25 +27,25 @@
             </Select>
           </FormItem>
           <FormItem label="产品名称">
-            <Input class="width-200" v-model="form.productName" readonly/>
+            <Input class="width-200 readonly-color" v-model="form.productName" readonly/>
           </FormItem>
         </Row>
 
         <Row>
           <FormItem label="下单数量">
-            <Input class="width-200" v-model="form.orderNumber" readonly/>
+            <Input class="width-200 readonly-color" v-model="form.orderNumber" readonly/>
 
           </FormItem>
           <FormItem label="产品类型">
-            <Input class="width-200" v-model="form.productType" readonly/>
+            <Input class="width-200 readonly-color" v-model="form.productType" readonly/>
           </FormItem>
 
 
           <FormItem label="供应商名称">
-            <Input style="width: 220px" v-model="form.supplier" readonly/>
+            <Input style="width: 220px" class="readonly-color" v-model="form.supplier" readonly/>
           </FormItem>
           <FormItem label="要求期货">
-            <Input class="width-200" v-model="form.requireDeliveryTime" readonly/>
+            <Input class="width-200 readonly-color" v-model="form.requireDeliveryTime" readonly/>
           </FormItem>
           <FormItem label="紧急程度">
             <Input class="width-200" v-model="form.urgency"/>
@@ -81,7 +81,7 @@
 
         <Row>
           <FormItem label="剩余可出库量">
-            <Input class="width-200" v-model="remainNum" readonly/>
+            <Input class="width-200 readonly-color" v-model="remainNum" readonly/>
           </FormItem>
           <FormItem label="本次预计出库量" prop="expectedOutboundNumber">
             <!--            <Input class="width-200" v-model="form.expectedOutboundNumber"/>-->
@@ -241,7 +241,7 @@
       mkCodeChange() {
         let {mkCode, gbOrderSn} = this.form
         if(!gbOrderSn) return
-        console.log(mkCode, gbOrderSn)
+        // console.log(mkCode, gbOrderSn)
 
         let info = this.supplyInfo.find(items => mkCode === items.mk_code && gbOrderSn === items.order_no)
         if(info) {
@@ -249,7 +249,7 @@
           this.form.productType = this.switchProType(info.product_type) // product_type
           this.form.orderNumber = info.amount
           this.form.supplier = info.supplier
-          this.form.requireDeliveryTime = info.demand_delivery == 0 ? '' : info.demand_delivery
+          this.form.requireDeliveryTime = info.demand_delivery == 0 ? '' : this.$format(info.demand_delivery, 'yyyy-MM-dd')
           this.hasInfo = true
         }else {
           this.hasInfo = false
@@ -381,6 +381,10 @@
 
   .font-size-12 {
     font-size: 12px;
+  }
+
+  .readonly-color /deep/ .ivu-input{
+    color: #d3cccc;
   }
 
   .necessary:before {

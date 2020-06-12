@@ -205,7 +205,7 @@
           <span class="line"></span>
         </div>
         <FormItem label="经办人">
-          <Input class="width-170" v-model="userInfo.realName" readonly/>
+          <Input class="width-170" v-model="detailData.createdBy" readonly/>
         </FormItem>
         <FormItem label="审核" prop="isPass" v-show="reviewModal.title === '出库单审核'">
           <RadioGroup v-model="reviewModal.form.isPass" class="width-120">
@@ -280,9 +280,9 @@
               <!--            TODO:  剩余可出库量-->
               <td>{{detailData.expectedOutboundNumber}}</td>
               <td>{{detailData.isReissue}}</td>
-              <td>{{detailData.reissueType}}</td>
-              <td>{{detailData.lossSn}}</td>
-              <td>{{detailData.lossNumber}}</td>
+              <td>{{(!detailData.reissueType || detailData.reissueType === '-') ? '无' : detailData.reissueType}}</td>
+              <td>{{(!detailData.lossSn || detailData.lossSn === '-') ? '无' : detailData.lossSn}}</td>
+              <td>{{(!detailData.lossNumber || detailData.lossNumber === '-') ? '无' : detailData.lossNumber}}</td>
               <td>{{detailData.expectedOutboundNumber}}</td>
               <td colspan="4">{{detailData.outboundReason}}</td>
             </tr>
@@ -631,6 +631,8 @@
             {title: '序号', type: 'index', width: 70, align: 'center'},
             {title: '申请人', key: 'created_by', width: 110, align: 'center'},
             {title: '申请时间', key: 'created_at', width: 110, align: 'center'},
+            {title: '灌包订单号', key: 'gb_order_sn', minWidth: 195, align: 'center'},
+            {title: '品牌', key: 'brand', width: 110, align: 'center'},
             {title: '出库单号', key: 'outbound_order_sn', minWidth: 195, align: 'center'},
             {title: '是否补发', key: 'is_reissue', width: 70, align: 'center'},
             {title: '慕可代码', key: 'mk_code', minWidth: 100, align: 'center'},
@@ -826,21 +828,6 @@
             opinion: ''
           }
           this.$refs.reviewForm.resetFields()
-          // if(this.reviewModal.title !== '完成出库'){
-          //   this.reviewModal.form = {
-          //     outboundApplyId: '',
-          //     isPass: 'yes',
-          //     opinion: ''
-          //   }
-          //   this.$refs.reviewForm.resetFields()
-          // }else {
-          //   this.reviewModal.form = {
-          //     outboundApplyId: '',
-          //     isPass: 'yes',
-          //     opinion: ''
-          //   }
-          //   this.$refs.reviewForm.resetFields()
-          // }
         }
       },
       ['confirmModal.show'](cur) {
@@ -884,13 +871,6 @@
         if (this.selection[pageProps.page].length > 1) return message = '一次只能操作一条数据'
         if (this.selection[pageProps.page].length === 0) return message = '请选择'
       },
-
-      // Form 操作
-      // addPlan() {
-      //   let currentTab = this.currentTab
-      //   let pageProps = this[currentTab].pageProps
-      //   if (this.selection[pageProps.page].length > 1) return this.$Message.warning('一次只能操作一条数据')
-      // },
 
       editApply() {
         let msg = this.singelOperate()
