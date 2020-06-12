@@ -135,9 +135,8 @@
             </div>
             <div class="upload-file">
               <div class="upload-list" v-for="(file, index) in form.boxItems" :key="index">
-<!--                <a href="javascript:void(0)" class="download-link" >{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
-                                  <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
-                <Icon type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>
+                <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>
+                <Icon type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index)"/>
               </div>
             </div>
           </div>
@@ -272,7 +271,7 @@
           name: 'storage-management/storage-application',
           params: {
             tab: 'record',
-            supplierOrderNumber: this.form.supplierOrderNumber
+            supplierOrderNumber: this.detailData.supplier_order_number
           }
         })
       },
@@ -379,49 +378,77 @@
 
       // 获取申请详情
       getDetail(id) {
-        // this.spinShow = true
-        this.$API.getStorageDetail(id).then(res => {
-          if (res.code !== 0) return
-          let data = res.data
-
-          this.form.boxItems = data.box_file
-          this.detailData = data
-          this.detailData.delivery_file = [data.delivery_file]
-          this.spinShow = false
+        return this.$API.getStorageDetail(id).then(res => {
+          if (res.code === 0) {
+            let data = res.data
+            this.form.boxItems = data.box_file
+            this.detailData = data
+            this.detailData.delivery_file = data.delivery_file
+          }
+          return res.code
         })
       },
 
       // 获取记录详情
       getRecordDetail(id) {
         // this.spinShow = true
-        this.$API.getStorageRecordDetail(id).then(res => {
-          if (res.code !== 0) return
-          let data = res.data
-          this.detailData = {
-            created_by: data.createdBy,
-            created_at: data.createdAt,
-            storage_number: data.storageNumber,
-            supplier_order_number: data.supplierOrderNumber,
-            amount: data.amount,
-            expected_quantity: data.expectedQuantity,
-            order_time: data.orderTime,
-            supplier: data.supplier,
-            packing: data.packing,
-            packing_type: data.packingType,
-            position_number: data.positionNumber,
-            remark: data.remark,
+        return this.$API.getStorageRecordDetail(id).then(res => {
+          if (res.code === 0) {
+            let data = res.data
+            this.detailData = {
+              created_by: data.createdBy,
+              created_at: data.createdAt,
+              storage_number: data.storageNumber,
+              supplier_order_number: data.supplierOrderNumber,
+              amount: data.amount,
+              expected_quantity: data.expectedQuantity,
+              order_time: data.orderTime,
+              supplier: data.supplier,
+              packing: data.packing,
+              packing_type: data.packingType,
+              position_number: data.positionNumber,
+              remark: data.remark,
+              delivery_file: data.fileItems
+            }
+            this.form.boxItems = data.boxItems
           }
-          this.detailData.delivery_file = [data.fileItems]
-          this.spinShow = false
+          return res.code
+        })
+      },
+
+      // 获取记录数据
+      getStorageRecordById(id) {
+        return this.$API.getStorageRecordByIds({ids: [id]}).then(res => {
+          if (res.code === 0) {
+            let data = res.data
+            this.detailData = {
+              created_by: data.createdBy,
+              created_at: data.createdAt,
+              storage_number: data.storageNumber,
+              supplier_order_number: data.supplierOrderNumber,
+              amount: data.amount,
+              expected_quantity: data.expectedQuantity,
+              order_time: data.orderTime,
+              supplier: data.supplier,
+              packing: data.packing,
+              packing_type: data.packingType,
+              position_number: data.positionNumber,
+              remark: data.remark,
+            }
+            this.detailData.delivery_file = [data.fileItems]
+          }
+          return res.code
         })
       },
 
       // 通过入库申请id获取入库数量(待确认+已确认)
       getNumberByApplyId(id) {
         // this.spinShow = true
-        this.$API.getNumberByApplyId(id).then(res => {
-          if (res.code !== 0) return
-          this.numberByapplyId = res.data[0]
+        return this.$API.getNumberByApplyId(id).then(res => {
+          if (res.code !== 0) {
+            this.numberByapplyId = res.data[0]
+          }
+          return res.code
         })
       }
     },
@@ -429,14 +456,27 @@
       this.userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
       this.applyId = this.$route.query.applyId
       this.recordId = this.$route.query.recordId
+
+      this.spinShow = true
+
       if(this.$route.query.recordId) {
+        console.log('修改入库记录')
         this.subTitle = '修改入库记录'
         this.form.id = this.recordId
-        this.getRecordDetail(this.recordId)
+        this.getRecordDetail(this.recordId).then(() => {
+          return this.getStorageRecordById(this.recordId)
+        }).then(code => {
+          code === 0 && (this.spinShow = false)
+        })
+
       }else {
+        console.log('手动入库')
         this.form.id = this.applyId
-        this.getDetail(this.applyId)
-        this.getNumberByApplyId(this.applyId)
+        this.getDetail(this.applyId).then(() => {
+          return this.getNumberByApplyId(this.applyId)
+        }).then(code => {
+          code === 0 && (this.spinShow = false)
+        })
       }
     },
     computed: {

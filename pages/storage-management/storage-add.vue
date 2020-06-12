@@ -58,7 +58,7 @@
           </Col>
           <Col span="4">
             <FormItem label="本次预计入库量" style="width: 100%" prop="expectedQuantity">
-              <InputNumber :min="0" :max="expectedQuantityMax" style="width: 100%" v-model="form.expectedQuantity"/>
+              <InputNumber :min="0" :max="remainNumber" style="width: 100%" v-model="form.expectedQuantity"/>
             </FormItem>
           </Col>
           <Col span="4">
@@ -173,7 +173,7 @@
           this.mkCodeList = [...new Set(mkCodeList)].map(items => ({value: items, label: items}))
 
         }).then(() => {
-          // this.getNumberByOrder()
+          this.getNumberByOrder(this.form.supplierOrderNumber)
         }).catch(err => {
           console.log(err)
         })
@@ -268,34 +268,33 @@
                 expectedQuantity: data.expected_quantity,
                 positionNumber: data.position_number,
                 remark: data.remark,
-                fileItems: [data.delivery_file],
+                fileItems: data.delivery_file,
               },
               this.orderChange()
               this.spinShow = false
         })
       },
       // 获取 统计包材订单待确认入库量+已实际入库量
-      getNumberByOrder() {
-        // this.spinShow = true
-        // this.$API.getNumberByOrder({orderNumber}).then(res => {
-        //   if (res.code === 0) {
-        //
-        //   }
-        // }).finally(() => {
-        //   this.spinShow = false
-        // })
+      getNumberByOrder(orderNumber) {
+        this.$API.getNumberByOrder({orderNumber}).then(res => {
+          if (res.code === 0) {
+            this.numberByOrder = res.data[0]
+          }
+        }).finally(() => {
+          this.spinShow = false
+        })
       },
       // 获取 通过批次号统计入库数量(待确认+已确认)
-      getNumberByBatch() {
-        // this.spinShow = true
-        // this.$API.getNumberByBatch({orderNumber}).then(res => {
-        //   if (res.code === 0) {
-        //
-        //   }
-        // }).finally(() => {
-        //   this.spinShow = false
-        // })
-      },
+      // getNumberByBatch() {
+      //   this.spinShow = true
+      //   this.$API.getNumberByBatch({orderNumber}).then(res => {
+      //     if (res.code === 0) {
+      //
+      //     }
+      //   }).finally(() => {
+      //     this.spinShow = false
+      //   })
+      // },
 
       // 采购系统api
       supplyInstance() {
@@ -330,16 +329,9 @@
       }
     },
     computed: {
-      expectedQuantityMax() {
-        // 剩余 + 本次预计 < 下单数
-        let amount = this.form.amount
-        let remainNumber = this.remainNumber
-        // console.log(Number(amount) - Number(remainNumber), 'com')
-        return Number(amount) - Number(remainNumber)
-      },
       remainNumber() {
-        // 下单 - （待确认 + 实际）
-        this.numberByOrder = 10
+        // TODO: 下单 - （待确认 + 实际）
+        // this.numberByOrder = 10
         return this.form.amount ? (this.form.amount - this.numberByOrder) + '' : ''
       }
     }

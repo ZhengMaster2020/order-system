@@ -18,7 +18,7 @@
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="3">
 <!--            <Input placeholder="申请状态" v-model="searchForm[currentTab].applyStatus" clearable></Input>-->
-            <Select placeholder="申请状态" v-model="searchForm[currentTab].applyStatus">
+            <Select placeholder="申请状态" v-model="searchForm[currentTab].applyStatus" clearable>
               <Option v-for="(status, index) in applyStatusList" :key="index" :value="status.value" :label="status.label"/>
             </Select>
           </Col>
@@ -51,9 +51,6 @@
           <Col :xs="24" :sm="12" :md="6" :lg="3">
             <Input placeholder="入库记录员" v-model="searchForm[currentTab].createdBy" clearable></Input>
           </Col>
-<!--          <Col :xs="24" :sm="12" :md="6" :lg="3">-->
-<!--            <Input placeholder="入库时间" v-model="searchForm[currentTab].createdTime" clearable></Input>-->
-<!--          </Col>-->
           <Col :xs="24" :sm="12" :md="6" :lg="3">
             <DatePicker  v-model="storageDate" clearable type="date" placeholder="入库时间" @on-change="dateChange"/>
           </Col>
@@ -62,9 +59,8 @@
             <Input placeholder="入库单号" v-model="searchForm[currentTab].storageNumber" clearable></Input>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="3">
-            <!--            <Input placeholder="申请状态" v-model="searchForm[currentTab].applyStatus" clearable></Input>-->
-            <Select placeholder="入库类型" v-model="searchForm[currentTab].storageType">
-              <Option v-for="(status, index) in applyStatusList" :key="index" :value="status.value" :label="status.label"/>
+            <Select placeholder="入库类型" v-model="searchForm[currentTab].storageType" clearable>
+              <Option v-for="(type, index) in storageType" :key="index" :value="type.value" :label="type.label"/>
             </Select>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="3">
@@ -98,8 +94,8 @@
                   size="small"
                   show-elevator
                   show-sizer
-                  @on-change="(page) => { changePage(page, 'application') }"
-                  @on-page-size-change="(size) => { changePageSize(size, 'application') }" />
+                  @on-change="(page) => { changePage(page, 'applicationPageProps') }"
+                  @on-page-size-change="(size) => { changePageSize(size, 'applicationPageProps') }" />
           </div>
         </TabPane>
 
@@ -264,7 +260,7 @@
                :key="index">{{file.name}}</a>
           </div>
         </FormItem>
-        <FormItem class="width-160">
+        <FormItem>
           <div>装箱单</div>
           <div>
             <a :href="file.url" :download="file.name" class="download-link"
@@ -438,7 +434,7 @@
             { title: '关联入库单号', key: 'storage_number', width: 140, align: 'center' },
             { title: '生产批次号', key: 'batch_number', width: 140, align: 'center' },
             { title: '生产数量', key: 'batch_num', width: 100, align: 'center' },
-            { title: '本次入库数量', key: 'current_quantity', width: 120, align: 'center' },
+            { title: '本次入库数量', key: 'current_quantity', width: 130, align: 'center' },
             { title: '状态', key: 'storage_status', width: 110, align: 'center' },
             { title: '入库记录员', key: 'created_by', width: 130, align: 'center' },
             { title: '入库时间', key: 'created_at', width: 130, align: 'center'},
@@ -520,6 +516,10 @@
           {value: 'inStock', label: '入库中'},
           {value: 'completed', label: '完成入库'},
           {value: 'overrule', label: '已驳回'},
+        ],
+        storageType: [
+          {value: 'manual', label: '手动入库'},
+          {value: 'scan', label: '扫码入库'}
         ]
       }
     },
@@ -529,6 +529,7 @@
         let currentTab = this.currentTab
 
         console.log(this.searchForm[currentTab])
+        this.getList('search')
         // if(this.application.selection.length > 1) return this.$Message.error('一次只能操作一条数据')
       },
       reivew() {
@@ -595,6 +596,7 @@
         this.finishedModal.subTitle = '已确认入库记录'
         this.finishedModal.checkTitle = '完成入库'
       },
+
       confirmStorage() {
         let currentTab = this.currentTab
         let selectName = [currentTab + 'Selected']
@@ -655,7 +657,6 @@
         this.cancelModal.form.id = selection[0].id
 
         this.cancelModal.show = true
-        // if(this.application.selection.length > 1) return this.$Message.error('一次只能操作一条数据')
       },
       exportStorageData(id) {
 
@@ -671,8 +672,11 @@
         if(selection.length === 0) return this.$Message.warning('请选择')
         if(selection.length > 1) return this.$Message.warning('只能修改一项')
         let id = selection[0].id
-
+        let check = null
         if(this.currentTab === 'application'){
+          check = selection[0].applyStatus === '待审核' || selection[0].applyStatus === '已驳回'
+          if(!check) return this.$Message.warning('待审核或已驳回才能修改')
+
           this.$router.push({
             path: '/storage-management/storage-add',
             query: {id}
@@ -680,6 +684,10 @@
           return
         }
 
+        check = selection[0].storage_status === '待确认' || selection[0].storage_status === '已驳回'
+        if(!check) return this.$Message.warning('待确认或已驳回才能修改')
+
+        console.log(id, 'edit')
         this.$router.push({
           path: '/storage-management/storage-manual',
           query: {
@@ -699,17 +707,17 @@
       // 改变当前分页
       changePage (page, key) {
         this[key].page = page
-        // this.getList();
+        this.getList();
       },
       // 改变分页size
       changePageSize (pageSize, key) {
         this[key].perPage = pageSize
-        // this.getList();
+        this.getList();
       },
       // 改变分页size
       dateChange (date, key) {
         this.searchForm[this.currentTab].createdTime = date
-        // this.getList();
+        this.getList();
       },
       submit(modal, form) {
 
@@ -758,6 +766,7 @@
         params.page = this[this.currentTab + 'PageProps'].page
         params.perPage = this[this.currentTab + 'PageProps'].perPage
 
+        console.log(this.searchForm[currentTab].supplierOrderNumber)
         this.tableLodaing = true
         this.$API[api](params).then(res => {
           // console.log(res)
@@ -817,9 +826,10 @@
             packing_type: res.data.packingType,
             position_number: res.data.positionNumber,
             remark: res.data.remark,
+            delivery_file: res.data.fileItems,
+            box_file: res.data.boxItems,
           }
 
-          this.detailData.delivery_file = [res.data.fileItems]
           if(res.data.storage_record && res.data.storage_record.length > 0) {
             this.detailData.curStorageTotal = res.data.storage_record.reduce((pre, cur) => {
               return pre + cur.current_quantity
@@ -841,7 +851,7 @@
                 mark_type: items.markType,
                 storage_type: items.storageType,
                 batch_num: items.batchNum,
-                current_quantity: items.currentQuantity,
+                current_quantity: items.currentQuantity
               }
             })
             if(res.data.length > 0) {
