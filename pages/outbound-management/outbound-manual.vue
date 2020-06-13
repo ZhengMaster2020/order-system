@@ -125,7 +125,7 @@
           </Col>
           <Col span="4">
             <FormItem label="出库单剩余可出库量" style="width: 100%">
-              <Input v-model="detailData.remainNumTotal" readonly/>
+              <Input :value="detailData.expectedOutboundNumber - detailData.remainNumTotal" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
