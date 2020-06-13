@@ -14,6 +14,13 @@ const powerEnum = {
   'FD-17494': '刘金梁',
 }
 
+let storeEnum = {
+  'FD-16349': '周一娜',
+  'FD-14775': '陈家茵',
+  'FD-16751': '罗鑫妍',
+  'FD-12492': '黄小亮'
+}
+
 if (ENV === 'production') {
   delete powerEnum['FD-0001']
 }
@@ -29,8 +36,14 @@ export default ({ app, store }) => {
           // 包含在里面 通过全部路由
           next();
         } else {
-          // 不包含在里面  只通过防伪码查询/登录/主页
-          let menuList = [{path: 'security-code/search-code'}, {path: 'login'}, {path: ''}]
+          let menuList
+          if (storeEnum[userInfo.username]) {
+            // 包含在storeEnum组里 只通过渠道和店铺设置/登录/主页
+            menuList = [{path: 'inquire-anomaly-tracking/channel-store-settings'}, {path: 'login'}, {path: ''}]
+          } else {
+            // 其他 只通过防伪码查询/登录/主页
+            menuList = [{path: 'security-code/search-code'}, {path: 'login'}, {path: ''}]
+          }
           if (menuList.find(item => ('/' + item.path) === to.path )) {
             next();
           } else {
