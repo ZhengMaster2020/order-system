@@ -489,7 +489,7 @@
           if(this.id) {
             let serialCodeData = JSON.parse(JSON.stringify(this.form.serialCodeData))
 
-            let editLgTheoretical = serialCodeData.some(items => items.startNumber >= items.endNumber)
+            let editLgTheoretical = serialCodeData.some(items => items.startNumber > items.endNumber)
 
             if(editLgTheoretical) return this.$Message.error('序列号结束值须大于起始值')
 
@@ -536,7 +536,6 @@
           if(!params.serialCodeItems.length > 0){
             delete params.serialCodeItems
           }else{
-            // aaa
             params.serialCodeItems = params.serialCodeItems.forEach(items => {
               items.uid && delete items.uid
             })
