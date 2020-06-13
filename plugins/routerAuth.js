@@ -39,7 +39,7 @@ export default ({ app, store }) => {
           let menuList
           if (storeEnum[userInfo.username]) {
             // 包含在storeEnum组里 只通过渠道和店铺设置/登录/主页
-            menuList = [{path: 'inquire-anomaly-tracking/channel-store-settings'}, {path: 'login'}, {path: ''}]
+            menuList = [{path: 'inquire-anomaly-tracking/channel-store-settings'}, {path: 'inquire-anomaly-tracking/store-setting-operations'}, {path: 'login'}, {path: ''}]
           } else {
             // 其他 只通过防伪码查询/登录/主页
             menuList = [{path: 'security-code/search-code'}, {path: 'login'}, {path: ''}]
