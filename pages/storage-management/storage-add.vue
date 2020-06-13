@@ -19,7 +19,7 @@
           </Col>
           <Col span="4">
             <FormItem label="慕可代码" style="width: 100%">
-              <Select v-model="form.mkCode" clearable @on-change="mkCodeChange">
+              <Select v-model="form.mkCode" clearable @on-change="mkCodeChange" :not-found-text="notFoundText" >
                 <Option v-for="mkCode in mkCodeList" :key="mkCode.label" :value="mkCode.value" :label="mkCode.label" />
               </Select>
             </FormItem>
@@ -145,6 +145,7 @@
           expectedQuantity: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
           positionNumber: [{required: true, message: '必填项', trigger: 'blur'}],
         },
+        isClear: true,
         mkCodeList: [],
         numberByOrder: null
         // change: this.$debonce(this.orderChange, 500, 'footer')
@@ -157,8 +158,15 @@
         // console.log(this.form.supplierOrderNumber)
         this.mkCodeList = []
         this.notFoundText = '加载中...'
+        let supplierOrderNumber = this.form.supplierOrderNumber
 
-        this.getSupplyInfo({order_no: this.form.supplierOrderNumber}).then(res => {
+        if(this.isClear) {
+          this.clearInfo()
+        }
+        this.isClear = true
+        if(!supplierOrderNumber) return
+
+        return this.getSupplyInfo({order_no: supplierOrderNumber}).then(res => {
           if(res.code !== 200 || res.data.length === 0) {
             this.notFoundText = '无匹配数据'
             this.mkCodeList = []
@@ -173,7 +181,7 @@
           this.mkCodeList = [...new Set(mkCodeList)].map(items => ({value: items, label: items}))
 
         }).then(() => {
-          this.getNumberByOrder(this.form.supplierOrderNumber)
+          this.getNumberByOrder(supplierOrderNumber)
         }).catch(err => {
           console.log(err)
         })
@@ -183,23 +191,44 @@
       mkCodeChange() {
         let {mkCode, supplierOrderNumber} = this.form
         if(!supplierOrderNumber) return
+        if(!mkCode) return this.clearInfo()
         // console.log(mkCode, supplierOrderNumber)
 
         let info = this.supplyInfo.find(items => mkCode === items.mk_code && supplierOrderNumber === items.order_no)
         if(info) {
-          this.form.packing = info.packing
-          this.form.packingType = info.type // product_type
-          this.form.amount = +info.amount
-          this.form.supplier = info.supplier
-          this.form.supplierId = info.supplier_id
-          this.form.orderTime = info.created_at == 0 ? '' : info.created_at
+          this.form = {
+            ...this.form,
+            packing: info.packing,
+            packingType: info.type,
+            amount: +info.amount,
+            supplier: info.supplier,
+            supplierId: info.supplier_id,
+            orderTime: info.created_at == 0 ? '' : this.$format(info.created_at, 'yyyy-MM-dd hh:mm:ss')
+          }
+
           this.hasInfo = true
         }else {
           this.hasInfo = false
-          this.$Message.warning('请确认包材订单号，慕可代码是否正确')
+          // this.$Message.warning('请确认包材订单号，慕可代码是否正确')
         }
       },
 
+      // 清空慕可代码下的订单信息
+      clearInfo() {
+        this.form = {
+          ...this.form,
+          packing: '',
+          packingType: '',
+          amount: null,
+          supplier: '',
+          supplierId: null,
+          orderTime: '',
+          mkCode: '',
+          expectedQuantity: null,
+          positionNumber: ''
+        }
+        this.hasInfo = false
+      },
 
       submit() {
         this.$refs.form.validate(val => {
@@ -251,7 +280,7 @@
 
       // 获取详情
       getDetail(id) {
-        // this.spinShow = true
+        this.spinShow = true
         this.$API.getStorageDetail(id).then(res => {
           console.log(res)
             if(res.code !== 0) return
@@ -259,23 +288,20 @@
               this.form =  {
                 supplierOrderNumber: data.supplier_order_number,
                 mkCode: data.mk_code,
-                orderTime: data.order_time,
-                packing: data.packing,
-                supplierId: data.supplier_id,
-                supplier: data.supplier,
-                amount: data.amount,
-                packingType: data.packing_type,
                 expectedQuantity: data.expected_quantity,
                 positionNumber: data.position_number,
                 remark: data.remark,
                 fileItems: data.delivery_file,
-              },
-              this.orderChange()
-              this.spinShow = false
+              }
+              this.orderChange().then(() => {
+                this.mkCodeChange()
+              })
+              // this.spinShow = false
         })
       },
       // 获取 统计包材订单待确认入库量+已实际入库量
       getNumberByOrder(orderNumber) {
+        if(!orderNumber) return
         this.$API.getNumberByOrder({orderNumber}).then(res => {
           if (res.code === 0) {
             this.numberByOrder = res.data[0]
@@ -284,17 +310,6 @@
           this.spinShow = false
         })
       },
-      // 获取 通过批次号统计入库数量(待确认+已确认)
-      // getNumberByBatch() {
-      //   this.spinShow = true
-      //   this.$API.getNumberByBatch({orderNumber}).then(res => {
-      //     if (res.code === 0) {
-      //
-      //     }
-      //   }).finally(() => {
-      //     this.spinShow = false
-      //   })
-      // },
 
       // 采购系统api
       supplyInstance() {
@@ -322,17 +337,19 @@
       this.id = this.$route.query.id
       this.applicant = userInfo.realName
 
-      console.log(this.$route.query)
+      // console.log(this.$route.query)
       this.supplyInstance()
       if (this.id) {
+        this.isClear = false
         this.getDetail(this.id)
       }
     },
     computed: {
       remainNumber() {
         // TODO: 下单 - （待确认 + 实际）
-        // this.numberByOrder = 10
-        return this.form.amount ? (this.form.amount - this.numberByOrder) + '' : ''
+        console.log(this.form.amount ,this.numberByOrder)
+        let amount = this.form.amount
+        return amount !== null ? (this.form.amount - this.numberByOrder) : null
       }
     }
   }

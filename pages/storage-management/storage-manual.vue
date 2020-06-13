@@ -261,6 +261,7 @@
           currentQuantity: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
         },
         numberByapplyId: null,
+        currentQuantity: null,
       }
     },
     methods: {
@@ -319,7 +320,6 @@
           this.form.batchData[index].remainNum = null
           return
         }
-        console.log(768)
         this.$API.getProductionBatch({batchNumber, page: 1, perPage: 1000}).then(res => {
           if(res.code !== 0) return
           let {list} = res.data
@@ -354,6 +354,8 @@
         // this.submitLoading = true
         if(this.applyId){
           if(params.boxItems.length === 0) return this.$Message.warning('请上传装箱单')
+          if(this.actualNumberTotal > this.remainNumber) return this.$Message.warning('本次入库总量不能入库申请单剩余可入库量')
+
           params.batchData = params.batchData.map(items => {
             return {
               batchNumber: items.batchNumber,
@@ -421,7 +423,7 @@
               position_number: data.positionNumber,
               remark: data.remark,
               delivery_file: data.fileItems,
-              recordRemainNumber: data.remainNumber
+              recordRemainNumber: data.remainNumber + this.currentQuantity
             }
             this.form.batchData[0].batchNumber = data.batchNumber
             this.form.batchData[0].inStockNumber = data.inStockNumber
@@ -445,13 +447,14 @@
     },
     mounted() {
       this.userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
-      this.applyId = this.$route.query.applyId
-      this.recordId = this.$route.query.recordId
+      this.applyId = this.$route.query.applyId || null
+      this.recordId = this.$route.query.recordId  || null
+      this.currentQuantity = this.$route.query.currentQuantity || null
 
       this.spinShow = true
 
       if(this.$route.query.recordId) {
-        console.log('修改入库记录')
+        console.log('修改入库记录', this.currentQuantity)
         this.subTitle = '修改入库记录'
         this.form.id = this.recordId
         this.getRecordDetail(this.recordId).then(code => {
@@ -487,7 +490,6 @@
 
       remainNumber() {
         // 剩余可入库 < 入库记录待确认 + 已确认 TODO: 接口待定
-        console.log(this.detailData.expected_quantity, this.numberByapplyId)
         return this.detailData.expected_quantity - this.numberByapplyId
       }
 
@@ -546,6 +548,15 @@
   .endNumStyle {
     width: 100%;
     padding-top: 34px;
+  }
+  .necessary:before {
+    content: '*';
+    display: inline-block;
+    margin-right: 4px;
+    line-height: 1;
+    font-family: SimSun;
+    font-size: 12px;
+    color: #ed4014;
   }
 
 </style>

@@ -151,6 +151,16 @@ const editStorageRecord = (data) => {
   })
 };
 
+// 入库记录 - 导出
+const exportStorageRecord = (params) => {
+  return fetch({
+    url: `traceability/storage-record/export`,
+    method: 'GET',
+    responseType: 'blob',
+    params
+  })
+};
+
 
 export default {
   getStorageList,
@@ -169,5 +179,6 @@ export default {
   confirmStorageRecord,
   cancelStorageRecord,
   getStorageRecordDetail,
-  editStorageRecord
+  editStorageRecord,
+  exportStorageRecord
 }

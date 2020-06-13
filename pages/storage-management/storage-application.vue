@@ -29,7 +29,7 @@
             <Input placeholder="包材名称" v-model="searchForm[currentTab].packing" clearable></Input>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="2">
-            <Button type="primary" @click="search('search')">搜索</Button>
+            <Button type="primary" @click="getList('search')">搜索</Button>
           </Col>
         </Row>
 
@@ -67,7 +67,7 @@
             <Input placeholder="下单编号" v-model="searchForm[currentTab].supplierOrderNumber" clearable></Input>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="2">
-            <Button type="primary" @click="search('search')">搜索</Button>
+            <Button type="primary" @click="getList('search')">搜索</Button>
           </Col>
         </Row>
         <Row class="margin-top-10">
@@ -121,7 +121,7 @@
 
 
 <!--    入库审核-->
-    <Modal v-model="reviewModal.show" title="入库单审核" width="1005">
+    <Modal v-model="reviewModal.show" title="入库单审核" width="1080">
       <Form inline ref="reviewForm" :model="reviewModal.form" :rules="rules">
         <div class="title">
           <span class="line"></span>
@@ -130,40 +130,40 @@
         </div>
 
         <FormItem label="申请人">
-          <Input class="width-180" v-model="detailData.created_by" readonly/>
+          <Input class="width-160" v-model="detailData.created_by" readonly/>
         </FormItem>
         <FormItem label="申请时间">
-          <Input class="width-180" v-model="detailData.created_at" readonly/>
+          <Input class="width-160" v-model="detailData.created_at" readonly/>
         </FormItem>
         <FormItem label="入库单号">
-          <Input class="width-180" v-model="detailData.storage_number" readonly/>
+          <Input class="width-160" v-model="detailData.storage_number" readonly/>
         </FormItem>
         <FormItem label="下单编号">
-          <Input class="width-180" v-model="detailData.supplier_order_number" readonly/>
+          <Input class="width-160" v-model="detailData.supplier_order_number" readonly/>
         </FormItem>
         <FormItem label="订单数量">
-          <Input class="width-180" v-model="detailData.amount" readonly/>
+          <Input class="width-160" v-model="detailData.amount" readonly/>
         </FormItem>
         <FormItem label="下单时间">
-          <Input class="width-180" v-model="detailData.order_time" readonly/>
+          <Input class="width-160" v-model="detailData.order_time" readonly/>
         </FormItem>
         <FormItem label="生产供应商">
-          <Input class="width-180" v-model="detailData.supplier" readonly/>
+          <Input class="width-160" v-model="detailData.supplier" readonly/>
         </FormItem>
         <FormItem label="包材名称">
-          <Input class="width-180" v-model="detailData.packing" readonly/>
+          <Input class="width-160" v-model="detailData.packing" readonly/>
         </FormItem>
         <FormItem label="类型">
-          <Input class="width-180" v-model="detailData.packing_type" readonly/>
+          <Input class="width-160" v-model="detailData.packing_type" readonly/>
         </FormItem>
         <FormItem label="本次预计入库量">
-          <Input class="width-180" v-model="detailData.expected_quantity" readonly/>
+          <Input class="width-160" v-model="detailData.expected_quantity" readonly/>
         </FormItem>
         <FormItem label="入库仓位号">
-          <Input class="width-180" v-model="detailData.position_number" readonly/>
+          <Input class="width-160" v-model="detailData.position_number" readonly/>
         </FormItem>
         <FormItem label="备注">
-          <Input class="width-180" v-model="detailData.remark" readonly/>
+          <Input style="width: 510px" v-model="detailData.remark" readonly/>
         </FormItem>
         <FormItem>
           <div>送货单文件</div>
@@ -299,7 +299,7 @@
           </Col>
           <Col span="2">
             <FormItem :label="index === 0? '标类型' : ''" style="width: 100%">
-              <Input v-model="serial.mark_type" readonly/>
+              <Input :value="finished ? switchMarkType(serial.mark_type) : serial.mark_type" readonly/>
             </FormItem>
           </Col>
           <Col span="2">
@@ -344,7 +344,7 @@
       </Form>
       <Spin size="large" fix v-if="spinShow"></Spin>
       <div class="modal-footer" slot="footer">
-        <Button type="default" @click="finishedModal.modal = false">取消</Button>
+        <Button type="default" @click="finishedModal.show = false">取消</Button>
         <Button type="primary" @click="submit('finishedModal', 'finishedForm')">确认</Button>
       </div>
     </Modal>
@@ -418,7 +418,7 @@
               }
             },
             { title: '申请状态', key: 'applyStatus', width: 100, align: 'center' },
-            { title: '生产供应商', key: 'supplier', width: 180, align: 'center' },
+            { title: '生产供应商', key: 'supplier', width: 170, align: 'center' },
             { title: '申请人', key: 'createdBy', width: 120, align: 'center' },
             { title: '申请时间', key: 'createdAt', width: 110, align: 'center' }
           ],
@@ -426,7 +426,7 @@
         applicationPageProps: {
           page: 1,
           total: 0,
-          perPage:  10
+          perPage: 10
         },
         recordColumns: [
             { type: 'selection', width: 60, align: 'center' },
@@ -448,7 +448,7 @@
         recordPageProps: {
             page: 1,
             total: 0,
-            perPage:  10
+            perPage: 10
           },
 
         detailData: {
@@ -524,14 +524,6 @@
       }
     },
     methods: {
-      // Form 操作
-      search() {
-        let currentTab = this.currentTab
-
-        console.log(this.searchForm[currentTab])
-        this.getList('search')
-        // if(this.application.selection.length > 1) return this.$Message.error('一次只能操作一条数据')
-      },
       reivew() {
         let currentTab = this.currentTab
         let selectName = [currentTab + 'Selected']
@@ -543,8 +535,8 @@
 
         let status = selection[0].applyStatus
 
-        if(status !== '已驳回') return this.$Message.warning('已驳回无法审核')
-        if(status !== '待确认') return this.$Message.warning('已审核')
+        if(status === '已驳回') return this.$Message.warning('已驳回无法审核')
+        if(status !== '待审核') return this.$Message.warning('已审核')
 
 
         this.getStorageDetail(selection[0].id).then(code => {
@@ -561,12 +553,11 @@
         let selection = this[selectName][page]
 
         if(selection.length === 0) return this.$Message.warning('请选择')
-        if(selection.length > 1) return this.$Message.warning('只能审核一项')
+        if(selection.length > 1) return this.$Message.warning('只能选择一项')
 
-        let status = selection[0].applyStatus
-        if(status !== '待入库' && status !== '入库中') return this.$Message.warning('待入库或入库中才可以手动入库')
-
-        let id = selection[0].id
+        let {id, applyStatus, actualQuantity, expectedQuantity} = selection[0]
+        if(applyStatus !== '待入库' && applyStatus !== '入库中') return this.$Message.warning('待入库或入库中才可以手动入库')
+        if(actualQuantity >= expectedQuantity) return this.$Message.warning('已达到预计入库量最大值，无法手动入库')
 
         this.$router.push({
           path: '/storage-management/storage-manual',
@@ -590,11 +581,13 @@
         })
 
         this.finishedModal.form.id = selection[0].id
-
-        this.finishedModal.show = true
-        this.finishedModal.title = '完成入库'
-        this.finishedModal.subTitle = '已确认入库记录'
-        this.finishedModal.checkTitle = '完成入库'
+        this.finishedModal = {
+          ...this.finishedModal,
+          show: true,
+          title: '完成入库',
+          subTitle: '已确认入库记录',
+          checkTitle: '完成入库',
+        }
       },
 
       confirmStorage() {
@@ -635,12 +628,15 @@
           code === 0 && (this.spinShow = false)
         })
 
+        this.finishedModal = {
+          ...this.finishedModal,
+          show: true,
+          title: '确认入库',
+          subTitle: '待确认入库记录',
+          checkTitle: '确认',
+        }
         this.finishedModal.form.id = applyIds[0]
 
-        this.finishedModal.show = true
-        this.finishedModal.title = '确认入库'
-        this.finishedModal.subTitle = '待确认入库记录'
-        this.finishedModal.checkTitle = '确认'
       },
       cancelStorage(id) {
         let currentTab = this.currentTab
@@ -652,15 +648,38 @@
         if(selection.length > 1) return this.$Message.warning('只能作废一项')
 
         let check = selection[0].storage_status === '待确认' || selection[0].storage_status === '已驳回'
+        if(selection[0].storage_status === '已作废') return this.$Message.warning('已作废')
         if(!check) return this.$Message.warning('待确认或已驳回才能作废入库记录')
 
         this.cancelModal.form.id = selection[0].id
 
         this.cancelModal.show = true
       },
-      exportStorageData(id) {
 
-        // if(this.application.selection.length > 1) return this.$Message.error('一次只能操作一条数据')
+      exportStorageData() {
+        let params = JSON.parse(JSON.stringify(this.searchForm[this.currentTab]))
+        delete params.page
+        delete params.perPage
+        this.$API.exportStorageRecord(params).then(res => {
+          this.handelExportData(res)
+        })
+      },
+      handelExportData(data) {
+        // console.log(res)
+        if (typeof window.chrome !== 'undefined') {
+          // Chrome version
+          var link = document.createElement('a');
+          link.href = window.URL.createObjectURL(data);
+          link.click();
+        } else if (typeof window.navigator.msSaveBlob !== 'undefined') {
+          // IE version
+          window.navigator.msSaveBlob(data);
+        } else {
+          // Firefox version
+          var file = new File([data], { type: 'application/force-download' });
+          window.open(URL.createObjectURL(file));
+        }
+        this.$Message.success('导出成功')
       },
 
       edit() {
@@ -691,7 +710,8 @@
         this.$router.push({
           path: '/storage-management/storage-manual',
           query: {
-            recordId: id
+            recordId: id,
+            currentQuantity: selection[0].current_quantity
           }
         })
         // if(this.application.selection.length > 1) return this.$Message.error('一次只能操作一条数据')
@@ -714,10 +734,10 @@
         this[key].perPage = pageSize
         this.getList();
       },
-      // 改变分页size
-      dateChange (date, key) {
+      // 日期
+      dateChange (date) {
         this.searchForm[this.currentTab].createdTime = date
-        this.getList();
+        this.getList('search');
       },
       submit(modal, form) {
 
@@ -766,7 +786,7 @@
         params.page = this[this.currentTab + 'PageProps'].page
         params.perPage = this[this.currentTab + 'PageProps'].perPage
 
-        console.log(this.searchForm[currentTab].supplierOrderNumber)
+        console.log(this[this.currentTab + 'PageProps'].page)
         this.tableLodaing = true
         this.$API[api](params).then(res => {
           // console.log(res)
@@ -797,7 +817,7 @@
           // console.log(res)
           if(res.code !== 0) return
           this.detailData = res.data
-          this.detailData.delivery_file = [res.data.delivery_file]
+          this.detailData.delivery_file = res.data.delivery_file
           if(res.data.storage_record.length > 0) {
             this.detailData.curStorageTotal = res.data.storage_record.reduce((pre, cur) => {
               return pre + cur.current_quantity
@@ -858,11 +878,19 @@
               this.detailData.curStorageTotal = res.data.reduce((pre, cur) => {
                 return pre + cur.currentQuantity
               }, 0)
-              console.log(this.detailData.curStorageTotal, 'this.detailData.curStorageTotal')
+              // console.log(this.detailData.curStorageTotal, 'this.detailData.curStorageTotal')
             }
           }
           return res.code
         })
+      },
+
+      switchMarkType(markType) {
+        let types = {
+          J: '平标',
+          P: '卷标'
+        }
+        return types[markType]
       }
     },
     watch: {
