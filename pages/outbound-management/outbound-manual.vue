@@ -492,7 +492,7 @@
             let editLgTheoretical = serialCodeData.some(items => items.startNumber > items.endNumber)
 
             if(editLgTheoretical) return this.$Message.error('序列号结束值须大于起始值')
-
+            if(this.actualNumberTotal > (this.detailData.expectedOutboundNumber - this.detailData.remainNumTotal) ) return this.$Message.error('实际点货总量不能大于出库单剩余可出库量')
             params = {}
 
             let fields = ['id', 'serialCodeSn', 'startNumber', 'endNumber', 'actualQuantity']
@@ -520,10 +520,9 @@
           params = JSON.parse(JSON.stringify(this.form))
           let lgTheoretical = params.serialCodeData.some(items => items.startNumber > items.endNumber)
 
-          if(lgTheoretical) return this.$Message.error('序列号起始值不能大于结束值')
-          console.log(this.form.fileItems, 'submit')
+          if(lgTheoretical) return this.$Message.error('序列号结束值须大于起始值')
           if(this.form.fileItems.length === 0) return this.$Message.error('请上传出库回传单')
-          if(this.actualNumberTotal > this.detailData.remainNumTotal ) return this.$Message.error('实际点货总量不能大于出库单剩余可出库量')
+          if(this.actualNumberTotal > (this.detailData.expectedOutboundNumber - this.detailData.remainNumTotal) ) return this.$Message.error('实际点货总量不能大于出库单剩余可出库量')
 
           params.serialCodeData.forEach(items => {
             items.startNumber = this.formatSerialCode(items.startNumber)
