@@ -143,7 +143,6 @@
                 :show-upload-list="false"
                 :action="fileUploadURL"
                 :headers="fileUploadHeaders"
-                :default-file-list="form.fileItems"
                 :on-format-error="(file) => onFormatError(file, '回传单')"
                 :before-upload="(file) => beforeUpload(file, '回传单')"
                 :on-success="(response) => onsuccess(response, '回传单')"
@@ -226,12 +225,12 @@
           </Col>
           <Col span="4">
             <FormItem :label="index === 0? '理论出库量' : ''" style="width: 100%">
-              <Input :value="(serial.endNumber === null || !serial.endNumber) ? '' : serial.endNumber - serial.startNumber" readonly/>
+              <Input :value="(serial.endNumber === null || !serial.endNumber) ? '' : serial.endNumber - serial.startNumber + 1" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem :label="index === 0? '实际点货量' : ''" style="width: 100%">
-              <InputNumber style="width: 100%;" :min="1" :max="serial.endNumber - serial.startNumber" v-model="serial.actualQuantity" @on-change="numberChange(index)" :readonly="serial.readonly"/>
+              <InputNumber style="width: 100%;" :min="1" :max="serial.endNumber - serial.startNumber + 1" v-model="serial.actualQuantity" @on-change="numberChange(index)" :readonly="serial.readonly"/>
             </FormItem>
           </Col>
           <Col span="3">
@@ -476,7 +475,7 @@
       endNumChange(index) {
         let {startNumber, endNumber} = this.form.serialCodeData[index]
         if(endNumber !== null) {
-          if(startNumber >= endNumber) return this.$Message.error('序列号结束值须大于起始值')
+          if(startNumber > endNumber) return this.$Message.error('序列号结束值须大于起始值')
         }
       },
 
@@ -508,7 +507,7 @@
             })
 
             this.$API.editOutbountRecord(params).then(res => {
-              console.log(res)
+              // console.log(res)
               if(res.code !== 0) return
               this.$Message.success(res.msg)
               this.$router.push('/outbound-management/CKSQ-outbound-application')
@@ -522,6 +521,7 @@
           let lgTheoretical = params.serialCodeData.some(items => items.startNumber > items.endNumber)
 
           if(lgTheoretical) return this.$Message.error('序列号起始值不能大于结束值')
+          console.log(this.form.fileItems, 'submit')
           if(this.form.fileItems.length === 0) return this.$Message.error('请上传出库回传单')
           if(this.actualNumberTotal > this.detailData.remainNumTotal ) return this.$Message.error('实际点货总量不能大于出库单剩余可出库量')
 
@@ -541,13 +541,14 @@
               items.uid && delete items.uid
             })
           }
-          params.fileItems = params.fileItems.forEach(items => {
+          params.fileItems = params.fileItems.map(items => {
             items.uid && delete items.uid
+            return items
           })
 
           // return console.log(params)
           this.$API.outboundLsitManual(params).then(res => {
-            console.log(res)
+            // console.log(res)
             if(res.code !== 0) return
             this.$Message.success(res.msg)
             this.$router.push('/outbound-management/CKSQ-outbound-application')
