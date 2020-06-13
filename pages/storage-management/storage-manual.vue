@@ -37,14 +37,12 @@
             <Input v-model="detailData.amount" readonly/>
           </FormItem>
         </Col>
-        <Col span="4">
+        <Col span="4" v-if="isManualStorage">
           <FormItem label="剩余可入库量" style="width: 100%">
             <Input v-model="detailData.remain_number" readonly/>
           </FormItem>
         </Col>
-      </Row>
 
-      <Row>
         <Col span="4">
           <FormItem label="下单时间" style="width: 100%">
             <Input v-model="detailData.order_time" readonly/>
@@ -55,7 +53,7 @@
             <Input v-model="detailData.supplier" readonly/>
           </FormItem>
         </Col>
-        <Col span="4">
+        <Col :span="isManualStorage ? 4 : 8">
           <FormItem label="包材名称" style="width: 100%">
             <Input v-model="detailData.packing" readonly/>
           </FormItem>
@@ -94,7 +92,7 @@
         </Col>
         <Col span="4" v-if="!isManualStorage">
           <FormItem label="剩余可入库量" style="width: 100%">
-            <Input v-model="detailData.reissueType" readonly/>
+            <Input v-model="detailData.recordRemainNumber" readonly/>
           </FormItem>
         </Col>
       </Row>
@@ -145,18 +143,18 @@
 
       <!--   TODO： for batchData     -->
       <Row v-for="(batch, index) in this.form.batchData" :key="index">
-        <Col span="2" v-if="isManualStorage">
+        <Col span="2" v-show="isManualStorage">
           <FormItem :label="index === 0? '序号' : ''" style="width: 100%">
             <Input :value="index + 1" readonly/>
           </FormItem>
         </Col>
         <Col span="4">
           <FormItem :label="index === 0? '生产批次号' : ''" style="width: 100%" :prop="'batchData.' + index + '.batchNumber'" :rules="rules.batchNumber">
-<!--            <Input v-model="batch.batchNumber" :readonly="batch.readonly"/>-->
             <Select
               filterable
               remote
               clearable
+              :disabled="!isManualStorage"
               :remote-method="query => remoteMethod(query,index)"
               v-model="batch.batchNumber"
               @on-change="batchNumberChange(batch.batchNumber, index)">
@@ -185,22 +183,23 @@
           </FormItem>
         </Col>
         <Col span="3" v-show="isManualStorage">
-          <FormItem :label="index === 0? '本次入库数量' : ''" style="width: 100%" :prop="'batchData.' + index + '.currentQuantity'" :rules="rules.currentQuantity">
+          <FormItem :label="index === 0 ? '本次入库数量' : ''" style="width: 100%" :prop="'batchData.' + index + '.currentQuantity'" :rules="rules.currentQuantity">
 <!--            <Input v-model="batch.currentQuantity"/>-->
             <InputNumber style="width: 100%;" :min="0" v-model="batch.currentQuantity"/>
           </FormItem>
         </Col>
         <Col span="3" v-show="!isManualStorage">
           <FormItem :label="index === 0? '已实际入库量' : ''" style="width: 100%">
-            <Input v-model="batch.currentQuantity"/>
+            <Input v-model="batch.inStockNumber" readonly/>
           </FormItem>
         </Col>
-        <Col span="3" v-show="!isManualStorage">
-          <FormItem :label="index === 0? '修改本次入库数量' : ''" style="width: 100%">
-            <Input v-model="batch.currentQuantity"/>
+        <Col span="4" v-show="!isManualStorage">
+          <!--          TODO: 最大值 detailData.recordRemainNumber  batch.remainNum-->
+          <FormItem :label="index === 0? '修改本次入库数量' : ''" style="width: 100%" :prop="'batchData.' + index + '.currentQuantity'" :rules="rules.currentQuantity">
+            <InputNumber style="width: 100%;" :min="0" :max="detailData.recordRemainNumber" v-model="batch.currentQuantity"/>
           </FormItem>
         </Col>
-        <Col span="3" v-if="isManualStorage">
+        <Col span="3" v-show="isManualStorage">
           <FormItem :label="index === 0? ' ' : ''" :class="index === 0 ? 'endNumStyle' : ''">
             <Button shape="circle" icon="md-add" v-if="index === 0" @click="addBatchData"></Button>
             <Button shape="circle" icon="md-remove" v-else style="margin-left: 12px"></Button>
@@ -371,7 +370,20 @@
             this.$router.push('/storage-management/storage-application')
           })
         }else {
+          console.log(editParams, '修改')
 
+          let editParams = {
+            id: this.form.id,
+            batchNumber: this.form.batchData[0].batchNumber,
+            currentQuantity: this.form.batchData[0].currentQuantity,
+          }
+          this.$API.editStorageRecord(editParams).then(res => {
+            console.log(res)
+            if(res.code !==0) return
+            this.submitLoading = false
+            this.$Message.success(res.msg)
+            this.$router.push('/storage-management/storage-application')
+          })
         }
 
       },
@@ -408,34 +420,13 @@
               packing_type: data.packingType,
               position_number: data.positionNumber,
               remark: data.remark,
-              delivery_file: data.fileItems
+              delivery_file: data.fileItems,
+              recordRemainNumber: data.remainNumber
             }
+            this.form.batchData[0].batchNumber = data.batchNumber
+            this.form.batchData[0].inStockNumber = data.inStockNumber
+            this.batchNumberChange(data.batchNumber, 0)
             this.form.boxItems = data.boxItems
-          }
-          return res.code
-        })
-      },
-
-      // 获取记录数据
-      getStorageRecordById(id) {
-        return this.$API.getStorageRecordByIds({ids: [id]}).then(res => {
-          if (res.code === 0) {
-            let data = res.data
-            this.detailData = {
-              created_by: data.createdBy,
-              created_at: data.createdAt,
-              storage_number: data.storageNumber,
-              supplier_order_number: data.supplierOrderNumber,
-              amount: data.amount,
-              expected_quantity: data.expectedQuantity,
-              order_time: data.orderTime,
-              supplier: data.supplier,
-              packing: data.packing,
-              packing_type: data.packingType,
-              position_number: data.positionNumber,
-              remark: data.remark,
-            }
-            this.detailData.delivery_file = [data.fileItems]
           }
           return res.code
         })
@@ -445,7 +436,7 @@
       getNumberByApplyId(id) {
         // this.spinShow = true
         return this.$API.getNumberByApplyId(id).then(res => {
-          if (res.code !== 0) {
+          if (res.code === 0) {
             this.numberByapplyId = res.data[0]
           }
           return res.code
@@ -463,9 +454,7 @@
         console.log('修改入库记录')
         this.subTitle = '修改入库记录'
         this.form.id = this.recordId
-        this.getRecordDetail(this.recordId).then(() => {
-          return this.getStorageRecordById(this.recordId)
-        }).then(code => {
+        this.getRecordDetail(this.recordId).then(code => {
           code === 0 && (this.spinShow = false)
         })
 
@@ -498,6 +487,7 @@
 
       remainNumber() {
         // 剩余可入库 < 入库记录待确认 + 已确认 TODO: 接口待定
+        console.log(this.detailData.expected_quantity, this.numberByapplyId)
         return this.detailData.expected_quantity - this.numberByapplyId
       }
 

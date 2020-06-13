@@ -142,6 +142,15 @@ const cancelStorageRecord = (data) => {
   })
 };
 
+// 入库记录 - 修改
+const editStorageRecord = (data) => {
+  return fetch({
+    url: `traceability/storage-record/update`,
+    method: 'POST',
+    data
+  })
+};
+
 
 export default {
   getStorageList,
@@ -160,4 +169,5 @@ export default {
   confirmStorageRecord,
   cancelStorageRecord,
   getStorageRecordDetail,
+  editStorageRecord
 }
