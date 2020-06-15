@@ -173,10 +173,7 @@
     </Modal>
 
 <!--    日志-->
-    <Modal
-      class="log-Modal"
-      width="1050"
-      v-model="logModal.show">
+    <Modal class="log-Modal" width="1150" v-model="logModal.show">
       <Form :model="logModal.traceData">
         <Divider>防伪码基础信息</Divider>
         <Row>
@@ -245,7 +242,7 @@
             <FormItem label="出库序列号范围">
 <!--              <Input :value="logModal.traceData.range" readonly />-->
               <Select :value="logModal.traceData.firstRange" placeholder="">
-                <Option v-for="(range, index) in rangeList" :key="index" :value="range.value" :label="range.Label"/>
+                <Option v-for="(range, index) in rangeList" :key="index" :value="range.value" :label="range.label"/>
               </Select>
             </FormItem>
           </Col>
@@ -283,9 +280,9 @@
                 <Input readonly :value="index + 1" />
               </FormItem>
             </Col>
-            <Col span="3">
+            <Col span="4">
               <FormItem :label="index === 0 ? '查询时间':''">
-                <Input readonly :value="item.createdAt && item.createdAt.substr(0, 10)" />
+                <Input readonly :value="item.createdAt" />
               </FormItem>
             </Col>
             <Col span="3">
@@ -293,7 +290,7 @@
                 <Input readonly :value="item.ip" />
               </FormItem>
             </Col>
-            <Col span="3">
+            <Col span="4">
               <FormItem :label="index === 0 ? '查询地区':''">
                 <Input readonly :value="item.ipLocation" />
               </FormItem>
@@ -313,7 +310,7 @@
                 <Input readonly :value="item.wechatNickname" />
               </FormItem>
             </Col>
-            <Col span="3">
+            <Col span="2">
               <FormItem :label="index === 0 ? '查询结果':''">
                 <Input readonly :value="item.isSucceed === 'yes' ? '成功' : '失败'" />
               </FormItem>
@@ -397,7 +394,9 @@
                         brand = items.value
                       }
                     })
-                    // TODO: brand serialCode 获取出库相应自动
+                    this.logModal.list = []
+                    this.logModal.traceData = {}
+
                     this.spinShow = true
                     this.logModal.show = true
                     this.$API.getNewSecurityCodeLog({brand, masterId, serialCode, securityCode, uniqueCode})
@@ -406,19 +405,29 @@
                       this.logModal.traceData = Array.isArray(res.data.traceData) ? {} : res.data.traceData
                     })
                     .then(() => {
-                      let rangeStr = 'A00000001-A00000003'
+                      // TODO: brand serialCode 获取出库相应信息
+                      // let rangeStr = 'A00000001-A00000003'
 
-                      console.log(this.rangeList)
                       this.$API.getOutboundLog({brand, serialCode, page: 1, perPage: 10}).then(res => {
                         this.spinShow = false
                         // console.log(res)
-                        if(res.code !==0) return
+
+                        if(res.code !== 0 || res.data.list.length === 0) return
                         // 取第一条 按理说：序列号查找到的会是单条数据
-                        this.traceData = {...this.traceData, ...res.data.list[0]}
-                        // 序列号范围
-                        if(res.data.list.length > 0){
-                          this.getRangeList(res.data.list[0].range)
+                        let data = res.data.list[0]
+
+                        this.logModal.traceData = {
+                          ...this.traceData,
+                          created_at: data.created_at,
+                          firstRang: '',
+                          gb_order_sn: data.gb_order_sn,
+                          supplier: data.supplier,
+                          mk_code: data.mk_code,
+                          product_name: data.product_name,
                         }
+
+                        // 序列号范围
+                        this.getRangeList(data.range)
                       })
                     })
                   }
@@ -457,27 +466,30 @@
                         brand = items.value
                       }
                     })
+                    this.logModal.list = []
+                    this.logModal.traceData = {}
                     this.spinShow = true
                     this.logModal.show = true
                     // 没有出库信息
                     this.$API.getOldSecurityCodeLog({brand, code: securityCode})
-                      .then(res => {
-                        this.logModal.list = res.data.list.map(items => {
-                          items.purchaseChannels = items.channel
-                          items.shop = items.keyword
-                          // items.wechatNickname = items.wechatNickname // 没有微信名
-                          return items
-                        })
-                        let traceData = res.data.traceData
-                        if(Array.isArray(traceData)) {
-                          this.logModal.traceData = {}
-                        }else {
-                          traceData.securityCode = traceData.code
-                          traceData.scodeBuildTime = traceData.scodeBuildTime == 0 ? '' : this.$format(traceData.scodeBuildTime, 'yyyy-MM-dd')
-                          this.logModal.traceData = traceData
-                        }
-                        this.spinShow = false
+                    .then(res => {
+                      this.logModal.list = res.data.list.map(items => {
+                        items.purchaseChannels = items.channel
+                        items.shop = items.keyword
+                        // items.wechatNickname = items.wechatNickname // 没有微信名
+                        return items
                       })
+                      let traceData = res.data.traceData
+                      if(Array.isArray(traceData)) {
+                        this.logModal.traceData = {}
+                      }else {
+                        traceData.securityCode = traceData.code
+                        traceData.scodeBuildTime = traceData.scodeBuildTime == 0 ? '' : this.$format(traceData.scodeBuildTime, 'yyyy-MM-dd')
+                        traceData.brand = row.brand
+                        this.logModal.traceData = traceData
+                      }
+                      this.spinShow = false
+                    })
                   }
                 }
               }, row.securityCode)
@@ -517,10 +529,7 @@
         logModal: {
           show: false,
           list: [],
-          traceData: {
-            link: '',
-            queried: ''
-          }
+          traceData: {}
         }
       }
     },
@@ -580,6 +589,7 @@
           })
       },
       getRangeList(rangeStr){
+        let letter = rangeStr.substr(0, 1)
         let rangeArr = rangeStr.split('-')
         let start = parseInt(rangeArr[0].substr(1))
         let end = parseInt(rangeArr[1].substr(1))
@@ -587,7 +597,7 @@
         list.push(rangeArr[0])
         for(let i = 0; i < end - start; i++){
           // console.log(++start)
-          list.push(this.formatSerialCode(rangeStr.substr(0, 1), ++start + ''))
+          list.push(this.formatSerialCode(letter, ++start + ''))
         }
         list.push(rangeArr[1])
 
@@ -597,7 +607,7 @@
             label: items
           })
         })
-        this.traceData.firstRange = rangeArr[0]
+        this.logModal.traceData.firstRange = rangeArr[0]
       },
       // 序列码格式 编号大写 + 8位数字
       formatSerialCode(letter, num) {
