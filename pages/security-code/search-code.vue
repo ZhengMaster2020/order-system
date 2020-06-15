@@ -382,51 +382,7 @@
                 },
                 on: {
                   click: () => {
-                    let {brand, masterId, serialCode, securityCode, securityCodeLink} = row
-                    let uniqueCode = ''
-                    securityCodeLink.substr(securityCodeLink.indexOf('?')).split('&').map(items => {
-                      if(items.indexOf('uniqueCode') != -1) {
-                        uniqueCode = items.split('=')[1]
-                      }
-                    })
-                    this.newBrandList.forEach(items => {
-                      if(items.label === brand){
-                        brand = items.value
-                      }
-                    })
-                    this.spinShow = true
-                    this.logModal.show = true
-                    this.$API.getNewSecurityCodeLog({brand, masterId, serialCode, securityCode, uniqueCode})
-                    .then(res => {
-                      this.logModal.list = res.data.list
-                      this.logModal.traceData = Array.isArray(res.data.traceData) ? {} : res.data.traceData
-                    })
-                    .then(() => {
-                      // TODO: brand serialCode 获取出库相应信息
-                      // let rangeStr = 'A00000001-A00000003'
-
-                      this.$API.getOutboundLog({brand, serialCode, page: 1, perPage: 10}).then(res => {
-                        this.spinShow = false
-                        // console.log(res)
-
-                        if(res.code !== 0 || res.data.list.length === 0) return
-                        // 取第一条 按理说：序列号查找到的会是单条数据
-                        let data = res.data.list[0]
-
-                        this.logModal.traceData = {
-                          ...this.traceData,
-                          created_at: data.created_at,
-                          firstRang: '',
-                          gb_order_sn: data.gb_order_sn,
-                          supplier: data.supplier,
-                          mk_code: data.mk_code,
-                          product_name: data.product_name,
-                        }
-
-                        // 序列号范围
-                        this.getRangeList(data.range)
-                      })
-                    })
+                    this.getNewLog(row)
                   }
                 }
               }, row.securityCode)
@@ -456,35 +412,7 @@
                 },
                 on: {
                   click: () => {
-                    let {brand, securityCode} = row
-                    // 品牌参数转换
-                    this.oldBrandList.forEach(items => {
-                      if(items.label === brand){
-                        brand = items.value
-                      }
-                    })
-                    this.spinShow = true
-                    this.logModal.show = true
-                    // 没有出库信息
-                    this.$API.getOldSecurityCodeLog({brand, code: securityCode})
-                    .then(res => {
-                      this.logModal.list = res.data.list.map(items => {
-                        items.purchaseChannels = items.channel
-                        items.shop = items.keyword
-                        // items.wechatNickname = items.wechatNickname // 没有微信名
-                        return items
-                      })
-                      let traceData = res.data.traceData
-                      if(Array.isArray(traceData)) {
-                        this.logModal.traceData = {}
-                      }else {
-                        traceData.securityCode = traceData.code
-                        traceData.scodeBuildTime = traceData.scodeBuildTime == 0 ? '' : this.$format(traceData.scodeBuildTime, 'yyyy-MM-dd')
-                        traceData.brand = row.brand
-                        this.logModal.traceData = traceData
-                      }
-                      this.spinShow = false
-                    })
+                    this.getOldLog(row)
                   }
                 }
               }, row.securityCode)
@@ -529,6 +457,80 @@
       }
     },
     methods: {
+      getNewLog(row){
+        let {brand, masterId, serialCode, securityCode, securityCodeLink} = row
+        let uniqueCode = ''
+        securityCodeLink.substr(securityCodeLink.indexOf('?')).split('&').map(items => {
+          if(items.indexOf('uniqueCode') != -1) {
+            uniqueCode = items.split('=')[1]
+          }
+        })
+        this.newBrandList.forEach(items => {
+          if(items.label === brand){
+            brand = items.value
+          }
+        })
+        this.spinShow = true
+        this.logModal.show = true
+        this.$API.getNewSecurityCodeLog({brand, masterId, serialCode, securityCode, uniqueCode}).then(res => {
+          this.logModal.list = res.data.list
+          this.logModal.traceData = Array.isArray(res.data.traceData) ? {} : res.data.traceData
+        }).then(() => {
+          // TODO: brand serialCode 获取出库相应信息
+          // let rangeStr = 'A00000001-A00000003'
+          this.$API.getOutboundLog({brand, serialCode, page: 1, perPage: 10}).then(res => {
+            this.spinShow = false
+            // console.log(res)
+
+            if(res.code !== 0 || res.data.list.length === 0) return
+            // 取第一条 按理说：序列号查找到的会是单条数据
+            let data = res.data.list[0]
+
+            this.logModal.traceData = {
+              ...this.traceData,
+              created_at: data.created_at,
+              firstRang: '',
+              gb_order_sn: data.gb_order_sn,
+              supplier: data.supplier,
+              mk_code: data.mk_code,
+              product_name: data.product_name,
+            }
+            // 序列号范围
+            this.getRangeList(data.range)
+          })
+        })
+      },
+      getOldLog(row) {
+        let {brand, securityCode} = row
+        // 品牌参数转换
+        this.oldBrandList.forEach(items => {
+          if(items.label === brand){
+            brand = items.value
+          }
+        })
+        this.spinShow = true
+        this.logModal.show = true
+        // 没有出库信息
+        this.$API.getOldSecurityCodeLog({brand, code: securityCode})
+          .then(res => {
+            this.logModal.list = res.data.list.map(items => {
+              items.purchaseChannels = items.channel
+              items.shop = items.keyword
+              // items.wechatNickname = items.wechatNickname // 没有微信名
+              return items
+            })
+            let traceData = res.data.traceData
+            if(Array.isArray(traceData)) {
+              this.logModal.traceData = {}
+            }else {
+              traceData.securityCode = traceData.code
+              traceData.scodeBuildTime = traceData.scodeBuildTime == 0 ? '' : this.$format(traceData.scodeBuildTime, 'yyyy-MM-dd')
+              traceData.brand = row.brand
+              this.logModal.traceData = traceData
+            }
+            this.spinShow = false
+          })
+      },
       getList (type) {
         let pageProps = null
         let search = this.getSearch()
