@@ -19,7 +19,7 @@
             <Input style="width: 220px" v-model="form.gbOrderSn" @on-change="change"/>
           </FormItem>
           <FormItem label="慕可代码">
-            <Select v-model="form.mkCode" class="width-200" @on-change="mkCodeChange">
+            <Select v-model="form.mkCode" class="width-200" @on-change="mkCodeChange" :not-found-text="notFoundText">
               <Option v-for="mkCode in mkCodeList"
                       :key="mkCode.label"
                       :value="mkCode.label"
@@ -134,9 +134,7 @@
           expectedOutboundNumber: null,
           outboundReason: '',
           brand: 'WIS',
-          //
           nextBy: '产品供应部-经理',
-          // remainNumer: null,
           applicant: '',
         },
         rules: {
@@ -187,7 +185,7 @@
     computed: {
       remainNum() {
         // 下单数量 - 汇总该灌包订单在出库记录中【待确认】+【已确认】的数量
-        console.log(this.form.orderNumber, this.gbOrderSnNum)
+        // console.log(this.form.orderNumber, this.gbOrderSnNum)
         return this.hasInfo ? this.form.orderNumber - this.gbOrderSnNum : null
       },
       expectedMaxNum() {
@@ -212,7 +210,9 @@
 
       gbOrderSnChange(){
         // TODO: 调取采购系统的接口 获取mkCode
-        console.log(this.form.gbOrderSn)
+        this.clear()
+        this.notFoundText = '加载中...'
+        if(!this.form.gbOrderSn) return
         this.notFoundText = '加载中...'
 
         this.getSupplyInfo({order_no: this.form.gbOrderSn}).then(res => {
@@ -232,7 +232,7 @@
         }).then(() => {
           this.getOutboundOrderNum()
         }).catch(err => {
-          console.log(err)
+          console.log(err, 'supplyApi error')
         })
 
 
@@ -241,6 +241,7 @@
       mkCodeChange() {
         let {mkCode, gbOrderSn} = this.form
         if(!gbOrderSn) return
+        if(!mkCode) return
         // console.log(mkCode, gbOrderSn)
 
         let info = this.supplyInfo.find(items => mkCode === items.mk_code && gbOrderSn === items.order_no)
@@ -266,6 +267,21 @@
         return productType[type]
       },
 
+      clear() {
+        this.form = {
+          ...this.form,
+          orderNumber: null,
+          mkCode: '',
+          productName: '',
+          productType: '',
+          requireDeliveryTime: '',
+          supplier: '',
+          isReissue: 0,
+          reissueType: 'other',
+          lossSn: '-',
+          lossNumber: '-',
+        }
+      },
       submit() {
         // this.submintLodaing = true
         this.$refs.form.validate(val => {
@@ -319,29 +335,24 @@
         return this.instance.get('/v1/search/search-order-bagging', {params})
           .then(res => {
             return res.data
-          }).catch(err => {
+          })
+          .catch(err => {
             if (err) return console.log(err.message)
           })
       },
-
+      // 获取统计灌包订单未确认+已确认出库数量
       getOutboundOrderNum() {
-        // 获取统计灌包订单未确认+已确认出库数量
         this.$API.getGBOrderSnNum({ gbOrderSn: this.form.gbOrderSn }).then(res => {
-          console.log(res)
           if (res.code !== 0) return
           this.gbOrderSnNum = Number(res.data[0])
         })
       },
-
+      // 获取出库申请单待确认出库+已确认出库数量
       getOutboundApplySnNum(id) {
-        // 获取出库申请单待确认出库+已确认出库数量
         this.$API.getOutboundApplySnNum(id).then(res => {
-          // console.log(res)
           if (res.code !== 0) return
-          // this.gbOrderSnNum = Number(res.data[0]) + Number(res.data[1])
           this.gbOrderSnNum = Number(res.data[0])
         })
-        // this.gbOrderSnNum = 500
       },
 
       getOutboundDetail(id) {
@@ -349,13 +360,15 @@
           if (res.code !== 0) return
           this.spinShow = false
           this.hasInfo = true
-          for (let key in res.data) {
-            this.form[key] = res.data[key]
+          this.mkCodeList = [{value: res.data.mkCode, label: res.data.mkCode}]
+          this.form = {
+            ...this.form,
+            ...res.data,
+            isReissue: res.data.isReissue === '是'? 1 : 0,
+            reissueType: res.data.reissueType ? res.data.reissueType : 'other',
+            lossSn: this.form.lossSn ? this.form.lossSn : '-',
+            lossNumber: this.form.lossNumber + ''
           }
-          this.form.isReissue = res.data.isReissue === '是'? 1 : 0
-          this.form.reissueType = res.data.reissueType ? res.data.reissueType : 'other'
-          this.form.lossSn = this.form.lossSn ? this.form.lossSn : '-'
-          this.form.lossNumber = this.form.lossNumber + ''
         })
       },
 
@@ -379,22 +392,7 @@
     width: 200px;
   }
 
-  .font-size-12 {
-    font-size: 12px;
-  }
-
   .readonly-color /deep/ .ivu-input{
     color: #d3cccc;
   }
-
-  .necessary:before {
-    content: '*';
-    display: inline-block;
-    margin-right: 4px;
-    line-height: 1;
-    font-family: SimSun;
-    font-size: 12px;
-    color: #ed4014;
-  }
-
 </style>
