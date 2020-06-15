@@ -394,9 +394,6 @@
                         brand = items.value
                       }
                     })
-                    this.logModal.list = []
-                    this.logModal.traceData = {}
-
                     this.spinShow = true
                     this.logModal.show = true
                     this.$API.getNewSecurityCodeLog({brand, masterId, serialCode, securityCode, uniqueCode})
@@ -466,8 +463,6 @@
                         brand = items.value
                       }
                     })
-                    this.logModal.list = []
-                    this.logModal.traceData = {}
                     this.spinShow = true
                     this.logModal.show = true
                     // 没有出库信息
