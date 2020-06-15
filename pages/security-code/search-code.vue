@@ -171,6 +171,159 @@
       </div>
       <Spin fix v-if="exportListLoading"></Spin>
     </Modal>
+
+<!--    日志-->
+    <Modal class="log-Modal" width="1150" v-model="logModal.show">
+      <Form :model="logModal.traceData">
+        <Divider>防伪码基础信息</Divider>
+        <Row>
+          <Col span="12">
+
+            <FormItem label="查询链接地址">
+              <Input :value="logModal.traceData.link" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="品牌">
+              <Input :value="logModal.traceData.brand" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="序列号">
+              <Input :value="logModal.traceData.serialCode" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="防伪码">
+              <Input :value="logModal.traceData.securityCode" readonly />
+            </FormItem>
+          </Col>
+        </Row>
+<!--    aaa    TODO:调出库列表接口-->
+        <Row>
+          <Col span="4">
+            <FormItem label="编码生成时间">
+              <Input :value="selectTab === 'new'? $format(logModal.traceData.createdAt, 'yyyy-MM-hh') : logModal.traceData.scodeBuildTime" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="是否激活">
+              <Input :value="logModal.traceData.enableStatus" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="是否失效">
+              <Input :value="!logModal.traceData.queried ? '' : logModal.traceData.queried >= 5 ? '失效' : '有效'" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="所属生产批次号">
+              <Input :value="logModal.traceData.batchNumber" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="所属包材订单号">
+              <Input :value="logModal.traceData.supplierOrderNumber" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="包材供应商">
+              <Input :value="logModal.traceData.supplier" readonly />
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="4">
+            <FormItem label="出库时间">
+              <Input :value="logModal.traceData.created_at" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="出库序列号范围">
+<!--              <Input :value="logModal.traceData.range" readonly />-->
+              <Select :value="logModal.traceData.firstRange" placeholder="">
+                <Option v-for="(range, index) in rangeList" :key="index" :value="range.value" :label="range.label"/>
+              </Select>
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="所属灌包订单号">
+              <Input :value="logModal.traceData.gb_order_sn" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="OEM供应商">
+              <Input :value="logModal.traceData.supplier" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="慕可代码">
+              <Input :value="logModal.traceData.mk_code" readonly />
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem label="产品名称">
+              <Input :value="logModal.traceData.product_name" readonly />
+            </FormItem>
+          </Col>
+        </Row>
+
+        <div class="title">
+          <span class="line"></span>
+          <div class="title-text">查询记录</div>
+          <span class="line"></span>
+        </div>
+        <div class="input-box">
+          <Row v-for="(item, index) in logModal.list" :key="index">
+            <Col span="2">
+              <FormItem :label="index === 0 ? '序号':''">
+                <Input readonly :value="index + 1" />
+              </FormItem>
+            </Col>
+            <Col span="4">
+              <FormItem :label="index === 0 ? '查询时间':''">
+                <Input readonly :value="item.createdAt" />
+              </FormItem>
+            </Col>
+            <Col span="3">
+              <FormItem :label="index === 0 ? 'IP':''">
+                <Input readonly :value="item.ip" />
+              </FormItem>
+            </Col>
+            <Col span="4">
+              <FormItem :label="index === 0 ? '查询地区':''">
+                <Input readonly :value="item.ipLocation" />
+              </FormItem>
+            </Col>
+            <Col span="3">
+              <FormItem :label="index === 0 ? '渠道':''">
+                <Input readonly :value="item.purchaseChannels" />
+              </FormItem>
+            </Col>
+            <Col span="3">
+              <FormItem :label="index === 0 ? '店铺':''">
+                <Input readonly :value="item.shop" />
+              </FormItem>
+            </Col>
+            <Col span="3">
+              <FormItem :label="index === 0 ? '用户昵称':''">
+                <Input readonly :value="item.wechatNickname" />
+              </FormItem>
+            </Col>
+            <Col span="2">
+              <FormItem :label="index === 0 ? '查询结果':''">
+                <Input readonly :value="item.isSucceed === 'yes' ? '成功' : '失败'" />
+              </FormItem>
+            </Col>
+          </Row>
+        </div>
+      </Form>
+
+      <div class="modal-footer" slot="footer">
+        <Button type="default" @click="logModal.show = false">取消</Button>
+      </div>
+      <Spin fix v-if="spinShow"></Spin>
+    </Modal>
   </div>
 </template>
 
@@ -183,6 +336,7 @@
     data () {
       return {
         selectTab: 'new', // tab的name  new/old
+        rangeList: [],
         newBrandList: [
           {label: 'WIS', value: 'WIS'},
           {label: '柏菲娜', value: 'BOOFINA'},
@@ -220,7 +374,20 @@
           {type: 'selection', width: 60, align: 'center'},
           {type: 'index', title: '序号', minWidth: 65, align: 'center'},
           {key: 'serialCode', title: '序列号', minWidth: 100, align: 'center'},
-          {key: 'securityCode', title: '防伪码', minWidth: 100, align: 'center'},
+          {key: 'securityCode', title: '防伪码', minWidth: 100, align: 'center',
+            render: (h, {row}) => {
+              return h('a', {
+                attrs: {
+                  href: 'javascript:void(0)'
+                },
+                on: {
+                  click: () => {
+                    this.getNewLog(row)
+                  }
+                }
+              }, row.securityCode)
+            }
+          },
           {key: 'brand', title: '品牌', minWidth: 80, align: 'center'},
           {key: 'purchaseChannels', title: '渠道', minWidth: 100, align: 'center'},
           {key: 'shop', title: '购买店铺', minWidth: 80, align: 'center'},
@@ -234,10 +401,22 @@
           {key: 'productionDate', title: '编码生成日期', minWidth: 140, align: 'center'},
           {key: 'masterId', title: '需求编号', minWidth: 100, align: 'center'},
         ],
-        oldColumn: [ // 旧防伪码表头
+        oldColumn: [ // 旧防伪码表头 getOldSecurityCodeLog
           {type: 'selection', width: 60, align: 'center'},
           {type: 'index', title: '序号', minWidth: 65, align: 'center'},
-          {key: 'securityCode', title: '防伪码', minWidth: 100, align: 'center'},
+          {key: 'securityCode', title: '防伪码', minWidth: 100, align: 'center',
+            render: (h, {row}) => {
+              return h('a', {
+                attrs: {
+                  href: 'javascript:void(0)'
+                },
+                on: {
+                  click: () => {
+                    this.getOldLog(row)
+                  }
+                }
+              }, row.securityCode)
+            }},
           {key: 'productionDate', title: '编码生成日期', minWidth: 130, align: 'center'},
           {key: 'brand', title: '品牌', minWidth: 80, align: 'center'},
           {key: 'purchaseChannels', title: '渠道', minWidth: 100, align: 'center'},
@@ -268,10 +447,90 @@
         selectNewList: [], // 新列表选中
         selectOldList: [], // 旧列表选中
         userData: {},
-        exportSelectIdList: [] // 导出选中信息
+        exportSelectIdList: [], // 导出选中信息
+        spinShow: false,
+        logModal: {
+          show: false,
+          list: [],
+          traceData: {}
+        }
       }
     },
     methods: {
+      getNewLog(row){
+        let {brand, masterId, serialCode, securityCode, securityCodeLink} = row
+        let uniqueCode = ''
+        securityCodeLink.substr(securityCodeLink.indexOf('?')).split('&').map(items => {
+          if(items.indexOf('uniqueCode') != -1) {
+            uniqueCode = items.split('=')[1]
+          }
+        })
+        this.newBrandList.forEach(items => {
+          if(items.label === brand){
+            brand = items.value
+          }
+        })
+        this.spinShow = true
+        this.logModal.show = true
+        this.$API.getNewSecurityCodeLog({brand, masterId, serialCode, securityCode, uniqueCode}).then(res => {
+          this.logModal.list = res.data.list
+          this.logModal.traceData = Array.isArray(res.data.traceData) ? {} : res.data.traceData
+        }).then(() => {
+          // TODO: brand serialCode 获取出库相应信息
+          // let rangeStr = 'A00000001-A00000003'
+          this.$API.getOutboundLog({brand, serialCode, page: 1, perPage: 10}).then(res => {
+            this.spinShow = false
+            // console.log(res)
+
+            if(res.code !== 0 || res.data.list.length === 0) return
+            // 取第一条 按理说：序列号查找到的会是单条数据
+            let data = res.data.list[0]
+
+            this.logModal.traceData = {
+              ...this.traceData,
+              created_at: data.created_at,
+              firstRang: '',
+              gb_order_sn: data.gb_order_sn,
+              supplier: data.supplier,
+              mk_code: data.mk_code,
+              product_name: data.product_name,
+            }
+            // 序列号范围
+            this.getRangeList(data.range)
+          })
+        })
+      },
+      getOldLog(row) {
+        let {brand, securityCode} = row
+        // 品牌参数转换
+        this.oldBrandList.forEach(items => {
+          if(items.label === brand){
+            brand = items.value
+          }
+        })
+        this.spinShow = true
+        this.logModal.show = true
+        // 没有出库信息
+        this.$API.getOldSecurityCodeLog({brand, code: securityCode})
+          .then(res => {
+            this.logModal.list = res.data.list.map(items => {
+              items.purchaseChannels = items.channel
+              items.shop = items.keyword
+              // items.wechatNickname = items.wechatNickname // 没有微信名
+              return items
+            })
+            let traceData = res.data.traceData
+            if(Array.isArray(traceData)) {
+              this.logModal.traceData = {}
+            }else {
+              traceData.securityCode = traceData.code
+              traceData.scodeBuildTime = traceData.scodeBuildTime == 0 ? '' : this.$format(traceData.scodeBuildTime, 'yyyy-MM-dd')
+              traceData.brand = row.brand
+              this.logModal.traceData = traceData
+            }
+            this.spinShow = false
+          })
+      },
       getList (type) {
         let pageProps = null
         let search = this.getSearch()
@@ -326,6 +585,38 @@
             this.isTableLoading = false;
           })
       },
+      getRangeList(rangeStr){
+        let letter = rangeStr.substr(0, 1)
+        let rangeArr = rangeStr.split('-')
+        let start = parseInt(rangeArr[0].substr(1))
+        let end = parseInt(rangeArr[1].substr(1))
+        let list = []
+        list.push(rangeArr[0])
+        for(let i = 0; i < end - start; i++){
+          // console.log(++start)
+          list.push(this.formatSerialCode(letter, ++start + ''))
+        }
+        list.push(rangeArr[1])
+
+        list.forEach(items => {
+          this.rangeList.push({
+            value: items,
+            label: items
+          })
+        })
+        this.logModal.traceData.firstRange = rangeArr[0]
+      },
+      // 序列码格式 编号大写 + 8位数字
+      formatSerialCode(letter, num) {
+        num = num + ''
+        let zeroLength = 8 - num.length
+        let fixZero = ''
+        for(let i = 0; i < zeroLength; i++){
+          fixZero += '0'
+        }
+        return letter + fixZero + num
+      },
+
       // 改变tab
       changeTab (name) {
         if (!this[name + 'Data'].length) {
@@ -500,6 +791,14 @@
           })
         })
       }
+    },
+    watch: {
+      ['logModal.show'](cur) {
+        if(!cur) {
+          this.logModal.list = []
+          this.logModal.traceData = {}
+        }
+      }
     }
   }
 </script>
@@ -550,4 +849,23 @@
   // /deep/ thead .ivu-table-cell-with-selection{
   //   display: none;
   // }
+  .log-Modal /deep/ .ivu-modal-body {
+    padding: 20px 10px;
+  }
+  .title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .title-text {
+      flex-shrink: 0;
+      padding: 0 10px;
+    }
+
+    .line {
+      width: 100%;
+      border-top: 1px dashed #000;
+    }
+  }
 </style>
