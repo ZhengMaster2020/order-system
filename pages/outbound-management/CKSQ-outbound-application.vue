@@ -893,7 +893,8 @@
             path: '/outbound-management/outbound-manual',
             query: {
               id: selection.id,
-              outbound_apply_id: selection.outbound_apply_id
+              outbound_apply_id: selection.outbound_apply_id,
+              type: selection.status === '待确认' ? 'wait_confirmed' : 'rejected'
             }
           })
         }else{
@@ -1206,7 +1207,7 @@
         this.spinShow
         let ids = []
         typeof id !== 'object' ? ids.push(id) : ids = id
-        this.$API.getOutbountSerialData({ids}).then(res => {
+        this.$API.getOutbountSerialData({ids, type: 'wait_confirmed'}).then(res => {
           if (res.code !== 0) return
           this.countGoodsModal.form.serialCodeData = res.data
         }).finally(() => {this.spinShow = false})

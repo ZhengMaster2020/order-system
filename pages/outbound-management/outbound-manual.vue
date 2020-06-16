@@ -576,11 +576,11 @@
         })
       },
 
-      getOutbountSerialData(id) {
+      getOutbountSerialData(id, type) {
         // this.spinShow = true
         let ids = []
         ids.push(id)
-        this.$API.getOutbountSerialData({ids}).then(res => {
+        this.$API.getOutbountSerialData({ids, type}).then(res => {
           if (res.code !== 0) return
           this.form.serialCodeData = res.data.map((items, index) => {
             items.number = ++index
@@ -676,11 +676,12 @@
       this.id = this.$route.query.id
       this.outbound_apply_id = this.$route.query.outbound_apply_id
       this.form.outboundApplyId = this.outbound_apply_id
+      this.type = this.$route.query.type
       this.form.realName = userInfo.realName || ''
       console.log(this.$route.query)
       console.log(this.outbound_apply_id)
       if(this.id) {
-        this.getOutbountSerialData(this.id)
+        this.getOutbountSerialData(this.id, this.type)
       }
       if(this.outbound_apply_id){
         this.getOutboundDetail(this.outbound_apply_id)
