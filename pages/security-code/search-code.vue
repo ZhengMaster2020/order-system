@@ -203,17 +203,17 @@
         <Row>
           <Col span="4">
             <FormItem label="编码生成时间">
-              <Input :value="selectTab === 'new'? $format(logModal.traceData.createdAt, 'yyyy-MM-hh') : logModal.traceData.scodeBuildTime" readonly />
+              <Input :value="selectTab === 'new'? logModal.traceData.createdAt : logModal.traceData.scodeBuildTime" readonly />
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem label="是否激活">
-              <Input :value="logModal.traceData.enableStatus" readonly />
+              <Input :value="!logModal.traceData.enableStatus ? '' : logModal.traceData.enableStatus === 'disabled' ? '否' : '是'" readonly />
             </FormItem>
           </Col>
           <Col span="4">
             <FormItem label="是否失效">
-              <Input :value="!logModal.traceData.queried ? '' : logModal.traceData.queried >= 5 ? '失效' : '有效'" readonly />
+              <Input :value="logModal.traceData.isSucceed" readonly />
             </FormItem>
           </Col>
           <Col span="4">
@@ -458,7 +458,7 @@
     },
     methods: {
       getNewLog(row){
-        let {brand, masterId, serialCode, securityCode, securityCodeLink} = row
+        let {brand, masterId, serialCode, securityCode, securityCodeLink, productionDate, isSucceed} = row
         let uniqueCode = ''
         securityCodeLink.substr(securityCodeLink.indexOf('?')).split('&').map(items => {
           if(items.indexOf('uniqueCode') != -1) {
@@ -475,10 +475,12 @@
         this.$API.getNewSecurityCodeLog({brand, masterId, serialCode, securityCode, uniqueCode}).then(res => {
           this.logModal.list = res.data.list
           this.logModal.traceData = Array.isArray(res.data.traceData) ? {} : res.data.traceData
+          this.logModal.traceData.createdAt = productionDate
+          this.logModal.traceData.isSucceed = isSucceed
         }).then(() => {
-          // TODO: brand serialCode 获取出库相应信息
+          // brand serialCode 获取出库相应信息
           // let rangeStr = 'A00000001-A00000003'
-          this.$API.getOutboundLog({brand, serialCode, page: 1, perPage: 10}).then(res => {
+          this.$API.getOutboundLog({brand: row.brand, serialCode, page: 1, perPage: 10}).then(res => {
             this.spinShow = false
             // console.log(res)
 
@@ -501,7 +503,7 @@
         })
       },
       getOldLog(row) {
-        let {brand, securityCode} = row
+        let {brand, securityCode, productionDate, isSucceed} = row
         // 品牌参数转换
         this.oldBrandList.forEach(items => {
           if(items.label === brand){
@@ -524,7 +526,8 @@
               this.logModal.traceData = {}
             }else {
               traceData.securityCode = traceData.code
-              traceData.scodeBuildTime = traceData.scodeBuildTime == 0 ? '' : this.$format(traceData.scodeBuildTime, 'yyyy-MM-dd')
+              traceData.scodeBuildTime = productionDate
+              traceData.isSucceed = isSucceed
               traceData.brand = row.brand
               this.logModal.traceData = traceData
             }
