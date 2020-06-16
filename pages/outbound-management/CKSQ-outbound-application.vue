@@ -262,7 +262,6 @@
               <td width="90">{{detailData.mkCode}}</td>
               <td width="125">{{detailData.productName}}</td>
               <td width="100">{{detailData.requireDeliveryTime}}</td>
-<!--            TODO:  紧急程度-->
               <td width="60">{{detailData.urgency == '' ? '-' : detailData.urgency}}</td>
               <td width="60">{{detailData.productType}}</td>
               <td width="60">{{detailData.orderNumber}}</td>
@@ -278,7 +277,7 @@
             </tr>
             <tr>
               <!--            TODO:  剩余可出库量-->
-              <td>{{detailData.expectedOutboundNumber}}</td>
+              <td>{{detailData.remainNum}}</td>
               <td>{{detailData.isReissue}}</td>
               <td>{{(!detailData.reissueType || detailData.reissueType === '-') ? '无' : detailData.reissueType}}</td>
               <td>{{(!detailData.lossSn || detailData.lossSn === '-') ? '无' : detailData.lossSn}}</td>
@@ -487,7 +486,7 @@
           <Input class="width-170" v-model="detailData.handleBy" readonly/>
         </FormItem>
         <FormItem label="已实际出库数量">
-          <Input class="width-170" v-model="detailData.expectedOutboundNumber" readonly/>
+          <Input class="width-170" v-model="detailData.confirmedNumber" readonly/>
         </FormItem>
         <FormItem label="审核" prop="isPass">
           <RadioGroup v-model="confirmModal.form.isPass" class="width-120">
@@ -736,6 +735,8 @@
           qrCodeUrl: '',
           flowingWater: '',
           urgency: '',
+          remainNum: '',
+          confirmedNumber: '',
           serialCodeItems: {},
           fileItems: {},
         },
@@ -1193,6 +1194,11 @@
           }
           this.detailData.lossSn = this.detailData.lossSn ? this.detailData.lossSn : '-'
           this.detailData.reissueType = this.switchReiusseType(this.detailData.reissueType)
+        }).then(() => {
+          this.$API.getGBOrderSnNum({ gbOrderSn: this.detailData.gbOrderSn }).then(res => {
+            if (res.code !== 0) return
+            this.detailData.remainNum = Number(this.detailData.orderNumber) - Number(res.data[0])
+          })
         })
       },
 
