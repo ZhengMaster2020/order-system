@@ -542,7 +542,7 @@
           </Col>
           <Col span="4">
             <FormItem label="理论出库量" style="width: 100%">
-              <Input :value="(serial.endNumber === null || !serial.endNumber) ? '' : serial.endNumber - serial.startNumber" readonly/>
+              <Input :value="(serial.endNumber === null || !serial.endNumber) ? '' : serial.endNumber - serial.startNumber + 1" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
