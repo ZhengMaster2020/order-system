@@ -115,7 +115,7 @@
         <Row>
           <Col span="4">
             <FormItem label="出库人员" style="width: 100%" prop="realName">
-              <Input v-model="userInfo.realName" readonly/>
+              <Input v-model="form.realName" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
@@ -277,6 +277,7 @@
         serialFileName: '',
         fileItem: null,
         form: {
+          realName: '',
           outboundApplyId: null,
           warehouseSn: '',
           fileItems: [],
@@ -484,7 +485,7 @@
 
         this.$refs.form.validate(val => {
           if (!val) return
-          // this.submintLodaing = true
+          this.submintLodaing = true
           let params = null
 
           if(this.id) {
@@ -496,7 +497,6 @@
             if(this.actualNumberTotal > (this.detailData.expectedOutboundNumber - this.detailData.remainNumTotal) ) return this.$Message.error('实际点货总量不能大于出库单剩余可出库量')
             params = {}
 
-            let fields = ['id', 'serialCodeSn', 'startNumber', 'endNumber', 'actualQuantity']
             params.data = serialCodeData.map(items => {
               return {
                 id: items.id,
@@ -512,6 +512,8 @@
               if(res.code !== 0) return
               this.$Message.success(res.msg)
               this.$router.push('/outbound-management/CKSQ-outbound-application')
+
+            }).finally(() => {
               this.submintLodaing = false
             })
 
@@ -525,6 +527,7 @@
           if(this.form.fileItems.length === 0) return this.$Message.error('请上传出库回传单')
           if(this.actualNumberTotal > (this.detailData.expectedOutboundNumber - this.detailData.remainNumTotal) ) return this.$Message.error('实际点货总量不能大于出库单剩余可出库量')
 
+          delete params.realName
           params.serialCodeData.forEach(items => {
             items.startNumber = this.formatSerialCode(items.startNumber)
             items.endNumber = this.formatSerialCode(items.endNumber)
@@ -551,6 +554,7 @@
             if(res.code !== 0) return
             this.$Message.success(res.msg)
             this.$router.push('/outbound-management/CKSQ-outbound-application')
+          }).finally(() => {
             this.submintLodaing = false
           })
 
@@ -672,7 +676,7 @@
       this.id = this.$route.query.id
       this.outbound_apply_id = this.$route.query.outbound_apply_id
       this.form.outboundApplyId = this.outbound_apply_id
-      this.userInfo = userInfo
+      this.form.realName = userInfo.realName || ''
       console.log(this.$route.query)
       console.log(this.outbound_apply_id)
       if(this.id) {
