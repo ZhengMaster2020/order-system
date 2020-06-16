@@ -348,16 +348,9 @@
           this.gbOrderSnNum = Number(res.data[0])
         })
       },
-      // 获取出库申请单待确认出库+已确认出库数量
-      getOutboundApplySnNum(id) {
-        this.$API.getOutboundApplySnNum(id).then(res => {
-          if (res.code !== 0) return
-          this.gbOrderSnNum = Number(res.data[0])
-        })
-      },
 
       getOutboundDetail(id) {
-        this.$API.getOutboundLsitDetail(id).then(res => {
+        return this.$API.getOutboundLsitDetail(id).then(res => {
           if (res.code !== 0) return
           this.spinShow = false
           this.hasInfo = true
@@ -370,6 +363,7 @@
             lossSn: this.form.lossSn ? this.form.lossSn : '-',
             lossNumber: this.form.lossNumber + ''
           }
+          this.getOutboundOrderNum()
         })
       },
 
@@ -381,8 +375,8 @@
       this.supplyInstance()
       // alert(this.$route.query.id)
       if(this.id) {
-        this.getOutboundApplySnNum(this.id)
-        this.getOutboundDetail(this.id)
+        this.spinShow = true
+        this.getOutboundDetail(this.id).then(() => {this.spinShow = false})
       }
     }
   }
