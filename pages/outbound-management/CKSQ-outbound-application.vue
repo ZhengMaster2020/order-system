@@ -448,7 +448,7 @@
               <Col>
                 <div style="text-align: center">
                   <a href="javascript:void(0)" class="font-size-12"
-                     @click="toOutbountRecord('confirmModal')">点击查看出库点出库记录>></a>
+                     @click="showCountGoodsModal">点击查看详细点货记录>></a>
                 </div>
               </Col>
             </Row>
@@ -839,14 +839,6 @@
           }
         }
         this.$refs.confirmForm.resetFields()
-      },
-      ['countGoodsModal.show'](cur) {
-        if(!cur) {
-          this.countGoodsModal.form = {
-            serialCodeData: []
-          }
-          this.$refs.countGoodsForm.resetFields()
-        }
       }
     },
     computed: {
@@ -1081,6 +1073,10 @@
           this.init('search')
         })
       },
+
+      showCountGoodsModal() {
+        this.countGoodsModal.show = true
+      },
       submit(modal, form, apiKey = 'outboundLsitReview') {
         let params = {}
         if (this[modal].title === '完成出库') {
@@ -1201,13 +1197,13 @@
       },
 
       getSerialDetail(id) {
+        this.spinShow
         let ids = []
-        typeof id === 'string' ? ids.push(id) : ids = id
-
+        typeof id !== 'object' ? ids.push(id) : ids = id
         this.$API.getOutbountSerialData({ids}).then(res => {
           if (res.code !== 0) return
           this.countGoodsModal.form.serialCodeData = res.data
-        })
+        }).finally(() => {this.spinShow = false})
       },
 
       switchReiusseType(type) {

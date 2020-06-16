@@ -114,7 +114,7 @@
         </Row>
         <Row>
           <Col span="4">
-            <FormItem label="出库人员" style="width: 100%">
+            <FormItem label="出库人员" style="width: 100%" prop="realName">
               <Input v-model="userInfo.realName" readonly/>
             </FormItem>
           </Col>
@@ -165,7 +165,7 @@
           <Col span="20">
             <div class="upload-list-wrap">
               <div class="margin-right-10">
-                <div class="necessary margin-bottom-10 font-size-12">导入序列号表格</div>
+                <div class="margin-bottom-10 font-size-12">导入序列号表格</div>
                 <Upload
                 :show-upload-list="false"
                 :format="['xls','xlsx']"
@@ -299,6 +299,7 @@
         },
         rules: {
           gbOrderSn: [{required: true, message: '必填项', trigger: 'blur'}],
+          realName: [{required: true, message: '必填项', trigger: 'blur'}],
           reissueType: [{required: true, message: '必填项', trigger: 'blur'}],
           serialCodeSn: [{required: true, message: '须大写字母', trigger: 'blur', pattern: /^[A-Z]/}],
           startNumber: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
@@ -369,7 +370,7 @@
           let fileName = file.name.substring(0, index)
           const check = fileName !== this.detailData.outboundOrderSn
           if(check){
-            this.$Message.error('文件名于入库单号不一致')
+            this.$Message.error('文件名于出库单号不一致')
           }else {
             this.fileItem = file
           }

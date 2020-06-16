@@ -185,7 +185,7 @@
     computed: {
       remainNum() {
         // 下单数量 - 汇总该灌包订单在出库记录中【待确认】+【已确认】的数量
-        // console.log(this.form.orderNumber, this.gbOrderSnNum)
+        console.log(this.form.orderNumber, this.gbOrderSnNum)
         return this.hasInfo ? this.form.orderNumber - this.gbOrderSnNum : null
       },
       expectedMaxNum() {
@@ -289,6 +289,7 @@
 
           if(!this.form.mkCode) return this.$Message.error('请选择慕可代码')
 
+          if(this.remainNum <= 0) return this.$Message.error('已达该订单号最大出库量')
           let apiKey = 'addOutboundLsit'
           let params = JSON.parse(JSON.stringify(this.form))
 
