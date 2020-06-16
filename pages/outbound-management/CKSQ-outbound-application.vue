@@ -435,7 +435,7 @@
             <Row>
               <Col v-for="(data, index) in countGoodsModal.form.serialCodeData" :key="index">
                 <FormItem label="出库人员">
-                  <Input class="width-160" v-model="detailData.outboundBy" readonly/>
+                  <Input class="width-160" v-model="userInfo.realName" readonly/>
                 </FormItem>
                 <FormItem label="实际点货量" prop="isPass">
                   <Input class="width-160" v-model="data.actualQuantity" readonly/>
