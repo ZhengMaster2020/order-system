@@ -29,6 +29,15 @@ export default [
       { path: 'inquire-anomaly-tracking/channel-store-settings', title: '渠道和店铺设置', name: 'inquire-anomaly-tracking/channel-store-settings' }
     ]
   },
+  {
+    path:'/inventory-management',
+    icon:'ios-book',
+    name:'/niventory-management',
+    title:'盘点管理',
+    children:[
+      {path:'inventory-management/inventory-records',title:"PDJL盘点记录",name:'inventory-management/inventory-records'}
+    ]
+  }
   // {
   //   path: '/anti-channel-conflict',
   //   icon: 'ios-book',
