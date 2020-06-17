@@ -38,6 +38,7 @@ export default [
     ]
   },
   {
+
     path: '/storage-management',
     icon: 'ios-book',
     name: '/storage-management',
@@ -46,6 +47,16 @@ export default [
       { path: 'storage-management/storage-application', title: '入库申请单', name: 'storage-management/storage-application' }
     ]
   },
+  {
+    path:'/inventory-management',
+    icon:'ios-book',
+    name:'/inventory-management',
+    title:'盘点管理',
+    children:[
+      {path:'inventory-management/inventory-records',title:"盘点记录",name:'inventory-management/inventory-records'}
+    ]
+  }
+
   // {
   //   path: '/anti-channel-conflict',
   //   icon: 'ios-book',

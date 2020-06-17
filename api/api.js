@@ -345,6 +345,74 @@ const searchOrderNum = params => {
   })
 }
 
+// 盘点管理-盘点记录-列表
+const inventoryRecordsList = params => {
+  return fetch({
+    url:'/traceability/inventory-record',
+    method:'GET',
+    params:params
+  })
+}
+
+// 盘点管理-盘点记录-添加
+const inventoryRecordsAdd = params => {
+  return fetch({
+    url:'/traceability/inventory-record',
+    method:'POST',
+    data:params
+  })
+}
+
+// 盘点管理-盘点记录-修改
+const inventoryRecordsUpdate = params => {
+  return fetch({
+    url:'/traceability/inventory-record',
+    method:'PATCH',
+    data:params
+  })
+}
+
+// 盘点管理-盘点记录-删除
+const inventoryRecordsDel = (params) => {
+  return fetch({
+    url:`/traceability/inventory-record/${params}`,
+    method:'DELETE',
+  })
+}
+
+// 盘点记录详情
+const inventoryRecordsDetail = params => {
+  return fetch({
+    url:`/traceability/inventory-record/${params}`,
+    method:'GET'
+  })
+}
+// 盘点管理-盘点记录-审核(初审/复审)
+const inventoryRecordsAudit = (params) => {
+  return fetch({
+    url:`/traceability/inventory-record/audit/${params.type}`,
+    method:'POST',
+    data:params
+  })
+}
+// 盘点管理-盘点记录-作废
+const inventoryRecordsInvalid = params => {
+  return fetch({
+    url:`/traceability/inventory-record/invalid/${params}`,
+    method:'POST'
+  })
+}
+// 盘点管理-盘点记录-导出
+const inventoryRecordsExport = params => {
+  return fetch({
+    url:'/traceability/inventory-record/export',
+    method:'GET',
+    params:params,
+    responseType:'blob'
+  })
+}
+
+
 export default {
   login,
   getUserInfo,
@@ -386,5 +454,14 @@ export default {
   searchOrderNum,
   boxCodeList,
   productCodeList,
-  productCodeSearch
+  productCodeSearch,
+  // 盘点管理-盘点记录
+  inventoryRecordsList,
+  inventoryRecordsExport,
+  inventoryRecordsAdd,
+  inventoryRecordsUpdate,
+  inventoryRecordsDel,
+  inventoryRecordsDetail,
+  inventoryRecordsInvalid,
+  inventoryRecordsAudit
 }
