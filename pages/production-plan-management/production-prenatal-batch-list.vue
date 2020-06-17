@@ -4,61 +4,28 @@
       <!--      Form-->
       <Form ref="searchForm" :model="searchForm" inline>
         <Row type="flex" justify="space-between">
-          <Col>
-            <FormItem>
-              <Input v-model="searchForm.createdBy" placeholder="创建人" class="width-120"/>
-            </FormItem>
-            <FormItem>
-              <DatePicker type="datetime"
-                          format="yyyy-MM-dd HH:mm:ss"
-                          placeholder="创建时间"
-                          class="width-120" @on-change="dateChange"/>
-            </FormItem>
-            <FormItem>
-              <Input v-model="searchForm.planNumber" placeholder="下单编号" class="width-120"/>
-            </FormItem>
-            <FormItem>
-              <Input v-model="searchForm.batchNumber" placeholder="生产批次号" class="width-120"/>
-            </FormItem>
-            <FormItem>
-              <FormItem prop="name">
-                <Select v-model="searchForm.brand" clearable placeholder="品牌" class="width-120">
-                  <Option v-for="brand in brandList" :key="brand.label" :value="brand.label">{{brand.value}}</Option>
-                </Select>
-              </FormItem>
-            </FormItem>
-            <FormItem>
-              <Input v-model="searchForm.planName" placeholder="所属计划名称" class="width-120"/>
-            </FormItem>
-            <FormItem>
-              <Input v-model="searchForm.supplier" placeholder="生成供应商" class="width-120"/>
-            </FormItem>
-            <FormItem>
-              <Select clearable placeholder="是否导出" style="width: 100px" v-model="searchForm.processStatus">
-                <Option value="notExported">未导出</Option>
-                <Option value="exported">已导出</Option>
-              </Select>
-            </FormItem>
-            <FormItem>
-              <Select clearable placeholder="是否撤销" style="width: 100px" v-model="searchForm.produceStatus">
-                <Option value="unrevoked">未撤销</Option>
-                <Option value="revoked">已撤销</Option>
-              </Select>
-            </FormItem>
-            <FormItem>
-              <Button type="primary" @click="search">搜索</Button>
-            </FormItem>
-          </Col>
+          <Input v-model="searchForm.createdBy" placeholder="创建人" class="width-120"/>
+          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="创建时间" class="width-120" @on-change="dateChange"/>
+          <Input v-model="searchForm.planNumber" placeholder="下单编号" class="width-120"/>
+          <Input v-model="searchForm.batchNumber" placeholder="生产批次号" class="width-120"/>
+            <Select v-model="searchForm.brand" clearable placeholder="品牌" class="width-120">
+              <Option v-for="brand in brandList" :key="brand.label" :value="brand.label">{{brand.value}}</Option>
+            </Select>
+          <Input v-model="searchForm.planName" placeholder="所属计划名称" class="width-120"/>
+          <Input v-model="searchForm.supplier" placeholder="生成供应商" class="width-120"/>
+          <Select clearable placeholder="是否导出" style="width: 100px" v-model="searchForm.processStatus">
+            <Option value="notExported">未导出</Option>
+            <Option value="exported">已导出</Option>
+          </Select>
+          <Select clearable placeholder="是否撤销" style="width: 100px" v-model="searchForm.produceStatus">
+            <Option value="unrevoked">未撤销</Option>
+            <Option value="revoked">已撤销</Option>
+          </Select>
+          <Button type="primary" @click="search">搜索</Button>
         </Row>
-        <Row>
-          <Col>
-            <FormItem>
-              <Button type="primary" @click="exportList">导表处理</Button>
-            </FormItem>
-            <FormItem>
-              <Button type="primary" @click="cancelProduction">撤销生产</Button>
-            </FormItem>
-          </Col>
+        <Row class="margin-top-10">
+          <Button type="primary" @click="exportList">关联下单编号</Button>
+          <!-- <Button type="primary" @click="cancelProduction">撤销生产</Button>-->
         </Row>
       </Form>
 
@@ -177,31 +144,31 @@
     </Modal>
 
     <!--  撤销生产  -->
-    <Modal
-    v-model="cancelProductModal.modal"
-    :title="cancelProductModal.title"
-    draggable
-    width="1000">
-      <Form inline ref="cancelProductForm" :model="cancelProductModal.form" :rules="rules">
-        <div class="title">
-          <span class="line"></span>
-          <div class="title-text">撤销</div>
-          <span class="line"></span>
-        </div>
+<!--    <Modal-->
+<!--    v-model="cancelProductModal.modal"-->
+<!--    :title="cancelProductModal.title"-->
+<!--    draggable-->
+<!--    width="1000">-->
+<!--      <Form inline ref="cancelProductForm" :model="cancelProductModal.form" :rules="rules">-->
+<!--        <div class="title">-->
+<!--          <span class="line"></span>-->
+<!--          <div class="title-text">撤销</div>-->
+<!--          <span class="line"></span>-->
+<!--        </div>-->
 
-        <FormItem label="撤销人">
-          <Input class="width-180" v-model="cancelProductModal.operator" readonly/>
-        </FormItem>
-        <FormItem label="意见" prop="opinion">
-          <Input style="width: 552px" v-model="cancelProductModal.form.opinion"/>
-        </FormItem>
-      </Form>
-      <div class="modal-footer" slot="footer">
-        <Button type="default" @click="cancelProductModal.modal = false">取消</Button>
-        <Button type="primary" @click="submit('cancelProductModal', 'cancelProductForm')" :loading="btnLoading">确认
-        </Button>
-      </div>
-    </Modal>
+<!--        <FormItem label="撤销人">-->
+<!--          <Input class="width-180" v-model="cancelProductModal.operator" readonly/>-->
+<!--        </FormItem>-->
+<!--        <FormItem label="意见" prop="opinion">-->
+<!--          <Input style="width: 552px" v-model="cancelProductModal.form.opinion"/>-->
+<!--        </FormItem>-->
+<!--      </Form>-->
+<!--      <div class="modal-footer" slot="footer">-->
+<!--        <Button type="default" @click="cancelProductModal.modal = false">取消</Button>-->
+<!--        <Button type="primary" @click="submit('cancelProductModal', 'cancelProductForm')" :loading="btnLoading">确认-->
+<!--        </Button>-->
+<!--      </div>-->
+<!--    </Modal>-->
   </div>
 </template>
 
@@ -280,7 +247,7 @@
               title: '已出库数量',
               key: 'quantity_shipped',
               align: 'center',
-              minWidth: 100,
+              minWidth: 110,
               render: (h, {row}) => h('a', {
                 attrs: {href: 'javascript:void(0)'},
                 on: {
@@ -364,15 +331,15 @@
             ]
           }
         },
-        cancelProductModal: {
-          modal: false,
-          title: '',
-          operator: '',
-          form: {
-            opinion: '',
-          },
-
-        },
+        // cancelProductModal: {
+        //   modal: false,
+        //   title: '',
+        //   operator: '',
+        //   form: {
+        //     opinion: '',
+        //   },
+        //
+        // },
         rules: {
           supplierOrderNumber: [{required: true, message: '采购系统的包材订单号', trigger: 'change'}],
           mkCode: [{required: true, message: '以采购下单编号下的慕可代码为准', trigger: 'change'}],
@@ -389,17 +356,17 @@
         this.$refs.exportForm.resetFields()
         this.resetExportData()
       },
-      'cancelProductModal.modal': function (cur) {
-        if (cur) return
-        this.$refs.cancelProductForm.resetFields()
-        this.cancelProductModal.form.opinion = ''
-      }
+      // 'cancelProductModal.modal': function (cur) {
+      //   if (cur) return
+      //   this.$refs.cancelProductForm.resetFields()
+      //   this.cancelProductModal.form.opinion = ''
+      // }
     },
     mounted() {
       let {planNumber, planName} = this.$route.params
       this.userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
       this.exportModal.operator = this.userInfo.realName
-      this.cancelProductModal.operator = this.userInfo.realName
+      // this.cancelProductModal.operator = this.userInfo.realName
       this.exportModal.planNumber = planNumber || ''
       this.searchForm.planName = planName || ''
       this.getProductionBatch('search')
@@ -410,18 +377,18 @@
       search() {
         this.getProductionBatch('search')
       },
-      cancelProduction() {
-        let selection = this.prenatalBatch.selection
-
-        if (selection.length < 1) return this.$Message.warning('请选择批次')
-        if (selection.length > 1) return this.$Message.warning('一次只能撤销一个批次')
-        // let isCheck = selection[0].produce_status === 'generated' && selection[0].process_status === 'notExported'
-
-        // if (!isCheck) return this.$Message.warning('已生成且未处理的才可撤销')
-
-        this.cancelProductModal.modal = true
-        this.cancelProductModal.title = `撤销生产批次号：${selection[0].batch_number}`
-      },
+      // cancelProduction() {
+      //   let selection = this.prenatalBatch.selection
+      //
+      //   if (selection.length < 1) return this.$Message.warning('请选择批次')
+      //   if (selection.length > 1) return this.$Message.warning('一次只能撤销一个批次')
+      //   // let isCheck = selection[0].produce_status === 'generated' && selection[0].process_status === 'notExported'
+      //
+      //   // if (!isCheck) return this.$Message.warning('已生成且未处理的才可撤销')
+      //
+      //   this.cancelProductModal.modal = true
+      //   this.cancelProductModal.title = `撤销生产批次号：${selection[0].batch_number}`
+      // },
       exportList() {
         let selection = []
         for (let key in this.cacheSelect) {
