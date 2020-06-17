@@ -460,11 +460,18 @@
       getNewLog(row){
         let {brand, masterId, serialCode, securityCode, securityCodeLink, productionDate, isSucceed} = row
         let uniqueCode = ''
-        securityCodeLink.substr(securityCodeLink.indexOf('?')).split('&').map(items => {
-          if(items.indexOf('uniqueCode') != -1) {
-            uniqueCode = items.split('=')[1]
-          }
-        })
+        if(securityCodeLink.indexOf('?') !== -1) {
+          securityCodeLink.substr(securityCodeLink.indexOf('?')).split('&').map(items => {
+            if(items.indexOf('uniqueCode') != -1) {
+              uniqueCode = items.split('=')[1]
+            }
+          })
+        }else {
+          let arr = securityCodeLink.split('/')
+          let index = arr.indexOf('uniqueCode')
+          uniqueCode = arr[index + 1]
+        }
+
         this.newBrandList.forEach(items => {
           if(items.label === brand){
             brand = items.value
