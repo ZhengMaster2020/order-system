@@ -26,23 +26,6 @@ export default function fetch(options) {
         return Promise.reject(err)
       }
     )
-
-    // http response 拦截器
-    // instance.interceptors.response.use(
-    //   (response) => {
-    //     return response
-    //   },
-    //   (error) => {
-    //     Notice.error({
-    //       title: '出错了！',
-    //       desc: '错误原因 ' + JSON.stringify(error),
-    //       duration: 0
-    //     })
-    //     iView.LoadingBar.error()
-    //     return Promise.reject(error) // 返回接口返回的错误信息
-    //   }
-    // )
-
     // 请求处理
     instance(options)
       .then((res) => {
@@ -55,28 +38,15 @@ export default function fetch(options) {
               data = JSON.parse(reader.result)
               Notice.error({
                 title: '错误代码：' + data.code,
-                desc: data.subMsg || data.msg,
+                desc: data.subMsg || data.msg || data.message,
                 duration: 3
               })
               reject(data);
             }
+          } else {
+            reject(data);
           }
           return;
-        } else if (data.code >= 1) {
-          if (data.__proto__ === Blob.prototype) {
-            var reader = new FileReader();
-            reader.readAsText(data, 'utf-8');
-            reader.onload = function () {
-              data = JSON.parse(reader.result)
-              let title = data.subMsg || data.message
-              data.data = data.data || []
-              Notice.warning({
-                title: 'code: ' + data.code,
-                desc: title
-              })
-              reject(data);
-            }
-          }
         } else {
           resolve(data)
         }
@@ -94,7 +64,7 @@ export default function fetch(options) {
             data = JSON.parse(reader.result);
             Notice.error({
               title: '错误代码：' + data.code,
-              desc: data.subMsg || data.msg,
+              desc: data.subMsg || data.msg || data.message,
               duration: 1.5
             })
             reject(error)
@@ -129,7 +99,7 @@ export default function fetch(options) {
 
         Notice.error({
           title: '错误代码：' + data.code,
-          desc: data.subMsg || data.msg,
+          desc: data.subMsg || data.msg || data.message,
           duration: 1.5
         })
         reject(error)
