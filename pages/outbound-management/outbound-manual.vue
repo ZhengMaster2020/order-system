@@ -499,7 +499,7 @@
 
             params.data = serialCodeData.map(items => {
               return {
-                id: items.id,
+                id: this.id,
                 serialCodeSn: items.serialCodeSn,
                 startNumber: this.formatSerialCode(items.startNumber),
                 endNumber: this.formatSerialCode(items.endNumber),
@@ -678,8 +678,8 @@
       this.form.outboundApplyId = this.outbound_apply_id
       this.type = this.$route.query.type
       this.form.realName = userInfo.realName || ''
-      console.log(this.$route.query)
-      console.log(this.outbound_apply_id)
+      console.log(this.id, 'id')
+      console.log(this.outbound_apply_id, 'outbound_apply_id')
       if(this.id) {
         this.getOutbountSerialData(this.id, this.type)
       }
