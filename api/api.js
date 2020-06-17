@@ -1,5 +1,6 @@
 import fetch from './fetch'
 import { SERVER_UAC_URL, USER_URL } from './config'
+import ENV from './env'
 
 const login = (params) => {
   return fetch({
@@ -411,7 +412,15 @@ const inventoryRecordsExport = params => {
     responseType:'blob'
   })
 }
-
+// 盘点管理-盘点记录-盘点对象模糊搜索
+const inventoryRecordsSearch = params => {
+  return fetch({
+    url:'/v1/search/search-supplier',
+    method:'GET',
+    baseURL: ENV === 'production' ?  'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com',
+    params:params
+  })
+}
 
 export default {
   login,
@@ -463,5 +472,6 @@ export default {
   inventoryRecordsDel,
   inventoryRecordsDetail,
   inventoryRecordsInvalid,
-  inventoryRecordsAudit
+  inventoryRecordsAudit,
+  inventoryRecordsSearch
 }

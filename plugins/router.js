@@ -50,7 +50,11 @@ export default [
   {
     path:'/inventory-management',
     icon:'ios-book',
+<<<<<<< HEAD
     name:'/inventory-management',
+=======
+    name:'/iventory-management',
+>>>>>>> feature_inventory_records_fengshaoluo
     title:'盘点管理',
     children:[
       {path:'inventory-management/inventory-records',title:"盘点记录",name:'inventory-management/inventory-records'}
