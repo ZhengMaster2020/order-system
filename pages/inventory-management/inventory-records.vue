@@ -829,7 +829,7 @@ export default {
       },
     // 上传凭证
     handleUpload(file) {
-      // console.log(file);
+     
     },
     // 上传凭证成功
     onsuccess(response, file, fileList) {
@@ -897,7 +897,6 @@ export default {
       let msg = this.operationVerify();
       if (msg) return this.$Message.warning(msg);
       let {status,id} = this.recordationList.selection[0];
-      console.log(this.recordationList.selection)
       if(status === "已驳回" || status === "待审核") return this.$Message.warning("初审未通过或未审核");
       if(status === "复审通过") return this.$Message.warning("已经审核");
        if(status === "已作废") return this.$Message.warning("作废的不能进行审核");
@@ -961,7 +960,6 @@ export default {
         let id = row.id;
         // 获取编辑详情
         this.$API.inventoryRecordsDetail(id).then(res => {
-          console.log(res)
           if(res.code === 0){
             let checkType = res.data.checkType === "自仓库存"?'self_inventory':res.data.checkType === "供应商库存"?'supplier_inventory':'';
             this.addform.form = res.data;
