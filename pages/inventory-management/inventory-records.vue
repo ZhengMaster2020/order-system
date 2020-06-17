@@ -97,7 +97,7 @@
                 </Select>
               </FormItem>
               <FormItem label="盘点类型" prop="checkType">
-                <Select v-model="addform.form.checkType" style="width:185px" placeholder="请选择">
+                <Select v-model="addform.form.checkType" @on-change="typeChange" style="width:185px" placeholder="请选择">
                   <Option
                     v-for="(item,index) in recordsList"
                     :value="item.value"
@@ -115,10 +115,28 @@
                 ></DatePicker>
               </FormItem>
               <FormItem label="盘点对象" prop="inventoryObject">
-                <Input v-model="addform.form.inventoryObject" clearable placeholder></Input>
+                <Input v-if="addform.form.checkType === 'self_inventory'" v-model="addform.form.inventoryObject" clearable placeholder></Input>
+                <Select 
+                v-else
+                v-model="addform.form.inventoryObject"
+                filterable
+                style="width:190px"
+                remote
+                clearable
+                :remote-method="inventobjSearch"
+                :loading="loadingObj">
+                <Option v-for="(option,index) in objList" :value="option.supplier" :key="index">{{option.supplier}}</Option>
+                </Select>
               </FormItem>
               <FormItem label="盘点项目" prop="inventoryProject">
-                <Input v-model="addform.form.inventoryProject" clearable placeholder></Input>
+                <Select v-model="addform.form.inventoryProject" clearable style="width:185px">
+                  <Option 
+                    v-for="(item,index) in projectList"
+                    :value="item.value"
+                    :key="item.value">
+                      {{item.label}}
+                  </Option>
+                </Select>
               </FormItem>
             </Col>
           </Row>
@@ -400,6 +418,8 @@
 <script>
 import Cookies from "js-cookie";
 import { SERVER_BASE_URL } from "../../api/config";
+import axios from 'axios';
+import ENV from '../../api/env';
 export default {
   name: "",
   data() {
@@ -415,6 +435,8 @@ export default {
         inventoryProject: "", //盘点项目
         createdBy: "" //盘点人
       },
+      loadingObj:false, //盘点对象loading
+      objList:[], //盘点对象
       addform: {
         //添加
         modal: false,
@@ -473,6 +495,28 @@ export default {
         {
           label: "自仓库存",
           value: "self_inventory"
+        }
+      ],
+      // 盘点项目
+      projectList:[],
+      projectList1:[
+        {
+          label:'月盘点核对',
+          value:'月盘点核对'
+        },
+        {
+          label:'入仓盘点',
+          value:'入仓盘点'
+        }
+      ],
+      projectList2:[
+        {
+          label:'实际剩余量',
+          value:'实际剩余量'
+        },
+        {
+          label:'灌包收货量',
+          value:'灌包收货量'
         }
       ],
       // 审核
@@ -655,6 +699,7 @@ export default {
   mounted() {
     this.userInfo = JSON.parse(window.localStorage.getItem('userInfo'));
     this.getList();
+    this.supplyInstance();
   },
   methods: {
     // 搜索
@@ -681,7 +726,58 @@ export default {
       this.addform.title = "添加";
       this.addform.modal = true;
       this.addform.form.id = "";
+      this.projectList = [];
     },
+    // 盘点类型的切换
+    typeChange(value){
+       if(value === "supplier_inventory"){
+         this.projectList = this.projectList2;
+          this.addform.form.inventoryObject = "";
+       }
+       if(value === 'self_inventory'){
+         this.projectList = this.projectList1;
+         this.$nextTick(()=>{
+           this.addform.form.inventoryObject = "IT开发部仓库";
+         })
+       }
+    },
+    // 盘点对象模糊搜索
+    inventobjSearch(query){
+      if(query !== ""){
+        this.loadingObj = true;
+        let params = {};
+        params.type = 2;
+        params.supplier = query;
+        this.getSupplyInfo(params).then(res => {
+           if(res.code === 200){
+            this.objList = res.data
+           }
+
+        }).finally(() => {
+              this.loadingObj = false;
+          })
+      }
+      else{
+        this.objList = [];
+      }
+    },
+    // 盘点对象-采购系统api
+    supplyInstance() {
+        const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com'
+        this.instance = axios.create({
+          baseURL: BASE_URL,
+          timeout: 20000,
+          headers: {'Authorization': 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X'}
+        });
+      },
+    getSupplyInfo(params) {
+        return this.instance.get('/v1/search/search-supplier', {params})
+          .then(res => {
+            return res.data
+          }).catch(err => {
+            if (err) return console.log(err.message)
+          })
+      },
     // 页
     changePage(e) {
       this.pageProps.page = e;

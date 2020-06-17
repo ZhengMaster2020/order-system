@@ -32,10 +32,10 @@ export default [
   {
     path:'/inventory-management',
     icon:'ios-book',
-    name:'/niventory-management',
+    name:'/iventory-management',
     title:'盘点管理',
     children:[
-      {path:'inventory-management/inventory-records',title:"PDJL盘点记录",name:'inventory-management/inventory-records'}
+      {path:'inventory-management/inventory-records',title:"盘点记录",name:'inventory-management/inventory-records'}
     ]
   }
   // {
