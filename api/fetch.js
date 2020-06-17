@@ -30,7 +30,7 @@ export default function fetch(options) {
     instance(options)
       .then((res) => {
         let data = res.data
-        if (res.status === 202) {
+        if (res.status === 202 || data.code > 0) {
           if (data.__proto__ === Blob.prototype) {
             var reader = new FileReader();
             reader.readAsText(data, 'utf-8');
@@ -44,6 +44,11 @@ export default function fetch(options) {
               reject(data);
             }
           } else {
+            Notice.error({
+              title: '错误代码：' + data.code,
+              desc: data.subMsg || data.msg || data.message,
+              duration: 3
+            })
             reject(data);
           }
           return;
