@@ -235,7 +235,7 @@
           </Col>
           <Col span="3">
             <FormItem :label="index === 0? ' ' : ''" :style="index === 0 ? endNumStyle : {}">
-              <Button shape="circle" icon="md-add" @click="addSerialData" v-if="index === 0"></Button>
+              <Button shape="circle" icon="md-add" @click="addSerialData" v-if="index === 0 && !id"></Button>
               <Button style="margin-left: 12px" shape="circle" icon="md-remove" @click="removeSerialData(index)" v-if="index !== 0 && !serial.readonly"></Button>
             </FormItem>
           </Col>
@@ -499,7 +499,7 @@
 
             params.data = serialCodeData.map(items => {
               return {
-                id: this.id,
+                id: items.id,
                 serialCodeSn: items.serialCodeSn,
                 startNumber: this.formatSerialCode(items.startNumber),
                 endNumber: this.formatSerialCode(items.endNumber),
