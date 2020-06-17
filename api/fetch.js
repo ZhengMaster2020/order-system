@@ -30,7 +30,7 @@ export default function fetch(options) {
     instance(options)
       .then((res) => {
         let data = res.data
-        if (res.status === 202 || data.code !== 0) {
+        if (res.status === 202) {
           if (data.__proto__ === Blob.prototype) {
             var reader = new FileReader();
             reader.readAsText(data, 'utf-8');
