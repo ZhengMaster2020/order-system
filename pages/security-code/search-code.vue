@@ -496,7 +496,7 @@
             let data = res.data.list[0]
 
             this.logModal.traceData = {
-              ...this.traceData,
+              ...this.logModal.traceData,
               created_at: data.created_at,
               firstRang: '',
               gb_order_sn: data.gb_order_sn,
