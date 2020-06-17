@@ -452,7 +452,8 @@
           show: false,
           list: [],
           traceData: {}
-        }
+        },
+        rangeList: [],
       }
     },
     methods: {
