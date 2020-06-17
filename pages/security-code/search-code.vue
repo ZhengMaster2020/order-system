@@ -336,7 +336,6 @@
     data () {
       return {
         selectTab: 'new', // tab的name  new/old
-        rangeList: [],
         newBrandList: [
           {label: 'WIS', value: 'WIS'},
           {label: '柏菲娜', value: 'BOOFINA'},
@@ -390,18 +389,18 @@
           },
           {key: 'brand', title: '品牌', minWidth: 80, align: 'center'},
           {key: 'purchaseChannels', title: '渠道', minWidth: 100, align: 'center'},
-          {key: 'shop', title: '购买店铺', minWidth: 80, align: 'center'},
+          {key: 'shop', title: '购买店铺', minWidth: 110, align: 'center'},
           // {key: 'scanAt', title: '扫码时间', minWidth: 100, align: 'center'},
-          {key: 'createdAt', title: '查询日期', minWidth: 140, align: 'center'},
+          {key: 'createdAt', title: '查询日期', width: 110, align: 'center'},
           {key: 'isSucceed', title: '是否成功', minWidth: 70, align: 'center'},
           {key: 'isOneDay', title: '是否24小时内查询', minWidth: 70, align: 'center'},
           {key: 'wechatNickname', title: '用户昵称', minWidth: 100, align: 'center'},
           {key: 'securityCodeLink', title: '链接', minWidth: 160, align: 'center'},
-          {key: 'ipLocation', title: 'IP地址', minWidth: 100, align: 'center'},
+          {key: 'ipLocation', title: 'IP地址', width: 120, align: 'center'},
           {key: 'productionDate', title: '编码生成日期', minWidth: 140, align: 'center'},
           {key: 'masterId', title: '需求编号', minWidth: 100, align: 'center'},
         ],
-        oldColumn: [ // 旧防伪码表头 getOldSecurityCodeLog
+        oldColumn: [ // 旧防伪码表头
           {type: 'selection', width: 60, align: 'center'},
           {type: 'index', title: '序号', minWidth: 65, align: 'center'},
           {key: 'securityCode', title: '防伪码', minWidth: 100, align: 'center',
@@ -800,6 +799,17 @@
             this.isExportLoading = false;
           })
         })
+      }
+    },
+    watch: {
+      isShowExportModal(cur) {
+        if(!cur){
+          this.$refs.exportForm.resetFields()
+          this.exportForm = {
+            verifyCode: null,
+            remark: ''
+          }
+        }
       }
     },
     watch: {

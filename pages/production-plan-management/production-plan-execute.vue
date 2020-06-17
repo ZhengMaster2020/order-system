@@ -30,8 +30,9 @@
         <FormItem label="计划名称">
           <Input class="width-195" v-model="baseicData.planName" readonly/>
         </FormItem>
-        <FormItem label="计划文件">
-          <div style="padding-top: 33px">
+        <FormItem>
+          <div>
+            <div>计划文件</div>
             <a :href="file.url" :download="file.name" class="download-link"
                v-for="(file, index) in baseicData.fileItems" :key="index">{{file.name}}</a>
           </div>
