@@ -202,7 +202,7 @@
         <Col span="3" v-show="isManualStorage">
           <FormItem :label="index === 0? ' ' : ''" :class="index === 0 ? 'endNumStyle' : ''">
             <Button shape="circle" icon="md-add" v-if="index === 0" @click="addBatchData"></Button>
-            <Button shape="circle" icon="md-remove" v-else style="margin-left: 12px"></Button>
+            <Button shape="circle" icon="md-remove" v-else style="margin-left: 12px" @click="removeBatchData(index)"></Button>
           </FormItem>
         </Col>
       </Row>
@@ -349,6 +349,10 @@
         })
       },
 
+      removeBatchData(index) {
+        this.form.batchData.splice(index, 1)
+      },
+
       submit() {
         let params = JSON.parse(JSON.stringify(this.form))
         // this.submitLoading = true
@@ -460,7 +464,6 @@
         this.getRecordDetail(this.recordId).then(code => {
           code === 0 && (this.spinShow = false)
         })
-
       }else {
         console.log('手动入库')
         this.form.id = this.applyId
