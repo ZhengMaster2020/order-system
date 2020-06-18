@@ -3,7 +3,7 @@
     <Card>
       <!--      Form-->
       <Form ref="searchForm" :model="searchForm" inline>
-        <Row type="flex" justify="space-between">
+        <Row>
           <Input v-model="searchForm.createdBy" placeholder="创建人" class="width-120"/>
           <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="创建时间" class="width-120" @on-change="dateChange"/>
           <Input v-model="searchForm.planNumber" placeholder="下单编号" class="width-120"/>
