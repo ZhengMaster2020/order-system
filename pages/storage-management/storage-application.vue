@@ -397,10 +397,10 @@
         applicationColumns: [
             { type: 'selection', width: 60, align: 'center' },
             { title: '序号', type: 'index', width: 70, align: 'center' },
-            { title: '入库单号', key: 'storageNumber', width: 140, align: 'center' },
-            { title: '下单编号', key: 'supplierOrderNumber', width: 140, align: 'center' },
+            { title: '入库单号', key: 'storageNumber', minWidth: 200, align: 'center' },
+            { title: '下单编号', key: 'supplierOrderNumber', minWidth: 180, align: 'center' },
             { title: '慕可代码', key: 'mkCode', width: 100, align: 'center' },
-            { title: '包材名称', key: 'packing', width: 120, align: 'center' },
+            { title: '包材名称', key: 'packing', minWidth: 190, align: 'center' },
             { title: '订单数量', key: 'amount', width: 110, align: 'center' },
             { title: '预计入库数量', key: 'expectedQuantity', width: 130, align: 'center' },
             { title: '已实际入库量', key: 'actualQuantity', width: 130, align: 'center',
@@ -411,6 +411,11 @@
                   },
                   on: {
                     click: () => {
+                      let {storageNumber, supplierOrderNumber} = row
+                      this.searchForm.record.storageNumber = storageNumber
+                      this.searchForm.record.supplierOrderNumber = supplierOrderNumber
+                      this.recordPageProps.page = 1
+                      this.currentTab = 'record'
                       console.log('click')
                     }
                   }
@@ -431,8 +436,8 @@
         recordColumns: [
             { type: 'selection', width: 60, align: 'center' },
             { title: '序号', type: 'index', width: 70, align: 'center' },
-            { title: '关联入库单号', key: 'storage_number', width: 140, align: 'center' },
-            { title: '生产批次号', key: 'batch_number', width: 140, align: 'center' },
+            { title: '关联入库单号', key: 'storage_number', minWidth: 200, align: 'center' },
+            { title: '生产批次号', key: 'batch_number', minWidth: 200, align: 'center' },
             { title: '生产数量', key: 'batch_num', width: 100, align: 'center' },
             { title: '本次入库数量', key: 'current_quantity', width: 130, align: 'center' },
             { title: '状态', key: 'storage_status', width: 110, align: 'center' },
@@ -440,7 +445,7 @@
             { title: '入库时间', key: 'created_at', width: 130, align: 'center'},
             { title: '入库类型', key: 'storage_type', width: 100, align: 'center' },
             { title: '慕可代码', key: 'mk_code', width: 140, align: 'center' },
-            { title: '包材名称', key: 'packing', width: 120, align: 'center' },
+            { title: '包材名称', key: 'packing', minWidth: 190, align: 'center' },
             { title: '标类型', key: 'mark_type', width: 120, align: 'center' },
             { title: '入库仓位号', key: 'position_number', width: 110, align: 'center' }
           ],
