@@ -146,6 +146,12 @@ export default {
       'FD-2202': '吴马红',
       'FD-17494': '刘金梁',
     }
+    let storeEnum = {
+      'FD-16349': '周一娜',
+      'FD-14775': '陈家茵',
+      'FD-16751': '罗鑫妍',
+      'FD-12492': '黄小亮'
+    }
     if (ENV === 'production') {
       delete powerEnum['FD-0001']
     }
@@ -153,16 +159,24 @@ export default {
       .then((res) => {
         if (res.code === 0) {
           if (powerEnum[res.data.username]) {
-            // 包含在里面 显示全部路由
+            // powerEnum超级管理组 包含在里面 显示全部路由
             this.menuList = router
           } else {
-            // 不包含在里面  只显示防伪码查询
-            let searchCodeGroup = router.filter(item => item.name === '/security-code')
-            searchCodeGroup.forEach((items, index) => {
-              items.children = items.children.filter(item => item.path = 'security-code/search-code')
-            })
-            console.log(searchCodeGroup)
-            this.menuList = searchCodeGroup
+            let resultGroup
+            if (storeEnum[res.data.username]) {
+              // storeEnum组  只显示渠道和店铺设置
+              resultGroup = router.filter(item => item.name === '/inquire-anomaly-tracking')
+              resultGroup.forEach((items, index) => {
+                items.children = items.children.filter(item => item.path === 'inquire-anomaly-tracking/channel-store-settings')
+              })
+            } else {
+              // 不包含在里面  只显示防伪码查询
+              resultGroup = router.filter(item => item.name === '/security-code')
+              resultGroup.forEach((items, index) => {
+                items.children = items.children.filter(item => item.path === 'security-code/search-code')
+              })
+            }
+            this.menuList = resultGroup
           }
         }
         window.localStorage.setItem('userInfo', JSON.stringify(res.data))
