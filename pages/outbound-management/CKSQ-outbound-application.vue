@@ -647,9 +647,10 @@
                   },
                   on: {
                     click: () => {
-                      this.currentTab = 'outboundRecord'
                       this.recordSearchForm.gbOrderSn = row.gb_order_sn
                       this.recordSearchForm.outboundOrderSn = row.outbound_order_sn
+                      this.outboundList.pageProps.page = 1
+                      this.currentTab = 'outboundRecord'
                     }
                   }
                 }, row.confirmed_number)
@@ -944,6 +945,7 @@
       },
 
       toOutbountRecord(modal = '') {
+        this.outboundList.pageProps.page = 1
         this.currentTab = 'outboundRecord'
         modal && (this[modal].show = false)
       },
