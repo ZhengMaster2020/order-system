@@ -630,16 +630,16 @@
             {title: '序号', type: 'index', width: 70, align: 'center'},
             {title: '申请人', key: 'created_by', width: 110, align: 'center'},
             {title: '申请时间', key: 'created_at', width: 110, align: 'center'},
-            {title: '灌包订单号', key: 'gb_order_sn', minWidth: 195, align: 'center'},
-            {title: '品牌', key: 'brand', width: 110, align: 'center'},
-            {title: '出库单号', key: 'outbound_order_sn', minWidth: 195, align: 'center'},
-            {title: '是否补发', key: 'is_reissue', width: 70, align: 'center'},
+            {title: '灌包订单号', key: 'gb_order_sn', minWidth: 190, align: 'center'},
+            {title: '品牌', key: 'brand', minWidth: 100, align: 'center'},
+            {title: '出库单号', key: 'outbound_order_sn', minWidth: 200, align: 'center'},
+            {title: '是否补发', key: 'is_reissue', minWidth: 100, align: 'center'},
             {title: '慕可代码', key: 'mk_code', minWidth: 100, align: 'center'},
-            {title: '产品名称', key: 'product_name', minWidth: 160, align: 'center'},
+            {title: '产品名称', key: 'product_name', minWidth: 180, align: 'center'},
             {title: '下单数量', key: 'order_number', minWidth: 100, align: 'center'},
             {title: '出库数量', key: 'expected_outbound_number', minWidth: 100, align: 'center'},
             {title: '出库状态', key: 'status', minWidth: 100, align: 'center'},
-            {title: '已实际出库数量', key: 'confirmed_number', minWidth: 100, align: 'center',
+            {title: '已实际出库数量', key: 'confirmed_number', minWidth: 140, align: 'center',
               render: (h, {row}) => {
                 return h('a', {
                   attrs: {
@@ -671,11 +671,11 @@
           columns: [
             {type: 'selection', width: 60, align: 'center'},
             {title: '序号', type: 'index', width: 70, align: 'center'},
-            {title: '关联出库单号', key: 'outbound_order_sn', minWidth: 195, align: 'center'},
+            {title: '关联出库单号', key: 'outbound_order_sn', minWidth: 200, align: 'center'},
             {title: '品牌', key: 'brand', minWidth: 80, align: 'center'},
             {title: '灌包订单号', key: 'gb_order_sn', minWidth: 195, align: 'center'},
-            {title: '出库记录状态', key: 'status', minWidth: 100, align: 'center'},
-            {title: '实际点货数量', key: 'actual_quantity', minWidth: 100, align: 'center',
+            {title: '出库记录状态', key: 'status', minWidth: 130, align: 'center'},
+            {title: '实际点货数量', key: 'actual_quantity', minWidth: 130, align: 'center',
               render: (h, {row}) => {
                 if(row.status !== '待确认'){
                   return h('span', {}, row.actual_quantity)
@@ -703,8 +703,7 @@
             {title: '慕可代码', key: 'mk_code', minWidth: 100, align: 'center'},
             {title: '产品名称', key: 'product_name', minWidth: 160, align: 'center'},
             {title: '下单数量', key: 'order_number', minWidth: 100, align: 'center'},
-            {title: '预计本次出库量', key: 'expected_outbound_number', minWidth: 100, align: 'center'}
-            // {title: '操作', key: 'action', align: 'center', slot: 'action', width: 130},
+            {title: '预计本次出库量', key: 'expected_outbound_number', minWidth: 140, align: 'center'}
           ],
           data: [],
           pageProps: {
