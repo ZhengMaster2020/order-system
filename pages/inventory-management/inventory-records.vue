@@ -528,8 +528,8 @@ export default {
       ruleValidate: {
         checkType: [{ required: true, message: "盘点类型不能为空", trigger: "change" }],
         inventoryTime: [{required: true,type: "date",message: "盘点年月不能为空",trigger: "change"}],
-        inventoryObject: [{ required: true, message: "盘点对象不能为空", trigger: "blur" }],
-        inventoryProject: [{ required: true, message: "盘点项目不能为空", trigger: "blur" }],
+        inventoryObject: [{ required: true, message: "盘点对象不能为空", trigger: "change" }],
+        inventoryProject: [{ required: true, message: "盘点项目不能为空", trigger: "change" }],
         inventoryNumber: [{ required: true, type:'number',message: "盘点数量不能为空", trigger: "blur" }]
       },
       // 初审验证
@@ -950,7 +950,7 @@ export default {
              })
            }
        })
-      // this.$API.inventoryRecordsInvalid()
+      
     },
     // 编辑
     handleEdit(index,row) {

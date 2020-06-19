@@ -32,10 +32,12 @@ export default [
   {
     path:'/inventory-management',
     icon:'ios-book',
-    name:'/iventory-management',
+    name:'/inventory-management',
     title:'盘点管理',
     children:[
-      {path:'inventory-management/inventory-records',title:"盘点记录",name:'inventory-management/inventory-records'}
+      {path:'inventory-management/inventory-records',title:"盘点记录",name:'inventory-management/inventory-records'},
+      {path:'inventory-management/destruction-records',title:'销毁记录',name:'inventory-management/destruction-records'},
+      {path:'inventory-management/recycling-records',title:'回收记录',name:'inventory-management/recycling-records'}
     ]
   }
   // {

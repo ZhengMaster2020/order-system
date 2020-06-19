@@ -422,6 +422,101 @@ const inventoryRecordsSearch = params => {
   })
 }
 
+// 盘点管理-销毁记录-列表数据
+const inventoryConsumptionList = params => {
+   return fetch({
+     url:`/traceability/inventory-management/${params.type}`,
+     method:'GET',
+     params:params
+   })
+}
+
+// 盘点管理-销毁记录-添加
+const inventoryConsumptionAdd = params => {
+  return fetch({
+    url:`/traceability/inventory-management/${params.type}`,
+    method:'POST',
+    data:params
+  })
+}
+
+// 盘点管理-销毁记录-修改
+const inventoryConsumptionUpdate = params => {
+  return fetch({
+    url:`/traceability/inventory-management/${params.type}`,
+    method:'PATCH',
+    data:params
+  })
+}
+
+// 盘点管理-销毁记录-初审
+const inventoryConsumptionFirst = params => {
+  return fetch({
+    url: `/traceability/inventory-management/audit/${params.type}`,
+    method:'POST',
+    data:params
+  })
+}
+
+// 盘点管理-销毁记录-复审
+const inventoryConsumptionSecond = params => {
+  return fetch({
+    url:`/inventory-management/audit-recheck/${params.type}`,
+    method:'POST',
+    data:params
+  })
+}
+
+// 盘点管理-销毁记录-删除
+const inventoryConsumptionDel = params => {
+  return fetch({
+    url:`/traceability/inventory-management/${params.type}`,
+    method:'DELETE',
+    params:params
+  })
+}
+
+// 盘点管理-销毁记录-作废
+const inventoryConsumptionInvalid = params => {
+  return fetch({
+    url:`/traceability/inventory-management/invalid`,
+    method:'POST',
+    data:params
+  })
+}
+
+// 盘点管理-销毁记录-核销处理
+const inventoryConsumptionCancel = params => {
+  return fetch({
+    url:`/traceability/inventory-management/handle/${params.type}`,
+    method:'POST',
+    data:params
+  })
+}
+// 盘点管理-销毁记录-详情
+const inventoryConsumptionDetail = params => {
+  return fetch({
+    url:`/traceability/inventory-management/detail/${params.id}`,
+    method:'GET',
+    params:params
+  })
+}
+// 盘点管理-销毁记录-导出
+const inventoryConsumptionExport = params => {
+  return fetch({
+    url:`/traceability/inventory-management/export/${params.type}`,
+    method:'GET',
+    params:params
+  })
+}
+// 盘点管理-销毁记录-模糊搜索
+const inventoryConsumptionFuzzysearch = params => {
+  return fetch({
+    url:'/outbound-apply/search',
+    method:'GET',
+    params:params
+  })
+}
 export default {
   login,
   getUserInfo,
@@ -473,5 +568,16 @@ export default {
   inventoryRecordsDetail,
   inventoryRecordsInvalid,
   inventoryRecordsAudit,
-  inventoryRecordsSearch
+  inventoryRecordsSearch,
+  // 盘点管理-销毁记录
+  inventoryConsumptionList,
+  inventoryConsumptionAdd,
+  inventoryConsumptionUpdate,
+  inventoryConsumptionFirst,
+  inventoryConsumptionSecond,
+  inventoryConsumptionDel,
+  inventoryConsumptionInvalid,
+  inventoryConsumptionCancel,
+  inventoryConsumptionDetail,
+  inventoryConsumptionFuzzysearch
 }
