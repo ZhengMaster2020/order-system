@@ -1,7 +1,7 @@
 import supplyFetch from './supply.fetch'
 
-// 入库申请 - 列表
-const getsupplylist = (params) => {
+// 添加入库申请
+const getBcOrderInFo = (params) => {
   return supplyFetch({
     url: `/v1/search/search-order-packing`,
     method: 'GET',
@@ -11,5 +11,5 @@ const getsupplylist = (params) => {
 
 
 export default {
-  getsupplylist,
+  getBcOrderInFo,
 }

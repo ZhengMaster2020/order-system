@@ -108,8 +108,8 @@
 <script>
   import Cookies from 'js-cookie'
   import {SERVER_BASE_URL} from '../../api/config'
-  import ENV from "../../api/env";
-  import axios from "axios";
+  // import ENV from "../../api/env";
+  // import axios from "axios";
 
 
   export default {
@@ -166,7 +166,7 @@
         this.isClear = true
         if(!supplierOrderNumber) return
 
-        return this.getSupplyInfo({order_no: supplierOrderNumber}).then(res => {
+        return this.$supplyAPI.getBcOrderInFo({order_no: supplierOrderNumber}).then(res => {
           if(res.code !== 200 || res.data.length === 0) {
             this.notFoundText = '无匹配数据'
             this.mkCodeList = []
@@ -312,23 +312,23 @@
       },
 
       // 采购系统api
-      supplyInstance() {
-        const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com/' : 'http://apisupplytest.fandow.com/'
-        this.instance = axios.create({
-          baseURL: BASE_URL,
-          timeout: 20000,
-          headers: {'Authorization': 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X'}
-        });
-      },
-
-      getSupplyInfo(params) {
-        return this.instance.get('/v1/search/search-order-packing', {params})
-          .then(res => {
-            return res.data
-          }).catch(err => {
-            if (err) return console.log(err.message)
-          })
-      },
+      // supplyInstance() {
+      //   const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com/' : 'http://apisupplytest.fandow.com/'
+      //   this.instance = axios.create({
+      //     baseURL: BASE_URL,
+      //     timeout: 20000,
+      //     headers: {'Authorization': 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X'}
+      //   });
+      // },
+      //
+      // getSupplyInfo(params) {
+      //   return this.instance.get('/v1/search/search-order-packing', {params})
+      //     .then(res => {
+      //       return res.data
+      //     }).catch(err => {
+      //       if (err) return console.log(err.message)
+      //     })
+      // },
 
 
     },
@@ -338,7 +338,7 @@
       this.applicant = userInfo.realName
 
       // console.log(this.$route.query)
-      this.supplyInstance()
+      // this.supplyInstance()
       if (this.id) {
         this.isClear = false
         this.getDetail(this.id)
