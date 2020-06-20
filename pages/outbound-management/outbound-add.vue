@@ -105,10 +105,10 @@
 </template>
 
 <script>
-  import Cookies from 'js-cookie'
-  import {SERVER_BASE_URL} from '../../api/config'
-  import ENV from "../../api/env";
-  import axios from "axios";
+  // import Cookies from 'js-cookie'
+  // import {SERVER_BASE_URL} from '../../api/config'
+  // import ENV from "../../api/env";
+  // import axios from "axios";
 
   export default {
     data() {
@@ -185,7 +185,7 @@
     computed: {
       remainNum() {
         // 下单数量 - 汇总该灌包订单在出库记录中【待确认】+【已确认】的数量
-        console.log(this.form.orderNumber, this.gbOrderSnNum)
+        // console.log(this.form.orderNumber, this.gbOrderSnNum)
         return this.hasInfo ? this.form.orderNumber - this.gbOrderSnNum : null
       },
       expectedMaxNum() {
@@ -215,7 +215,7 @@
         if(!this.form.gbOrderSn) return
         this.notFoundText = '加载中...'
 
-        this.getSupplyInfo({order_no: this.form.gbOrderSn}).then(res => {
+        this.$supplyAPI.getOrderBaggingInfo({order_no: this.form.gbOrderSn}).then(res => {
           if(res.code !== 200 || res.data.length === 0) {
             this.notFoundText = '无匹配数据'
             this.mkCodeList = []
@@ -322,25 +322,25 @@
       },
 
 
-      // 采购系统api
-      supplyInstance() {
-        const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com'
-        this.instance = axios.create({
-          baseURL: BASE_URL,
-          timeout: 20000,
-          headers: {'Authorization': 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X'}
-        });
-      },
+      // // 采购系统api
+      // supplyInstance() {
+      //   const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com'
+      //   this.instance = axios.create({
+      //     baseURL: BASE_URL,
+      //     timeout: 20000,
+      //     headers: {'Authorization': 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X'}
+      //   });
+      // },
 
-      getSupplyInfo(params) {
-        return this.instance.get('/v1/search/search-order-bagging', {params})
-          .then(res => {
-            return res.data
-          })
-          .catch(err => {
-            if (err) return console.log(err.message)
-          })
-      },
+      // getSupplyInfo(params) {
+      //   return this.instance.get('/v1/search/search-order-bagging', {params})
+      //     .then(res => {
+      //       return res.data
+      //     })
+      //     .catch(err => {
+      //       if (err) return console.log(err.message)
+      //     })
+      // },
       // 获取统计灌包订单未确认+已确认出库数量
       getOutboundOrderNum() {
         this.$API.getGBOrderSnNum({ gbOrderSn: this.form.gbOrderSn }).then(res => {
@@ -372,7 +372,7 @@
       let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
       this.id = this.$route.query.id
       this.form.applicant = userInfo.realName
-      this.supplyInstance()
+      // this.supplyInstance()
       // alert(this.$route.query.id)
       if(this.id) {
         this.spinShow = true
