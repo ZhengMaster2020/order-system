@@ -461,7 +461,7 @@ const inventoryConsumptionFirst = params => {
 // 盘点管理-销毁记录-复审
 const inventoryConsumptionSecond = params => {
   return fetch({
-    url:`/inventory-management/audit-recheck/${params.type}`,
+    url:`/traceability/inventory-management/audit-recheck/${params.type}`,
     method:'POST',
     data:params
   })
@@ -472,7 +472,7 @@ const inventoryConsumptionDel = params => {
   return fetch({
     url:`/traceability/inventory-management/${params.type}`,
     method:'DELETE',
-    params:params
+    data:params
   })
 }
 
@@ -496,9 +496,8 @@ const inventoryConsumptionCancel = params => {
 // 盘点管理-销毁记录-详情
 const inventoryConsumptionDetail = params => {
   return fetch({
-    url:`/traceability/inventory-management/detail/${params.id}`,
+    url:`/traceability/inventory-management/detail/${params}`,
     method:'GET',
-    params:params
   })
 }
 // 盘点管理-销毁记录-导出
@@ -506,13 +505,13 @@ const inventoryConsumptionExport = params => {
   return fetch({
     url:`/traceability/inventory-management/export/${params.type}`,
     method:'GET',
-    params:params
+    responseType: 'blob' 
   })
 }
 // 盘点管理-销毁记录-模糊搜索
 const inventoryConsumptionFuzzysearch = params => {
   return fetch({
-    url:'/outbound-apply/search',
+    url:'/traceability/outbound-apply/search',
     method:'GET',
     params:params
   })
@@ -579,5 +578,6 @@ export default {
   inventoryConsumptionInvalid,
   inventoryConsumptionCancel,
   inventoryConsumptionDetail,
+  inventoryConsumptionExport,
   inventoryConsumptionFuzzysearch
 }

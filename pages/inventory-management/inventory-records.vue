@@ -715,6 +715,7 @@ export default {
       params.page = this.pageProps.page;
       params.perPage = this.pageProps.perPage;
       this.$API.inventoryRecordsList(params).then(res => {
+        console.log(res);
         this.recordationList.iventorydata = res.data.list;
         this.pageProps = res.data;
       });
