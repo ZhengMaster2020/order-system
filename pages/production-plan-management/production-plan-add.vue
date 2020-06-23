@@ -42,9 +42,9 @@
             <Option value="no">否</Option>
           </Select>
         </FormItem>
-        <FormItem label="下级经办人">
-          <Input class="width-200" v-model="form.nextBy" readonly/>
-        </FormItem>
+<!--        <FormItem label="下级经办人">-->
+<!--          <Input class="width-200" v-model="form.nextBy" readonly/>-->
+<!--        </FormItem>-->
         <FormItem label="备注">
           <Input style="width: 420px" v-model="form.remark"/>
         </FormItem>
