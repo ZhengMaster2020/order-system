@@ -416,7 +416,7 @@
                       this.searchForm.record.supplierOrderNumber = supplierOrderNumber
                       this.recordPageProps.page = 1
                       this.currentTab = 'record'
-                      console.log('click')
+                      // console.log('click')
                     }
                   }
                 }, row.actualQuantity)
@@ -466,8 +466,6 @@
             }
           ]
         },
-        // Modal
-
         reviewModal: {
           show: false,
           reivewer: '',
@@ -629,7 +627,7 @@
           this.getStorageRecordDetail(recordIds[0]).then(() => {
           return this.getPendingConfirmRecord(recordIds)
         }).then((code) => {
-          console.log(code, 'code')
+          // console.log(code, 'code')
           code === 0 && (this.spinShow = false)
         })
 
@@ -711,7 +709,6 @@
         check = selection[0].storage_status === '待确认' || selection[0].storage_status === '已驳回'
         if(!check) return this.$Message.warning('待确认或已驳回才能修改')
 
-        console.log(id, 'edit')
         this.$router.push({
           path: '/storage-management/storage-manual',
           query: {
@@ -719,7 +716,6 @@
             currentQuantity: selection[0].current_quantity
           }
         })
-        // if(this.application.selection.length > 1) return this.$Message.error('一次只能操作一条数据')
       },
       // table 选项操作
       selectionChange(selection) {
@@ -791,10 +787,9 @@
         params.page = this[this.currentTab + 'PageProps'].page
         params.perPage = this[this.currentTab + 'PageProps'].perPage
 
-        console.log(this[this.currentTab + 'PageProps'].page)
+        // console.log(this[this.currentTab + 'PageProps'].page)
         this.tableLodaing = true
         this.$API[api](params).then(res => {
-          // console.log(res)
           if(res.code !== 0) return
 
           let {count, page, list} = res.data
@@ -819,7 +814,6 @@
       getStorageDetail(id) {
         this.spinShow = true
         return this.$API.getStorageDetail(id).then(res => {
-          // console.log(res)
           if(res.code !== 0) return
           this.detailData = res.data
           this.detailData.delivery_file = res.data.delivery_file
@@ -836,7 +830,6 @@
       getStorageRecordDetail(id) {
         this.spinShow = true
         return this.$API.getStorageRecordDetail(id).then(res => {
-          // console.log(res)
           if(res.code !== 0) return
           this.detailData = {
             created_by: res.data.createdBy,
@@ -883,7 +876,6 @@
               this.detailData.curStorageTotal = res.data.reduce((pre, cur) => {
                 return pre + cur.currentQuantity
               }, 0)
-              // console.log(this.detailData.curStorageTotal, 'this.detailData.curStorageTotal')
             }
           }
           return res.code
@@ -921,7 +913,6 @@
         }
       },
       currentTab(cur) {
-        // this.searchForm[cur] = {} 清空？
         this.getList()
       }
     },
@@ -938,7 +929,6 @@
       if(tab) {
         tab && (this.currentTab = tab)
         supplierOrderNumber && (this.searchForm[tab].supplierOrderNumber = supplierOrderNumber)
-        console.log(this.searchForm[tab])
       }else {
         this.getList()
       }

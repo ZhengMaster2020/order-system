@@ -329,7 +329,6 @@
 
           this.$API.getStorageBatchNumber({batchNumber}).then(res => {
             if(res.code !== 0) return
-            // console.log(this.form.batchData[index].remainNum, this.form.batchData[index].num - res.data[0])
             this.form.batchData[index].remainNum = this.form.batchData[index].num - res.data[0]
           })
         })
@@ -366,25 +365,19 @@
               currentQuantity: items.currentQuantity,
             }
           })
-          console.log(this.form)
-          console.log(params, 'params')
           this.$API.manualStotageApply(params).then(res => {
-            console.log(res)
             if(res.code !==0) return
             this.submitLoading = false
             this.$Message.success(res.msg)
             this.$router.push('/storage-management/storage-application')
           })
         }else {
-          console.log(editParams, '修改')
-
           let editParams = {
             id: this.form.id,
             batchNumber: this.form.batchData[0].batchNumber,
             currentQuantity: this.form.batchData[0].currentQuantity,
           }
           this.$API.editStorageRecord(editParams).then(res => {
-            console.log(res)
             if(res.code !==0) return
             this.submitLoading = false
             this.$Message.success(res.msg)
@@ -409,7 +402,6 @@
 
       // 获取记录详情
       getRecordDetail(id) {
-        // this.spinShow = true
         return this.$API.getStorageRecordDetail(id).then(res => {
           if (res.code === 0) {
             let data = res.data
@@ -440,7 +432,6 @@
 
       // 通过入库申请id获取入库数量(待确认+已确认)
       getNumberByApplyId(id) {
-        // this.spinShow = true
         return this.$API.getNumberByApplyId(id).then(res => {
           if (res.code === 0) {
             this.numberByapplyId = res.data[0]
@@ -458,14 +449,14 @@
       this.spinShow = true
 
       if(this.$route.query.recordId) {
-        console.log('修改入库记录', this.currentQuantity)
+        // console.log('修改入库记录', this.currentQuantity)
         this.subTitle = '修改入库记录'
         this.form.id = this.recordId
         this.getRecordDetail(this.recordId).then(code => {
           code === 0 && (this.spinShow = false)
         })
       }else {
-        console.log('手动入库')
+        // console.log('手动入库')
         this.form.id = this.applyId
         this.getDetail(this.applyId).then(() => {
           return this.getNumberByApplyId(this.applyId)
@@ -483,7 +474,6 @@
           let currentQuantity = cur.currentQuantity || 0
           return Number(pre) + Number(currentQuantity)
         }, 0)
-        // console.log(total)
         return total
       },
 
@@ -492,7 +482,7 @@
       },
 
       remainNumber() {
-        // 剩余可入库 < 入库记录待确认 + 已确认 TODO: 接口待定
+        // 剩余可入库 < 入库记录待确认 + 已确认
         return this.detailData.expected_quantity - this.numberByapplyId
       }
 
