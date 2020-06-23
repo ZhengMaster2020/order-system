@@ -1,9 +1,9 @@
 import supplyFetch from './supply.fetch'
 
-// 入库申请 - 列表
-const getsupplylist = (params) => {
+// 添加出库申请单 - 通过灌包订单获取订单信息
+const getOrderBaggingInfo = (params) => {
   return supplyFetch({
-    url: `/v1/search/search-order-packing`,
+    url: `/v1/search/search-order-bagging`,
     method: 'GET',
     params
   })
@@ -11,5 +11,5 @@ const getsupplylist = (params) => {
 
 
 export default {
-  getsupplylist,
+  getOrderBaggingInfo,
 }
