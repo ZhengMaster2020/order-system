@@ -38,7 +38,9 @@ module.exports = {
     },
     '@/plugins/api',
     '@/plugins/format',
-    '@/plugins/routerAuth' // 路由守卫
+    '@/plugins/routerAuth', // 路由守卫
+    '@/plugins/print',
+    '@/plugins/debonce'
   ],
   /*
    ** Nuxt.js modules

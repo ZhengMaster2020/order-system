@@ -55,11 +55,41 @@ const exportOldSecurityList = (params) => {
   })
 }
 
+// 新防伪码日志
+const getNewSecurityCodeLog = (params) => {
+  return fetch({
+    url: `traceability/trace/traceLog/new`,
+    method: 'GET',
+    params
+  })
+}
+
+// 旧防伪码日志
+const getOldSecurityCodeLog = (params) => {
+  return fetch({
+    url: `traceability/trace/traceLog/old`,
+    method: 'GET',
+    params
+  })
+}
+
+// 出库记录-列表
+const getOutboundLog = (params) => {
+  return fetch({
+    url: `traceability/outbound-log/index`,
+    method: 'GET',
+    params
+  })
+}
+
 export default {
   getSecurityHistoryNewList,
   getSecurityHistoryOldList,
   getSecurityExportList,
   getSecurityExportKey,
   exportNewSecurityList,
-  exportOldSecurityList
+  exportOldSecurityList,
+  getNewSecurityCodeLog,
+  getOldSecurityCodeLog,
+  getOutboundLog
 }

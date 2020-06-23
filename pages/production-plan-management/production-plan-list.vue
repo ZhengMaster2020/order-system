@@ -4,52 +4,26 @@
       <!--      Form-->
       <Form ref="searchForm" :model="searchForm" inline>
         <Row>
-          <Col>
-            <FormItem prop="name">
-              <Input v-model="searchForm.createdBy" placeholder="申请人" class="width-120"/>
-            </FormItem>
-            <FormItem prop="name">
-              <Input v-model="searchForm.planNumber" placeholder="计划编号" class="width-120"/>
-            </FormItem>
-            <FormItem prop="name">
-              <Select v-model="searchForm.brand" clearable placeholder="品牌" class="width-120">
-                <Option v-for="brand in brandList" :key="brand.label" :value="brand.label">{{brand.value}}</Option>
-              </Select>
-            </FormItem>
-            <FormItem prop="name">
-              <Select v-model="searchForm.planStatus" clearable placeholder="计划状态" class="width-120">
-                <Option v-for="status in planStatus" :key="status.label" :value="status.label">{{status.value}}</Option>
-              </Select>
-            </FormItem>
-            <FormItem prop="name">
-              <Input v-model="searchForm.planName" placeholder="计划名称" class="width-120"/>
-            </FormItem>
-            <FormItem prop="user">
-              <Select v-model="searchForm.isFillPlan" clearable placeholder="是否补Q计划" class="width-120">
-                <Option value="yes">是</Option>
-                <Option value="no">否</Option>
-              </Select>
-            </FormItem>
-            <FormItem>
-              <Button type="primary" @click="search">搜索</Button>
-            </FormItem>
-          </Col>
+          <Input v-model="searchForm.createdBy" placeholder="申请人" class="width-120"/>
+          <Input v-model="searchForm.planNumber" placeholder="计划编号" class="width-120"/>
+          <Select v-model="searchForm.brand" clearable placeholder="品牌" class="width-120">
+            <Option v-for="brand in brandList" :key="brand.label" :value="brand.label">{{brand.value}}</Option>
+          </Select>
+          <Select v-model="searchForm.planStatus" clearable placeholder="计划状态" class="width-120">
+            <Option v-for="status in planStatus" :key="status.label" :value="status.label">{{status.value}}</Option>
+          </Select>
+          <Input v-model="searchForm.planName" placeholder="计划名称" class="width-120"/>
+          <Select v-model="searchForm.isFillPlan" clearable placeholder="是否补Q计划" class="width-120">
+            <Option value="yes">是</Option>
+            <Option value="no">否</Option>
+          </Select>
+          <Button type="primary" @click="search">搜索</Button>
         </Row>
-        <Row>
-          <Col>
-            <FormItem>
-              <Button type="primary" @click="addPlan">添加计划</Button>
-            </FormItem>
-            <FormItem>
-              <Button type="primary" @click="reviewPlan">经理审核</Button>
-            </FormItem>
-            <FormItem>
-              <Button type="primary" @click="executePlan">执行计划</Button>
-            </FormItem>
-            <FormItem>
-              <Button type="primary" @click="finishedPlan">执行完毕</Button>
-            </FormItem>
-          </Col>
+        <Row class="margin-top-10">
+          <Button type="primary" @click="addPlan">添加计划</Button>
+          <Button type="primary" @click="reviewPlan">审核</Button>
+          <Button type="primary" @click="executePlan">执行计划</Button>
+          <Button type="primary" @click="finishedPlan">执行完毕</Button>
         </Row>
       </Form>
 
@@ -95,7 +69,7 @@
     <Modal
     v-model="reviewModal.modal"
     title="计划审核"
-    width="1000">
+    width="1005">
       <Form inline ref="reviewForm" :model="reviewModal.form" :rules="rules">
         <div class="title">
           <span class="line"></span>
@@ -127,8 +101,9 @@
         <FormItem label="计划名称">
           <Input class="width-180" v-model="reviewModal.data.planName" readonly/>
         </FormItem>
-        <FormItem label="计划文件">
-          <div style="padding-top: 33px">
+        <FormItem>
+          <div>
+            <div>计划文件</div>
             <a :href="file.url" :download="file.name" class="download-link"
                v-for="(file, index) in reviewModal.data.fileItems"
                :key="index">{{file.name}}</a>
@@ -166,7 +141,7 @@
     <Modal
     v-model="finishedModal.modal"
     title="执行完毕"
-    width="1000">
+    width="1005">
       <Form inline ref="finishedForm" :model="finishedModal.form" :rules="rules">
         <div class="title">
           <span class="line"></span>
@@ -198,8 +173,9 @@
         <FormItem label="计划名称">
           <Input class="width-180" v-model="finishedModal.data.planName" readonly/>
         </FormItem>
-        <FormItem label="计划文件">
-          <div style="padding-top: 33px">
+        <FormItem>
+          <div>
+            <div>计划文件</div>
             <a :href="file.url" :download="file.name" class="download-link"
                v-for="(file, index) in finishedModal.data.fileItems"
                :key="index">{{file.name}}</a>
@@ -233,7 +209,7 @@
     <Modal
     v-model="statusDetailModal.modal"
     title="状态详情"
-    width="1000">
+    width="1005">
       <Form inline>
         <div class="title">
           <span class="line"></span>
@@ -265,8 +241,9 @@
         <FormItem label="计划名称">
           <Input class="width-180" v-model="statusDetailModal.form.base.planName" readonly/>
         </FormItem>
-        <FormItem label="计划文件">
-          <div style="padding-top: 33px">
+        <FormItem>
+          <div>
+            <div>计划文件</div>
             <a :href="file.url" :download="file.name"
                v-for="(file, index) in statusDetailModal.form.base.fileItems"
                :key="index" class="download-link">{{file.name}}</a>
@@ -396,12 +373,12 @@
               }
             },
             {title: '季度', key: 'quarter', align: 'center', width: 70},
-            {title: '计划编号', key: 'planNumber', align: 'center', minWidth: 170},
+            {title: '计划编号', key: 'planNumber', align: 'center', minWidth: 210},
             {
               title: '是否补Q计划',
               key: 'isFillPlan',
               align: 'center',
-              width: 80,
+              width: 120,
               render: (h, {row}) => h('span', {}, row.isFillPlan === 'yes' ? '是' : '否')
             },
             {title: '品牌', key: 'brand', align: 'center', width: 100},
@@ -413,7 +390,7 @@
               title: '实际执行量',
               key: 'realNum',
               align: 'center',
-              width: 100,
+              width: 110,
               render: (h, {row}) => {
                 return h('a', {
                   attrs: {
@@ -783,7 +760,7 @@
       // 筛选计划状态
       getPlanStatus(val) {
         let statusObj = {
-          pendingManagerReview: '待经理审核',
+          pendingManagerReview: '待审核',
           pendingExecuted: '待执行',
           overrule: '已驳回',
           executing: '执行中',
@@ -855,7 +832,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
-
+    font-weight: 700;
     .title-text {
       flex-shrink: 0;
       padding: 0 10px;
