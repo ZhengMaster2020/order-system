@@ -34,13 +34,10 @@
         <Row>
           <FormItem label="下单数量">
             <Input class="width-200 readonly-color" v-model="form.orderNumber" readonly/>
-
           </FormItem>
           <FormItem label="产品类型">
             <Input class="width-200 readonly-color" v-model="form.productType" readonly/>
           </FormItem>
-
-
           <FormItem label="供应商名称">
             <Input style="width: 220px" class="readonly-color" v-model="form.supplier" readonly/>
           </FormItem>
@@ -84,7 +81,6 @@
             <Input class="width-200 readonly-color" v-model="remainNum" readonly/>
           </FormItem>
           <FormItem label="本次预计出库量" prop="expectedOutboundNumber">
-            <!--            <Input class="width-200" v-model="form.expectedOutboundNumber"/>-->
             <InputNumber :min="0"
                          :max="expectedMaxNum"
                          :precision='0'
@@ -105,10 +101,6 @@
 </template>
 
 <script>
-  // import Cookies from 'js-cookie'
-  // import {SERVER_BASE_URL} from '../../api/config'
-  // import ENV from "../../api/env";
-  // import axios from "axios";
 
   export default {
     data() {
@@ -169,10 +161,6 @@
 
     },
     watch: {
-      ['form.reissueType'](cur) {
-        // this.form.lossSn = cur !== 'loss' ? '-' : ''
-        // && (this.form.lossNumber = '-')
-      },
       ['form.isReissue'](cur) {
         if(cur !== 1) {
           this.form.reissueType = 'other'
@@ -209,7 +197,7 @@
       },
 
       gbOrderSnChange(){
-        // TODO: 调取采购系统的接口 获取mkCode
+        // 调取采购系统的接口 获取mkCode
         this.clear()
         this.notFoundText = '加载中...'
         if(!this.form.gbOrderSn) return
@@ -283,7 +271,7 @@
         }
       },
       submit() {
-        // this.submintLodaing = true
+        this.submintLodaing = true
         this.$refs.form.validate(val => {
           if (!val) return
 
@@ -295,7 +283,7 @@
 
           delete params.nextBy
           delete params.applicant
-          // TODO: 补发类型 损耗记录单 ('-' 则删除) --- 删除
+          // 补发类型 损耗记录单 ('-' 则删除) --- 删除
           for(let key in params) {
             params[key] === '-' && delete params[key]
           }
@@ -316,31 +304,11 @@
             if (res.code !== 0) return
             this.$Message.success(res.msg)
             this.$router.push('/outbound-management/CKSQ-outbound-application')
-            this.submintLodaing = false
-          })
+
+          }).finally(() => {this.submintLodaing = false})
         })
       },
 
-
-      // // 采购系统api
-      // supplyInstance() {
-      //   const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com'
-      //   this.instance = axios.create({
-      //     baseURL: BASE_URL,
-      //     timeout: 20000,
-      //     headers: {'Authorization': 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X'}
-      //   });
-      // },
-
-      // getSupplyInfo(params) {
-      //   return this.instance.get('/v1/search/search-order-bagging', {params})
-      //     .then(res => {
-      //       return res.data
-      //     })
-      //     .catch(err => {
-      //       if (err) return console.log(err.message)
-      //     })
-      // },
       // 获取统计灌包订单未确认+已确认出库数量
       getOutboundOrderNum() {
         this.$API.getGBOrderSnNum({ gbOrderSn: this.form.gbOrderSn }).then(res => {
@@ -372,8 +340,6 @@
       let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
       this.id = this.$route.query.id
       this.form.applicant = userInfo.realName
-      // this.supplyInstance()
-      // alert(this.$route.query.id)
       if(this.id) {
         this.spinShow = true
         this.getOutboundDetail(this.id).then(() => {this.spinShow = false})

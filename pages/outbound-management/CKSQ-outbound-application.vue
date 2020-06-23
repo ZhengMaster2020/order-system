@@ -5,7 +5,6 @@
       <Form ref="listSearchForm" :model="listSearchForm" inline v-show="currentTab === 'outboundList'">
         <Row>
           <Col :xs="24" :sm="12" :md="6" :lg="3">
-<!--            <Input v-model="listSearchForm.brand" clearable placeholder="品牌"/>-->
             <Select  v-model="listSearchForm.brand" clearable placeholder="品牌">
               <Option v-for="(brand, index) in brandList" :key="index" :value="brand.value" :label="brand.label"/>
             </Select>
@@ -659,7 +658,6 @@
             {title: '要求货期', key: 'require_delivery_time', width: 110, align: 'center'},
             {title: '产品类型', key: 'product_type', minWidth: 100, align: 'center'},
             {title: 'OEM供应商', key: 'supplier', minWidth: 210, align: 'center'},
-            // {title: '操作', key: 'action', align: 'center', slot: 'action', width: 130},
           ],
           data: [],
           pageProps: {
@@ -795,29 +793,6 @@
     },
     watch: {
       currentTab(cur) {
-        // if (cur === 'outboundList') {
-        //   this.listSearchForm = {
-        //     gbOrderSn: '',
-        //     mkCode: '',
-        //     productName: '',
-        //     createdBy: '',
-        //     createTime: '',
-        //     outboundOrderSn: '',
-        //     brand: ''
-        //   }
-        // } else {
-        //   this.recordSearchForm = {
-        //     gbOrderSn: '',
-        //     mkCode: '',
-        //     productName: '',
-        //     createdBy: '',
-        //     createdTime: '',
-        //     outboundOrderSn: '',
-        //     supplier: '',
-        //     serialCode: '',
-        //     brand: ''
-        //   }
-        // }
         this[cur].pageProps.page = 1
         this.init('search')
       },
@@ -927,7 +902,6 @@
         let currentTab = this.currentTab
         let pageProps = this[currentTab].pageProps
         this.selection[pageProps.page] = selection
-        // console.log(this.selection)
       },
       // 改变当前分页
       changePage(page, key) {
@@ -940,7 +914,6 @@
         this.init();
       },
       dateChange(date) {
-        console.log(date)
         this.recordSearchForm.createdTime = date
       },
 
@@ -951,7 +924,6 @@
       },
 
       exportOutbountList() {
-        console.log('exportOutbountList')
         let params = JSON.parse(JSON.stringify(this.listSearchForm))
         params.perPage = this[this.currentTab].pageProps.perPage
         params.page = this[this.currentTab].pageProps.page
@@ -962,7 +934,6 @@
       },
 
       exportOutbountRecord() {
-        console.log('exportOutbountRecord')
         let params = JSON.parse(JSON.stringify(this.listSearchForm))
         params.perPage = this[this.currentTab].pageProps.perPage
         params.page = this[this.currentTab].pageProps.page

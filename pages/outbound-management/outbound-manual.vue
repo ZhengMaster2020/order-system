@@ -154,7 +154,6 @@
               <div class="upload-file">
                 <div class="upload-list" v-for="(file, index) in form.fileItems" :key="index">
                   <a href="javascript:void(0)" class="download-link" @click="showImageModal(file.url)">{{file.name}}</a>
-<!--                  <a href="javascript:void(0)" class="download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
                   <Icon v-if="file.uid" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '回传单')"/>
                 </div>
               </div>
@@ -183,8 +182,6 @@
                 <a :key="index" :href="file.url" :download="file.name" class="download-link">{{file.name}}</a>
                 <Icon v-if="file.uid" type="ios-trash-outline" size="14" class="icon-trash" @click="onremove(index, '导入序列号')"/>
               </div>
-<!--              <a v-for="(file, index) in form.serialCodeItems" :key="index" :href="file.url" class="serialdata download-link">{{file.name.substring(0, file.name.lastIndexOf('.'))}}</a>-->
-<!--              <a v-for="(file, index) in form.fileItems" :key="index" style="padding: 43px 0 0 10px" href="javascript:void(0)" class="download-link">{{serialFileName}}</a>-->
             </div>
           </Col>
           <Col span="4" style="text-align: right; margin-top: 35px">
@@ -192,7 +189,6 @@
           </Col>
         </Row>
 
-<!--   TODO： for serialCodeData     -->
         <Row v-for="(serial, index) in this.form.serialCodeData" :key="index">
           <Col span="2">
             <FormItem :label="index === 0? '序号' : ''" style="width: 100%">
@@ -366,7 +362,7 @@
         if(type === '回传单'){
 
         } else {
-          // TODO: 单个文件 会覆盖？ 文件名即出库单号
+          // 单个文件 会覆盖？ 文件名即出库单号
           let index = file.name.lastIndexOf('.')
           let fileName = file.name.substring(0, index)
           const check = fileName !== this.detailData.outboundOrderSn
@@ -439,15 +435,12 @@
       onerror(error, type) {
         this.$Message.error('上传失败')
       },
-      // onOverMaxSize() {
-      //   this.$Message.warning('上传文件最大15m')
-      // },
       onremove(index, type) {
         if(type === '回传单') {
           this.form.fileItems.splice(index, 1)
         }else {
           let removeItem = this.form.serialCodeItems.splice(index, 1)
-          console.log(removeItem[0].uid)
+          // console.log(removeItem[0].uid)
           this.form.serialCodeData = this.form.serialCodeData.filter(items => items.uid !== removeItem[0].uid)
           this.importData = this.importData.filter(items => items.uid !== removeItem[0].uid)
           this.form.serialCodeData.map((items, index) => {
@@ -595,9 +588,8 @@
         this.$API.getOutboundApplySnNum(id).then(res => {
           // console.log(res)
           if (res.code !== 0) return
-          // TODO: 出库单剩余可出库量
+          // 出库单剩余可出库量
           this.detailData.remainNumTotal = res.data[0]
-          // this.detailData.remainNumTotal = res.data[0] + res.data[1]
         })
       },
 
@@ -605,9 +597,8 @@
         this.$API.checkSerialcode(code).then(res => {
           // console.log(res)
           if (res.code !== 0) return
-          // TODO：验证序列号
+          // 验证序列号
           this.detailData.remainNumTotal = res.data[0]
-          // this.detailData.remainNumTotal = res.data[0] + res.data[1]
         })
       },
 
@@ -667,9 +658,7 @@
         }, 0)
         // console.log(total)
         return total
-      },
-      // 出库单剩余可出库量
-      // remainNumTotal() {},
+      }
     },
     mounted() {
       let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
@@ -678,8 +667,8 @@
       this.form.outboundApplyId = this.outbound_apply_id
       this.type = this.$route.query.type
       this.form.realName = userInfo.realName || ''
-      console.log(this.id, 'id')
-      console.log(this.outbound_apply_id, 'outbound_apply_id')
+      // console.log(this.id, 'id')
+      // console.log(this.outbound_apply_id, 'outbound_apply_id')
       if(this.id) {
         this.getOutbountSerialData(this.id, this.type)
       }
