@@ -18,6 +18,14 @@ export default [
       { path: 'production-plan-management/production-plan-list', title: '生产计划列表', name: 'production-plan-management/production-plan-list' },
       { path: 'production-plan-management/production-prenatal-batch-list', title: '生产批次列表', name: 'production-plan-management/production-prenatal-batch-list' }
     ]
+  },{
+    path: '/outbound-management',
+    icon: 'ios-book',
+    name: '/outbound-management',
+    title: '出库管理',
+    children: [
+      { path: 'outbound-management/CKSQ-outbound-application', title: '出库申请单', name: 'outbound-management/CKSQ-outbound-application' }
+    ]
   },
   {
     path: '/inquire-anomaly-tracking',
@@ -27,6 +35,16 @@ export default [
     children: [
       { path: 'inquire-anomaly-tracking/FQA-setting', title: '常见问题设置', name: 'inquire-anomaly-tracking/FQA-setting' },
       { path: 'inquire-anomaly-tracking/channel-store-settings', title: '渠道和店铺设置', name: 'inquire-anomaly-tracking/channel-store-settings' }
+    ]
+  },
+  {
+
+    path: '/storage-management',
+    icon: 'ios-book',
+    name: '/storage-management',
+    title: '入库管理',
+    children: [
+      { path: 'storage-management/storage-application', title: '入库申请单', name: 'storage-management/storage-application' }
     ]
   },
   {
@@ -40,6 +58,7 @@ export default [
       {path:'inventory-management/recycling-records',title:'回收记录',name:'inventory-management/recycling-records'}
     ]
   }
+
   // {
   //   path: '/anti-channel-conflict',
   //   icon: 'ios-book',
