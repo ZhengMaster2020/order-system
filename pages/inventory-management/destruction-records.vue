@@ -746,9 +746,15 @@ export default {
             },
             {
               title: "序号",
-              key: 'id',
+              key: 'num',
               width: 80,
-              align: "center"
+              align: "center",
+              sortable: true,//开启排序
+              sortType:"dec",//初始化排序
+              render:(h,params) => {
+                return h('span',(params.index+1))
+              }
+
             },
             {
               title:'损耗记录人',
@@ -1040,7 +1046,6 @@ export default {
            params.opinion = this.firstModal.form.opinion;
            params.type = 'write_off';
            this.$API.inventoryConsumptionFirst(params).then(res => {
-             console.log(res);
              if(res.code === 0){
                this.firstModal.modal = false;
                this.getList();
@@ -1096,7 +1101,6 @@ export default {
       this.cancelModal.modal = true;
       this.$refs.cancelModal.resetFields(); //清楚上一次验证,同时也会将数据清
       this.$API.inventoryConsumptionDetail(id).then(res => {
-        console.log(res);
         this.cancelModal.form = {
           ...this.cancelModal.form,
           ...res.data
@@ -1241,7 +1245,6 @@ export default {
     },
     // 上传凭证
     handleUpload(file) {
-    //  console.log(this.cancelModal.form, 'before')
     },
     // 上传损耗凭证
     onsuccess(response,file,fileList){

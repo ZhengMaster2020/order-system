@@ -766,9 +766,14 @@ export default {
             },
             {
                 title: "序号",
-                key: "id",
+                key: "num",
                 width: 80,
-                align: "center"
+                align: "center",
+                sortable: true,//开启排序
+                sortType:"dec",//初始化排序
+                render:(h,params) => {
+                  return h('span',(params.index+1))
+              }
             },
             {
               title:'回收记录人',
@@ -889,7 +894,6 @@ export default {
         this.tableLoading = true
         this.$API.inventoryConsumptionList(params).then(res =>{
           if(res.code === 0){
-            // console.log(res);
             this.recordationList.iventorydata = res.data.list;
             this.pageProps = res.data;
           }
@@ -939,7 +943,6 @@ export default {
                  delete  params.outboundApplyId;
               }
               this.$API.inventoryConsumptionAdd(params).then(res => {
-              console.log(res);
               if(res.code === 0){
                 this.$Message.success(res.msg);
                 this.pageProps.page = 1;
@@ -1021,7 +1024,6 @@ export default {
       this.reviewModal.modal = true;
       // 详情
       this.$API.inventoryConsumptionDetail(id).then(res => {
-          console.log(res);
           this.reviewModal.form = res.data;
           this.reviewModal.form.has_outbound_apply = res.data.has_outbound_apply === 'yes'?'是':res.data.has_outbound_apply === 'no'?'否':'';
           this.reviewModal.form.mark_type = res.data.mark_type === 'J'?'卷标':res.data.mark_type === 'P'?'平标':'';
@@ -1059,7 +1061,6 @@ export default {
       if(recovery_status !== "待回收入库") return this.$Message.warning("复审通过后才可以回收入库!");
       this.recoveryModal.modal = true;
       this.$API.inventoryConsumptionDetail(id).then(res => {
-        console.log(res);
         this.recoveryModal.form = {
           ...this.recoveryModal.form,
           ...res.data
@@ -1082,7 +1083,6 @@ export default {
            params.inStockFileItems = this.recoveryModal.form.inStockFileItems;
            params.type = 'recovery';
            this.$API.inventoryConsumptionCancel(params).then(res => {
-             console.log(res);
              if(res.code === 0){
                this.$Message.success(res.msg);
                this.getList();
@@ -1120,12 +1120,9 @@ export default {
     },
     //  编辑
      handleEdit(index,row){
-       console.log(row)
        this.addform.title = "编辑";
        this.addform.modal = true;
-        
         let id = row.id;
-        // this.$set(this.addform.form, 'outboundOrderSn', '')
         this.$refs.addform.resetFields(); //清楚上一次验证,同时也会将数据清空
         this.outboundOrderSnList = []
         this.addform.form.createdBy = this.userInfo.realName;
