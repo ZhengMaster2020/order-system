@@ -864,7 +864,7 @@ export default {
           value:'inStockPending'
         },
         {
-          label:'已回收入库',
+          label:'已入库',
           value:'inStocked'
         },
         {
