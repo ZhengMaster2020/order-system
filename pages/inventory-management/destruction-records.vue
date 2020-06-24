@@ -862,7 +862,7 @@ export default {
         },
         {
           label:'待销毁',
-          value:'destoryPending'
+          value:'destroyPending'
         },
         {
           label:'已销毁',
