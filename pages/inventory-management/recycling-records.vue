@@ -45,7 +45,8 @@
               @on-selection-change="selection => { selectionChange(selection) }"
               :columns="recordationList.inventoryList"
               :data="recordationList.iventorydata"
-              :loading="tableLoading" >
+              :loading="tableLoading" 
+               >
                 <template slot-scope="scope" slot="action">
                 <Tooltip placement="top" content="编辑" transfer>
                   <Button
@@ -767,7 +768,7 @@ export default {
             {
                 title: "序号",
                 key: "num",
-                width: 80,
+                width: 100,
                 align: "center",
                 sortable: true,//开启排序
                 sortType:"dec",//初始化排序
@@ -859,12 +860,12 @@ export default {
           value:'auditRecheckPending'
         },
         {
-          label:'待销毁',
-          value:'destoryPending'
+          label:'待回收入库',
+          value:'inStockPending'
         },
         {
-          label:'已销毁',
-          value:'destroyed'
+          label:'已回收入库',
+          value:'inStocked'
         },
         {
           label:'已作废',
@@ -1204,7 +1205,7 @@ export default {
            this.addform.form.product_name = this.outboundOrderSnList[i].product_name
            this.addform.form.order_number = this.outboundOrderSnList[i].order_number
            this.addform.form.supplier = this.outboundOrderSnList[i].supplier 
-           this.addform.form.confirmed_number = this.outboundOrderSnList[i].order_number; 
+           this.addform.form.confirmed_number = this.outboundOrderSnList[i].confirmed_number; 
            
        }
      }

@@ -31,11 +31,11 @@
             <Row>
               <Col>
                 <Button type="primary" @click="exportSubmit">导出数据</Button>
-                <Button type="primary" @click="addDesturction">添加消耗</Button>
+                <Button type="primary" @click="addDesturction">添加损耗</Button>
                 <Button type="primary" @click="firstSubmit">初审</Button>
                 <Button type="primary" @click="reviewSubmit">复审</Button>
                 <Button type="primary" @click="cancelSubmit">核销处理</Button>
-                <Button type="primary">灌包补发申请</Button>
+                <Button type="primary" @click="reissueSubmit">灌包补发申请</Button>
                 <Button type="primary" @click="invalidSubmit">作废</Button>
               </Col>
             </Row>
@@ -193,7 +193,7 @@
               >
                 <Button icon="ios-cloud-upload-outline" class="margin-bottom-10">选择文件</Button>
               </Upload>
-               <p style="color:red">请上传盘点凭证</p>
+               <p style="color:red">请上传供应商做货损耗凭证</p>
                <div class="upload-list" v-for="(file, index) in addform.form.lossFileItems" :key="index">
                 <a
                   :href="file.url"
@@ -747,7 +747,7 @@ export default {
             {
               title: "序号",
               key: 'num',
-              width: 80,
+              width: 100, 
               align: "center",
               sortable: true,//开启排序
               sortType:"dec",//初始化排序
@@ -826,6 +826,7 @@ export default {
         count: 0,
         pageCount:'', //记录当前第几页
       },
+      
       // 初审验证
       firstAuditRules:{
         isPass:[{required:true,message:'审核不能为空',trigger:'change'}],
@@ -1004,11 +1005,29 @@ export default {
            this.addform.form.product_name = this.outboundOrderSnList[i].product_name
            this.addform.form.order_number = this.outboundOrderSnList[i].order_number
            this.addform.form.supplier = this.outboundOrderSnList[i].supplier 
-           this.addform.form.confirmed_number = this.outboundOrderSnList[i].order_number; 
+           this.addform.form.confirmed_number = this.outboundOrderSnList[i].confirmed_number; 
            
        }
      }
     },
+    // 灌包补发
+      reissueSubmit(){
+        let msg = this.operationVerify();
+        if (msg) return this.$Message.warning(msg);
+        // 灌包补发申请条件是必须复审过后，并且需要有灌包订单号才可以补发
+        let {destruction_status,has_outbound_apply} = this.recordationList.selection[0];
+        if((destruction_status === '待初审' || destruction_status === '已驳回' || destruction_status === '已作废' || destruction_status === '待复审')){
+          this.$Message.warning("复审通过才可以进行补发申请!");
+          return
+        }
+        if(has_outbound_apply === '否'){
+          this.$Message.warning("请选择有灌包订单号的损耗单进行补发");
+          return
+        }
+        else{
+           this.$router.push("/outbound-management/CKSQ-outbound-application")
+        }
+      },
     // 操作验证
     operationVerify() {
         let msg;
