@@ -821,15 +821,10 @@ export default {
             {
               title:'状态',
               key:'recovery_status',
-              width:100,
+              width:150,
               align:'center'
             },
-            {
-              title:'是否补发',
-              key:'is_reissue',
-              width:'150',
-              align:'center'
-            },
+            
             {
               title:'操作',
               slot:'action',
