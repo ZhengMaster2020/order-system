@@ -2,7 +2,7 @@
 import ENV from './env'
 import fetch from './fetch'
 
-let baseURL = ENV ==='production' ?  'http://api.fandow.com/' : 'http://kongtest.fandow.com/'
+let baseURL = ENV ==='production' ?  '//api.fandow.com/' : '//kongtest.fandow.com/'
 
 // 列表
 const getChannelStorelist = (params) => {
