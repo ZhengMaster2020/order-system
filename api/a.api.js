@@ -5,6 +5,8 @@ import productionPlanListApi from './production-plan-list-api.js'
 import productionPrenatalBatchListApi from './production-prenatal-batch-list-api.js'
 import FQASettingApi from './FQA-setting-api.js'
 import channerlStoreSettingsApi from './channerl-store-settings-api'
+import CSKQOutboundApplicationApi from './CSKQ-outbound-application-api'
+import storageApplicationApi from './storage-application-api'
 
 /**
  * 旧版本接口 => api.js
@@ -20,5 +22,7 @@ export default {
   ...productionPlanListApi,
   ...productionPrenatalBatchListApi,
   ...FQASettingApi,
-  ...channerlStoreSettingsApi
+  ...channerlStoreSettingsApi,
+  ...CSKQOutboundApplicationApi,
+  ...storageApplicationApi
 }

@@ -1,12 +1,15 @@
 /* 渠道店铺设置 */
-
+import ENV from './env'
 import fetch from './fetch'
+
+let baseURL = ENV ==='production' ?  '//api.fandow.com/' : '//kongtest.fandow.com/'
 
 // 列表
 const getChannelStorelist = (params) => {
   return fetch({
-    url: `traceability/channelStore`,
+    url: `channelStore`,
     method: 'GET',
+    baseURL,
     params
   })
 }
@@ -14,8 +17,9 @@ const getChannelStorelist = (params) => {
 // 渠道列表 可单条数据获取-下拉选项
 const getChannelLists = (params) => {
   return fetch({
-    url: `traceability/channelStore/channel`,
+    url: `channelStore/channel`,
     method: 'GET',
+    baseURL,
     params
   })
 }
@@ -32,8 +36,9 @@ const addChannelLists = ({data}) => {
 // 渠道 详情
 const getChannelListsDetail = ({id}) => {
   return fetch({
-    url: `traceability/channelStore/channel/${id}`,
+    url: `channelStore/channel/${id}`,
     method: 'GET',
+    baseURL
   })
 }
 

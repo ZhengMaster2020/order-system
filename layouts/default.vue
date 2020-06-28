@@ -155,6 +155,8 @@ export default {
     if (ENV === 'production') {
       delete powerEnum['FD-0001']
     }
+
+    this.wmStyle()
     this.$API.getUserInfo()
       .then((res) => {
         if (res.code === 0) {
@@ -212,11 +214,68 @@ export default {
     },
     fullscreenChange(isFullScreen) {
       // console.log(isFullScreen);
+    },
+    wmStyle() {
+      let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
+      let style = document.createElement('style')
+      let content = userInfo.username + ' ' + userInfo.realName
+      style.setAttribute('type', 'text/css')
+      // ivu-table-tbody
+      style.innerHTML = `
+        .ivu-table::before{
+        box-sizing: border-box; content: '   ';
+        display: block;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background-color: transparent;
+        filter: alpha(opacity=70);
+        opacity: 0.7;
+        z-index: 1000;
+        background-image: url('${this.canvasWM({content})}')
+        }
+        .ivu-card {
+        background-image: url('${this.canvasWM({
+        content,
+        fillStyle: '#e8e8e8'
+      })}')
+        }
+        .ivu-modal-body::before {
+        background-image: url('${this.canvasWM({
+        content,
+        fillStyle: '#e8e8e8'
+      })}')
+        }`
+      document.head.appendChild(style)
+    },
+    canvasWM({
+               container = document.body,
+               width = '170px',
+               height = '80px',
+               textAlign = 'center',
+               textBaseline = 'middle',
+               font = "12px microsoft yahei",
+               fillStyle = '#d6d7da',
+               content = '请勿外传',
+               rotate = '-10',
+               zIndex = 1000
+             } = {}) {
+      let canvas = document.createElement('canvas');
+
+      canvas.setAttribute('width', width);
+      canvas.setAttribute('height', height);
+      let ctx = canvas.getContext("2d");
+
+      ctx.textAlign = textAlign;
+      ctx.textBaseline = textBaseline;
+      ctx.font = font;
+      ctx.fillStyle = fillStyle;
+      ctx.rotate(Math.PI / 180 * rotate);
+      ctx.fillText(content, parseFloat(width) / 2, parseFloat(height) / 2);
+
+      let base64Url = canvas.toDataURL();
+      return base64Url
     }
-  },
-  beforeRouteEnter:(to,from,next) => {
-    console.log(to)
-    next()
   }
 }
 </script>
