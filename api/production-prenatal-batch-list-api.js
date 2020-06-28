@@ -34,7 +34,7 @@ const getOrderPacking = (params) => {
   return fetch({
     url: `v1/search/search-order-packing`,
     method: 'GET',
-    baseURL: ENV === 'production' ?  'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com',
+    baseURL: ENV === 'production' ?  '//apisupply.fandow.com' : '//apisupplytest.fandow.com',
     params: params
   })
 };
