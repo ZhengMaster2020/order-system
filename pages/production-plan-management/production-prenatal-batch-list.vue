@@ -3,7 +3,7 @@
     <Card>
       <!--      Form-->
       <Form ref="searchForm" :model="searchForm" inline>
-        <Row type="flex" justify="space-between">
+        <Row>
           <Input v-model="searchForm.createdBy" placeholder="创建人" class="width-120"/>
           <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="创建时间" class="width-120" @on-change="dateChange"/>
           <Input v-model="searchForm.planNumber" placeholder="下单编号" class="width-120"/>
@@ -173,8 +173,6 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import ENV from '../../api/env'
 
   export default {
     data() {
@@ -370,7 +368,6 @@
       this.exportModal.planNumber = planNumber || ''
       this.searchForm.planName = planName || ''
       this.getProductionBatch('search')
-      this.supplyInstance()
     },
     methods: {
       // Form 操作
@@ -505,7 +502,7 @@
         params.order_no = supplierOrderNumber
         this.mkCodeList = ''
         this.exportModal.notFoundText = '加载中...'
-        this.getSupplyInfo(params)
+        this.$supplyAPI.getBcOrderInFo(params)
           .then(res => {
             if (res.code === 200) {
               let data = res.data
@@ -541,7 +538,7 @@
         if (!mkCode) return
         params.order_no = this.exportModal.form.supplierOrderNumber
         params.mk_code = this.exportModal.form.mkCode
-        this.getSupplyInfo(params)
+        this.$supplyAPI.getBcOrderInFo(params)
           .then(res => {
             if (res.code === 200) {
               let data = res.data
@@ -552,23 +549,7 @@
             }
           })
       },
-      // 采购系统api
-      supplyInstance() {
-        const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com'
-        this.instance = axios.create({
-          baseURL: BASE_URL,
-          timeout: 20000,
-          headers: {'Authorization': 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X'}
-        });
-      },
-      getSupplyInfo(params) {
-        return this.instance.get('v1/search/search-order-packing', {params})
-          .then(res => {
-            return res.data
-          }).catch(err => {
-            if (err) return console.log(err.message)
-          })
-      },
+
       submit(modal, form) {
         // 已选中的总数量+已处理数量不可大于采购下单数量的110%；
         this.$refs[form].validate(val => {

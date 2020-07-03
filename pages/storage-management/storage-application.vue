@@ -397,10 +397,10 @@
         applicationColumns: [
             { type: 'selection', width: 60, align: 'center' },
             { title: '序号', type: 'index', width: 70, align: 'center' },
-            { title: '入库单号', key: 'storageNumber', width: 140, align: 'center' },
-            { title: '下单编号', key: 'supplierOrderNumber', width: 140, align: 'center' },
+            { title: '入库单号', key: 'storageNumber', minWidth: 200, align: 'center' },
+            { title: '下单编号', key: 'supplierOrderNumber', minWidth: 180, align: 'center' },
             { title: '慕可代码', key: 'mkCode', width: 100, align: 'center' },
-            { title: '包材名称', key: 'packing', width: 120, align: 'center' },
+            { title: '包材名称', key: 'packing', minWidth: 190, align: 'center' },
             { title: '订单数量', key: 'amount', width: 110, align: 'center' },
             { title: '预计入库数量', key: 'expectedQuantity', width: 130, align: 'center' },
             { title: '已实际入库量', key: 'actualQuantity', width: 130, align: 'center',
@@ -411,7 +411,12 @@
                   },
                   on: {
                     click: () => {
-                      console.log('click')
+                      let {storageNumber, supplierOrderNumber} = row
+                      this.searchForm.record.storageNumber = storageNumber
+                      this.searchForm.record.supplierOrderNumber = supplierOrderNumber
+                      this.recordPageProps.page = 1
+                      this.currentTab = 'record'
+                      // console.log('click')
                     }
                   }
                 }, row.actualQuantity)
@@ -431,8 +436,8 @@
         recordColumns: [
             { type: 'selection', width: 60, align: 'center' },
             { title: '序号', type: 'index', width: 70, align: 'center' },
-            { title: '关联入库单号', key: 'storage_number', width: 140, align: 'center' },
-            { title: '生产批次号', key: 'batch_number', width: 140, align: 'center' },
+            { title: '关联入库单号', key: 'storage_number', minWidth: 200, align: 'center' },
+            { title: '生产批次号', key: 'batch_number', minWidth: 200, align: 'center' },
             { title: '生产数量', key: 'batch_num', width: 100, align: 'center' },
             { title: '本次入库数量', key: 'current_quantity', width: 130, align: 'center' },
             { title: '状态', key: 'storage_status', width: 110, align: 'center' },
@@ -440,7 +445,7 @@
             { title: '入库时间', key: 'created_at', width: 130, align: 'center'},
             { title: '入库类型', key: 'storage_type', width: 100, align: 'center' },
             { title: '慕可代码', key: 'mk_code', width: 140, align: 'center' },
-            { title: '包材名称', key: 'packing', width: 120, align: 'center' },
+            { title: '包材名称', key: 'packing', minWidth: 190, align: 'center' },
             { title: '标类型', key: 'mark_type', width: 120, align: 'center' },
             { title: '入库仓位号', key: 'position_number', width: 110, align: 'center' }
           ],
@@ -461,8 +466,6 @@
             }
           ]
         },
-        // Modal
-
         reviewModal: {
           show: false,
           reivewer: '',
@@ -624,7 +627,7 @@
           this.getStorageRecordDetail(recordIds[0]).then(() => {
           return this.getPendingConfirmRecord(recordIds)
         }).then((code) => {
-          console.log(code, 'code')
+          // console.log(code, 'code')
           code === 0 && (this.spinShow = false)
         })
 
@@ -706,7 +709,6 @@
         check = selection[0].storage_status === '待确认' || selection[0].storage_status === '已驳回'
         if(!check) return this.$Message.warning('待确认或已驳回才能修改')
 
-        console.log(id, 'edit')
         this.$router.push({
           path: '/storage-management/storage-manual',
           query: {
@@ -714,7 +716,6 @@
             currentQuantity: selection[0].current_quantity
           }
         })
-        // if(this.application.selection.length > 1) return this.$Message.error('一次只能操作一条数据')
       },
       // table 选项操作
       selectionChange(selection) {
@@ -786,10 +787,9 @@
         params.page = this[this.currentTab + 'PageProps'].page
         params.perPage = this[this.currentTab + 'PageProps'].perPage
 
-        console.log(this[this.currentTab + 'PageProps'].page)
+        // console.log(this[this.currentTab + 'PageProps'].page)
         this.tableLodaing = true
         this.$API[api](params).then(res => {
-          // console.log(res)
           if(res.code !== 0) return
 
           let {count, page, list} = res.data
@@ -814,7 +814,6 @@
       getStorageDetail(id) {
         this.spinShow = true
         return this.$API.getStorageDetail(id).then(res => {
-          // console.log(res)
           if(res.code !== 0) return
           this.detailData = res.data
           this.detailData.delivery_file = res.data.delivery_file
@@ -831,7 +830,6 @@
       getStorageRecordDetail(id) {
         this.spinShow = true
         return this.$API.getStorageRecordDetail(id).then(res => {
-          // console.log(res)
           if(res.code !== 0) return
           this.detailData = {
             created_by: res.data.createdBy,
@@ -878,7 +876,6 @@
               this.detailData.curStorageTotal = res.data.reduce((pre, cur) => {
                 return pre + cur.currentQuantity
               }, 0)
-              // console.log(this.detailData.curStorageTotal, 'this.detailData.curStorageTotal')
             }
           }
           return res.code
@@ -916,7 +913,6 @@
         }
       },
       currentTab(cur) {
-        // this.searchForm[cur] = {} 清空？
         this.getList()
       }
     },
@@ -933,7 +929,6 @@
       if(tab) {
         tab && (this.currentTab = tab)
         supplierOrderNumber && (this.searchForm[tab].supplierOrderNumber = supplierOrderNumber)
-        console.log(this.searchForm[tab])
       }else {
         this.getList()
       }

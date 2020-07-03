@@ -108,9 +108,6 @@
 <script>
   import Cookies from 'js-cookie'
   import {SERVER_BASE_URL} from '../../api/config'
-  import ENV from "../../api/env";
-  import axios from "axios";
-
 
   export default {
     data() {
@@ -154,7 +151,7 @@
     methods: {
 
       orderChange() {
-        // TODO: 调取采购系统的接口 获取mkCode
+        // 调取采购系统的接口 获取mkCode
         // console.log(this.form.supplierOrderNumber)
         this.mkCodeList = []
         this.notFoundText = '加载中...'
@@ -166,7 +163,7 @@
         this.isClear = true
         if(!supplierOrderNumber) return
 
-        return this.getSupplyInfo({order_no: supplierOrderNumber}).then(res => {
+        return this.$supplyAPI.getBcOrderInFo({order_no: supplierOrderNumber}).then(res => {
           if(res.code !== 200 || res.data.length === 0) {
             this.notFoundText = '无匹配数据'
             this.mkCodeList = []
@@ -233,10 +230,10 @@
       submit() {
         this.$refs.form.validate(val => {
           if (val) {
-            console.log(this.form)
+            // console.log(this.form)
             if (this.form.fileItems.length <= 0) return this.$Message.error('请上传供应商送货副联单')
             // return console.log(this.form)
-            // this.submintLodaing = true
+            this.submintLodaing = true
             let params = JSON.parse(JSON.stringify(this.form))
             let api = 'addStorageApply'
             if (this.id) {
@@ -265,7 +262,7 @@
       onsuccess(response) {
         if (response.code === 0) {
           this.$Message.success(response.msg)
-          console.log(response)
+          // console.log(response)
           this.form.fileItems.push(response.data.fileUploadVo)
         } else {
           this.$Message.error('上传有误')
@@ -282,7 +279,7 @@
       getDetail(id) {
         this.spinShow = true
         this.$API.getStorageDetail(id).then(res => {
-          console.log(res)
+          // console.log(res)
             if(res.code !== 0) return
               let data = res.data
               this.form =  {
@@ -310,27 +307,6 @@
           this.spinShow = false
         })
       },
-
-      // 采购系统api
-      supplyInstance() {
-        const BASE_URL = ENV === 'production' ? 'http://apisupply.fandow.com/' : 'http://apisupplytest.fandow.com/'
-        this.instance = axios.create({
-          baseURL: BASE_URL,
-          timeout: 20000,
-          headers: {'Authorization': 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X'}
-        });
-      },
-
-      getSupplyInfo(params) {
-        return this.instance.get('/v1/search/search-order-packing', {params})
-          .then(res => {
-            return res.data
-          }).catch(err => {
-            if (err) return console.log(err.message)
-          })
-      },
-
-
     },
     mounted() {
       let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
@@ -338,7 +314,7 @@
       this.applicant = userInfo.realName
 
       // console.log(this.$route.query)
-      this.supplyInstance()
+      // this.supplyInstance()
       if (this.id) {
         this.isClear = false
         this.getDetail(this.id)
@@ -346,8 +322,8 @@
     },
     computed: {
       remainNumber() {
-        // TODO: 下单 - （待确认 + 实际）
-        console.log(this.form.amount ,this.numberByOrder)
+        // 下单 - （待确认 + 实际）
+        // console.log(this.form.amount ,this.numberByOrder)
         let amount = this.form.amount
         return amount !== null ? (this.form.amount - this.numberByOrder) : null
       }

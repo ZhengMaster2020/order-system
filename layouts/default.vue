@@ -5,7 +5,13 @@
 
 <template>
   <div class="main" :class="{ 'main-hide-text': shrink }">
-    <div class="sidebar-menu-con" :style="{ width: shrink ? '60px' : '200px', overflow: shrink ? 'visible' : 'auto'}">
+    <div
+      class="sidebar-menu-con"
+      :style="{
+        width: shrink ? '60px' : '200px',
+        overflow: shrink ? 'visible' : 'auto',
+      }"
+    >
       <shrinkable-menu
         :shrink="shrink"
         :theme="menuTheme"
@@ -16,7 +22,11 @@
       >
         <div slot="top" class="logo-con">
           <img v-show="!shrink" key="max-logo" src="~assets/images/logo.png" />
-          <img v-show="shrink" key="min-logo" src="~assets/images/logo-min.png" />
+          <img
+            v-show="shrink"
+            key="min-logo"
+            src="~assets/images/logo-min.png"
+          />
         </div>
       </shrinkable-menu>
     </div>
@@ -26,13 +36,21 @@
     >
       <div class="main-header">
         <div class="navicon-con">
-          <Button :style="{transform: 'rotateZ(' + (shrink ? '-90' : '0') + 'deg)', padding: '5px 10px 6px', marginTop: '2px'}" type="text" @click="toggleClick">
+          <Button
+            :style="{
+              transform: 'rotateZ(' + (shrink ? '-90' : '0') + 'deg)',
+              padding: '5px 10px 6px',
+              marginTop: '2px',
+            }"
+            type="text"
+            @click="toggleClick"
+          >
             <Icon type="md-menu" size="24" />
           </Button>
         </div>
         <div class="header-middle-con">
           <div class="main-breadcrumb">
-            <breadcrumb-nav :current-path="currentPath"></breadcrumb-nav>
+            <breadcrumb-nav v-if="breadList" :current-path="breadList"></breadcrumb-nav>
           </div>
         </div>
         <div class="header-avator-con">
@@ -41,12 +59,24 @@
               <Icon type="md-refresh" :size="23" />
             </Tooltip>
           </div>
-          <full-screen v-model="isFullScreen" @on-change="fullscreenChange"></full-screen>
+          <full-screen
+            v-model="isFullScreen"
+            @on-change="fullscreenChange"
+          ></full-screen>
           <!-- <lock-screen></lock-screen>
           <message-tip v-model="mesCount"></message-tip> -->
           <div class="user-dropdown-menu-con">
-            <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
-              <Dropdown transfer trigger="click" @on-click="handleClickUserDropdown">
+            <Row
+              type="flex"
+              justify="end"
+              align="middle"
+              class="user-dropdown-innercon"
+            >
+              <Dropdown
+                transfer
+                trigger="click"
+                @on-click="handleClickUserDropdown"
+              >
                 <a href="javascript:void(0)">
                   <span class="main-user-name">{{ userInfo.realName }}</span>
                   <Icon type="md-arrow-dropdown" />
@@ -60,13 +90,16 @@
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
-              <Avatar :src="avatorPath" style="background: #619fe7;margin-left: 10px;"></Avatar>
+              <Avatar
+                :src="avatorPath"
+                style="background: #619fe7;margin-left: 10px;"
+              ></Avatar>
             </Row>
           </div>
         </div>
       </div>
       <div class="tags-con">
-        <!-- <tags-page-opened :page-tags-list="pageTagsList"></tags-page-opened> -->
+        <tags-page-opened :page-tags-list="pageTagsList"></tags-page-opened>
       </div>
     </div>
     <div class="single-page-con" :style="{ left: shrink ? '60px' : '200px' }">
@@ -81,8 +114,9 @@
 import ENV from '../api/env'
 import Cookies from 'js-cookie'
 import router from '~/plugins/router'
+import otherRouter from '~/plugins/other-router'
 import shrinkableMenu from '~/components/shrinkable-menu/shrinkable-menu.vue'
-// import tagsPageOpened from '~/components/tags-page-opened.vue'
+import tagsPageOpened from '~/components/tags-page-opened.vue'
 import breadcrumbNav from '~/components/breadcrumb-nav.vue'
 import fullScreen from '~/components/full-screen.vue'
 // import lockScreen from '~/components/lockscreen/lockscreen.vue'
@@ -91,7 +125,7 @@ export default {
   middleware: 'auth',
   components: {
     shrinkableMenu,
-    // tagsPageOpened,
+    tagsPageOpened,
     breadcrumbNav,
     fullScreen
     // lockScreen,
@@ -99,7 +133,7 @@ export default {
   },
   head() {
     return {
-      title: '防伪码系统'
+      title: '防伪码系统',
     }
   },
   data() {
@@ -110,13 +144,13 @@ export default {
       openedSubmenuArr: [],
       menuList: [],
       beforePush: true,
-      userInfo:{}
+      userInfo: {},
+      breadList: [{name: '首页', path: '/'}]
     }
   },
   computed: {
     pageTagsList() {
-      // return this.$store.state.app.pageOpenedList // 打开的页面的页面对象
-      return []
+      return this.$store.state.app.pageOpenedList // 打开的页面的页面对象
     },
     currentPath() {
       // return this.$store.state.app.currentPath // 当前面包屑数组
@@ -129,59 +163,31 @@ export default {
     menuTheme() {
       // return this.$store.state.app.menuTheme
       return 'dark'
-    }
+    },
   },
   mounted() {
-    // this.menuList = router
-    // console.log(this.$router.options.routes, router)
     // this.$nextTick(() => {
     //   this.$nuxt.$loading.start()
     //   setTimeout(() => this.$nuxt.$loading.finish(), 600)
     // })
-    let powerEnum = {
-      'FD-0001': '超级管理员',
-      'FD-7724': '李时达',
-      'FD-13059': '谢绮玲',
-      'FD-11271': '李锐钊',
-      'FD-2202': '吴马红',
-      'FD-17494': '刘金梁',
-    }
-    let storeEnum = {
-      'FD-16349': '周一娜',
-      'FD-14775': '陈家茵',
-      'FD-16751': '罗鑫妍',
-      'FD-12492': '黄小亮'
-    }
-    if (ENV === 'production') {
-      delete powerEnum['FD-0001']
-    }
-    this.$API.getUserInfo()
-      .then((res) => {
-        if (res.code === 0) {
-          if (powerEnum[res.data.username]) {
-            // powerEnum超级管理组 包含在里面 显示全部路由
-            this.menuList = router
-          } else {
-            let resultGroup
-            if (storeEnum[res.data.username]) {
-              // storeEnum组  只显示渠道和店铺设置
-              resultGroup = router.filter(item => item.name === '/inquire-anomaly-tracking')
-              resultGroup.forEach((items, index) => {
-                items.children = items.children.filter(item => item.path === 'inquire-anomaly-tracking/channel-store-settings')
-              })
-            } else {
-              // 不包含在里面  只显示防伪码查询
-              resultGroup = router.filter(item => item.name === '/security-code')
-              resultGroup.forEach((items, index) => {
-                items.children = items.children.filter(item => item.path === 'security-code/search-code')
-              })
-            }
-            this.menuList = resultGroup
-          }
+    this.$API.getPowerMenu().then((res) => {
+      if (res.code === 0) {
+        let params = res.data
+        params.push('/GET/notebook/index')
+        if (params.length) {
+          this.menuList = this.routerPower(params, router)
         }
+      }
+    })
+    this.$API.getUserInfo().then((res) => {
+      if (res.code === 0) {
         window.localStorage.setItem('userInfo', JSON.stringify(res.data))
-        this.userInfo = res.data;
-      })
+        this.userInfo = res.data
+        this.wmStyle()
+      }
+    })
+    this.$store.commit('app/init')
+    this.setBread()
   },
   methods: {
     toggleClick() {
@@ -195,7 +201,7 @@ export default {
       if (name === 'ownSpace') {
         // util.openNewPage(this, 'ownspace_index');
         this.$router.push({
-          name: 'ownspace_index'
+          name: 'ownspace_index',
         })
       } else if (name === 'loginout') {
         // 退出登录
@@ -203,7 +209,7 @@ export default {
         this.$store.commit('clearOpenedSubmenu')
         Cookies.remove('authorization')
         this.$router.push({
-          name: 'login'
+          name: 'login',
         })
       }
     },
@@ -212,11 +218,128 @@ export default {
     },
     fullscreenChange(isFullScreen) {
       // console.log(isFullScreen);
+    },
+    wmStyle() {
+      let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
+      let style = document.createElement('style')
+      let content = userInfo.username + ' ' + userInfo.realName
+      style.setAttribute('type', 'text/css')
+      // ivu-table-tbody
+      style.innerHTML = `
+        .ivu-table::before{
+        box-sizing: border-box; content: '   ';
+        display: block;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background-color: transparent;
+        filter: alpha(opacity=70);
+        opacity: 0.7;
+        z-index: 1000;
+        background-image: url('${this.canvasWM({ content })}')
+        }
+        .ivu-card {
+        background-image: url('${this.canvasWM({
+          content,
+          fillStyle: '#e8e8e8',
+        })}')
+        }
+        .ivu-modal-body::before {
+        background-image: url('${this.canvasWM({
+          content,
+          fillStyle: '#e8e8e8',
+        })}')
+        }`
+      document.head.appendChild(style)
+    },
+    canvasWM({
+      container = document.body,
+      width = '170px',
+      height = '80px',
+      textAlign = 'center',
+      textBaseline = 'middle',
+      font = '12px microsoft yahei',
+      fillStyle = '#d6d7da',
+      content = '请勿外传',
+      rotate = '-10',
+      zIndex = 1000,
+    } = {}) {
+      let canvas = document.createElement('canvas')
+
+      canvas.setAttribute('width', width)
+      canvas.setAttribute('height', height)
+      let ctx = canvas.getContext('2d')
+
+      ctx.textAlign = textAlign
+      ctx.textBaseline = textBaseline
+      ctx.font = font
+      ctx.fillStyle = fillStyle
+      ctx.rotate((Math.PI / 180) * rotate)
+      ctx.fillText(content, parseFloat(width) / 2, parseFloat(height) / 2)
+
+      let base64Url = canvas.toDataURL()
+      return base64Url
+    },
+    // 路由权限过滤
+    routerPower (powerList, routerList) {
+      let result = []
+      routerList.forEach(item => {
+        if (item.children && item.children.length) {
+          item.children = this.routerPower(powerList, item.children)
+          if (item.children.length) {
+            result.push(item)
+          }
+        } else {
+          let findItem = powerList.find(it => it === item.path)
+          if (findItem) {
+            result.push(item)
+          }
+        }
+      })
+      return result
+    },
+    // 找到路由组
+    findRouteGroup (route, searchList, parentList = [{name: '首页', path: '/'}]) {
+      if (route === '/') {
+        return parentList
+      }
+      for (let i = 0; i < searchList.length; i++) {
+        const item = searchList[i];
+        if (!item.children || !item.children.length) {
+          if (item.name === route) {
+            let result = JSON.parse(JSON.stringify(parentList))
+            result.splice(1, 0, {name: item.title})
+            return result
+          }
+        } else {
+          let result = this.findRouteGroup(route, item.children)
+          if (result) {
+            result.splice(1, 0, {name: item.title})
+            return result
+          }
+        }
+      }
+    },
+    // 设置面包屑
+    setBread () {
+      let breadList = this.findRouteGroup(this.$route.path.slice(1), router)
+      if (breadList) {
+        this.breadList = breadList
+      } else {
+        let result = otherRouter.find(item => item.name === this.$route.path.slice(1))
+        this.breadList = result ? [{name: '首页', path: '/'}, {name: result.title}] : result
+      }
     }
   },
-  beforeRouteEnter:(to,from,next) => {
-    console.log(to)
-    next()
+  watch: {
+    $route (newVal) {
+      // let tooltips = document.querySelectorAll('.ivu-tooltip-popper')
+      // tooltips.forEach((item) => {
+      //   item.style.display = 'none'
+      // })
+      this.setBread()
+      this.$store.commit('app/openPage', newVal);
+    }
   }
 }
 </script>

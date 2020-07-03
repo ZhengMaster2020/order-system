@@ -24,6 +24,5 @@ export default {
   ...FQASettingApi,
   ...channerlStoreSettingsApi,
   ...CSKQOutboundApplicationApi,
-  ...channerlStoreSettingsApi,
   ...storageApplicationApi
 }

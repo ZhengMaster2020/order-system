@@ -5,7 +5,7 @@
       :key="item.name"
       :to="item.path"
     >
-      {{ itemTitle(item) }}
+      {{ item.name }}
     </BreadcrumbItem>
   </Breadcrumb>
 </template>
@@ -18,15 +18,6 @@ export default {
       default: function () { return [] }
     }
   },
-  methods: {
-    itemTitle(item) {
-      if (typeof item.title === 'object') {
-        // return this.$t(item.title.i18n);
-        return '首页'
-      } else {
-        return item.title
-      }
-    }
-  }
+  methods: {}
 }
 </script>
