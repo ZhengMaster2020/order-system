@@ -179,11 +179,11 @@ export default {
         }
       }
     })
-    this.wmStyle()
     this.$API.getUserInfo().then((res) => {
       if (res.code === 0) {
         window.localStorage.setItem('userInfo', JSON.stringify(res.data))
         this.userInfo = res.data
+        this.wmStyle()
       }
     })
     this.$store.commit('app/init')
