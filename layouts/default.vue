@@ -308,13 +308,13 @@ export default {
         if (!item.children || !item.children.length) {
           if (item.name === route) {
             let result = JSON.parse(JSON.stringify(parentList))
-            result.splice(2, 1, {name: item.title})
+            result.splice(1, 0, {name: item.title})
             return result
           }
         } else {
           let result = this.findRouteGroup(route, item.children)
           if (result) {
-            result.splice(2, 1, {name: item.title})
+            result.splice(1, 0, {name: item.title})
             return result
           }
         }

@@ -5,5 +5,6 @@ export default [
   { name: 'outbound-management/outbound-manual', title: '手动出库' },
   { name: 'inquire-anomaly-tracking/FQA-add', title: '常见问题编辑' },
   { name: 'storage-management/storage-add', title: '编辑入库单' },
-  { name: 'storage-management/storage-manual', title: '手动入库' }
+  { name: 'storage-management/storage-manual', title: '手动入库' },
+  { name: 'production-plan-management/production-plan-add', title: '编辑生产计划' }
 ]
