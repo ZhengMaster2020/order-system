@@ -27,12 +27,12 @@
     >
       <transition-group name="taglist-moving-animation">
         <Tag
-          v-for="item in pagetagslist"
+          v-for="item in tagsList"
           ref="tagsPageOpened"
           :key="item.name"
           type="dot"
           :name="item.name"
-          :closable="item.name === 'home_index' ? false : true"
+          :closable="item.name === 'index' ? false : true"
           :color="
             item.children
               ? item.children[0].name === currentPageName
@@ -43,8 +43,7 @@
                 : 'default'
           "
           @on-close="closePage"
-          @click.native="linkTo(item)"
-        >
+          @click.native="linkTo(item)">
           {{ itemTitle(item) }}
         </Tag>
       </transition-group>
@@ -55,7 +54,7 @@
 <script>
 export default {
   props: {
-    pagetagslist: Array,
+    pageTagsList: Array,
     beforePush: {
       type: Function,
       default: (item) => {
@@ -133,18 +132,17 @@ export default {
         const tagWidth = event.target.parentNode.offsetWidth
         this.tagBodyLeft = Math.min(this.tagBodyLeft + tagWidth, 0)
       }
-      this.$store.commit('removeTag', name)
-      this.$store.commit('closePage', name)
+      this.$store.commit('app/closeTag', name)
       pageOpenedList = this.$store.state.app.pageOpenedList
-      localStorage.pageOpenedList = JSON.stringify(pageOpenedList)
+      // localStorage.pageOpenedList = JSON.stringify(pageOpenedList)
       if (this.currentPageName === name) {
         this.linkTo(lastPageObj)
       }
 
       // 清空表单本地数据存储
-      if (localStorage[name]) {
-        localStorage[name] = ''
-      }
+      // if (localStorage[name]) {
+      //   localStorage[name] = ''
+      // }
     },
     linkTo(item) {
       const routerObj = {}
@@ -196,12 +194,12 @@ export default {
     },
     handleTagsOption(type) {
       if (type === 'clearAll') {
-        this.$store.commit('clearAllTags')
+        this.$store.commit('app/clearAllTags')
         this.$router.push({
-          name: 'home_index'
+          name: 'index'
         })
       } else {
-        this.$store.commit('clearOtherTags', this)
+        this.$store.commit('app/clearOtherTags', this.$route.name)
       }
       this.tagBodyLeft = 0
     },
@@ -235,3 +233,8 @@ export default {
   }
 }
 </script>
+<style lang="less" scoped>
+  /deep/ .ivu-tag-text{
+    cursor: default;
+  }
+</style>
