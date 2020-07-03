@@ -143,7 +143,6 @@
         this.$refs.form.validate(val => {
           if (val) {
             if (this.form.fileItems.length <= 0) return this.$Message.error('请上传计划文件')
-            // return console.log(this.form)
             this.submintLodaing = true
             if (this.id) {
               let param = {
@@ -179,6 +178,7 @@
         return !check;
       },
       onsuccess(response) {
+        console.log(response)
         if (response.code === 0) {
           this.$Message.success(response.msg)
           this.form.fileItems.push(response.data.fileUploadVo)
