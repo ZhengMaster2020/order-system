@@ -111,6 +111,7 @@ export default {
           LoginForm.grant_type = this.grant_type
           this.$API.login(LoginForm).then((res) => {
             if (!res.code) {
+              this.$store.commit('app/clearAllTags')
               // Cookies.set('user', this.form.username, { expires: 1 })
               Cookies.set('authorization', res.access_token, {
                 expires: 1

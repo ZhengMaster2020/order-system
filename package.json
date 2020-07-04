@@ -23,9 +23,11 @@
         "echarts": "^4.5.0",
         "js-cookie": "^2.2.0",
         "koa": "^2.6.2",
+        "koa-router": "^9.1.0",
         "less": "^3.9.0",
         "less-loader": "^5.0.0",
         "nuxt": "^2.11.0",
+        "request": "^2.88.2",
         "view-design": "^4.0.2",
         "vue-calendar-component": "^2.8.2",
         "vue-i18n": "^8.12.0"
