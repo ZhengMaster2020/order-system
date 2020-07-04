@@ -567,6 +567,7 @@
         this.spinShow = true
         // 计划详情
         this.$API.getProductionPlanDetail({id}).then(res => {
+          console.log(res);
           if (res.code === 0) {
             let data = res.data
             for (let key in this.reviewModal.data) {

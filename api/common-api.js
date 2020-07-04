@@ -7,6 +7,24 @@ const searchUSers = (params) => {
     params: params
   })
 };
+
+// 获取权限菜单
+const getPowerMenu = () => {
+  return fetch({
+    url: `traceability/userMenu`,
+    method: 'GET',
+  })
+}
+
+// 获取权限控制页面
+const getPowerPage = () => {
+  return fetch({
+    url: `traceability/userMenu/admin`
+  })
+}
+
 export default {
-  searchUSers
+  searchUSers,
+  getPowerMenu,
+  getPowerPage
 }
