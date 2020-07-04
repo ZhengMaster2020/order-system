@@ -38,6 +38,7 @@ export default [
     ]
   },
   {
+
     path: '/storage-management',
     icon: 'ios-book',
     name: '/storage-management',
@@ -59,6 +60,18 @@ export default [
       }
     ]
   },
+  {
+    path:'/inventory-management',
+    icon:'ios-book',
+    name:'/inventory-management',
+    title:'盘点管理',
+    children:[
+      {path:'/GET/inventory-record',title:"盘点记录",name:'inventory-management/inventory-records'},
+      {path:'/GET/inventory-management/{[a-z_]+}',title:'销毁记录',name:'inventory-management/destruction-records'},
+      {path:'/GET/inventory-management/{[a-z_]+}',title:'回收记录',name:'inventory-management/recycling-records'}
+    ]
+  }
+
   // {
   //   path: '/anti-channel-conflict',
   //   icon: 'ios-book',
