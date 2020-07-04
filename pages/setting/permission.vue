@@ -19,7 +19,7 @@ export default {
         } else if (ENV === 'test') {
           this.iframeSrc = 'http://kongtest.fandow.com/userMenu/admin'
         } else {
-          this.iframeSrc = 'http://api.fandow.com/userMenu/admin'
+          this.iframeSrc = 'https://api.fandow.com/userMenu/admin'
         }
         // window.location.href = window.location.href;
         window.onresize = () => {
