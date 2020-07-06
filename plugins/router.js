@@ -34,7 +34,7 @@ export default [
     title: '查询及异常追踪',
     children: [
       { path: '/GET/FAQ', title: '常见问题设置', name: 'inquire-anomaly-tracking/FQA-setting' },
-      { path: '	/GET/channelStore', title: '渠道和店铺设置', name: 'inquire-anomaly-tracking/channel-store-settings' }
+      { path: '/GET/channelStore', title: '渠道和店铺设置', name: 'inquire-anomaly-tracking/channel-store-settings' }
     ]
   },
   {
