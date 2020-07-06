@@ -36,9 +36,8 @@ const addChannelLists = ({data}) => {
 // 渠道 详情
 const getChannelListsDetail = ({id}) => {
   return fetch({
-    url: `channelStore/channel/${id}`,
+    url: `traceability/channelStore/channel/${id}`,
     method: 'GET',
-    baseURL
   })
 }
 
