@@ -1,9 +1,9 @@
 /* 常见问题设置 */
 import ENV from './env'
 import fetch from './fetch'
+import {SUPPLY_BASEURL} from './config'
 
-let baseURL = ENV ==='production' ?  '//api.fandow.com/' : '//kongtest.fandow.com/'
-
+let baseURL = SUPPLY_BASEURL
 // 列表
 const getFQAlist = (params) => {
   return fetch({

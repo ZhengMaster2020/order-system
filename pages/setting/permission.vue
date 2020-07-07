@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import {IFRAM_SRC} from '../../api/config';
+import ENV from '../../api/env';
 export default {
     name: 'permission',
     data () {
@@ -14,7 +14,13 @@ export default {
         }
     },
     mounted () {
-        this.iframeSrc = IFRAM_SRC;
+        if (ENV === 'development') {
+          this.iframeSrc = 'http://kongtest.fandow.com/userMenu/admin';
+        } else if (ENV === 'test') {
+          this.iframeSrc = 'http://kongtest.fandow.com/userMenu/admin'
+        } else {
+          this.iframeSrc = 'https://api.fandow.com/userMenu/admin'
+        }
         // window.location.href = window.location.href;
         window.onresize = () => {
             const ifm = document.getElementById('iframepage');

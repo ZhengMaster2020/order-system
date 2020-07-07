@@ -1,8 +1,8 @@
 /* 渠道店铺设置 */
 import ENV from './env'
 import fetch from './fetch'
-
-let baseURL = ENV ==='production' ?  '//api.fandow.com/' : '//kongtest.fandow.com/'
+import {SUPPLY_BASEURL} from './config'
+let baseURL = SUPPLY_BASEURL;
 
 // 列表
 const getChannelStorelist = (params) => {
