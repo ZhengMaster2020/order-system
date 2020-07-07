@@ -17,7 +17,17 @@ const getBcOrderInFo = (params) => {
     params
   })
 };
+
+// 盘点管理-盘点记录添加-盘点对象
+const getSupplyInfo = (params) => {
+  return supplyFetch({
+    url:'/v1/search/search-supplier',
+    method:'GET',
+    params
+  })
+}
 export default {
   getOrderBaggingInfo,
-  getBcOrderInFo
+  getBcOrderInFo,
+  getSupplyInfo
 }
