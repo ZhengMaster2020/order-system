@@ -26,9 +26,8 @@ const addFQAlist = ({data}) => {
 // 详情
 const getFQAlistDetail = ({id}) => {
   return fetch({
-    url: `FAQ/${id}`,
-    method: 'GET',
-    baseURL,
+    url: `traceability/FAQ/${id}`,
+    method: 'GET'
   })
 }
 
