@@ -1,8 +1,7 @@
 /* 渠道店铺设置 */
-import ENV from './env'
 import fetch from './fetch'
-import {SUPPLY_BASEURL} from './config'
-let baseURL = SUPPLY_BASEURL;
+import {SKIP_ACCESS_URL} from './config'
+let baseURL = SKIP_ACCESS_URL;
 
 // 列表
 const getChannelStorelist = (params) => {
