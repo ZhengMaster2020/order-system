@@ -13,6 +13,7 @@ let baseUrl = '//api.fandow.com/oa/'
 let fileUrl = '//api.fandow.com/oa/file'
 let UAC_URL = '//api.fandow.com/oa/uac'
 let userUrl = '//api.fandow.com/'
+let iframeSrc = '//api.fandow.com/userMenu/admin'
 
 if (ENV === 'production') {
   console.log('---- production ----')
@@ -22,6 +23,7 @@ if (ENV === 'production') {
   fileUrl = 'http://apibeta.fandow.com/oa/file'
   UAC_URL = 'http://kongtest.fandow.com/oa/uac'
   userUrl = 'http://kongtest.fandow.com/oa/uac'
+  iframeSrc = 'http://kongtest.fandow.com/userMenu/admin'
 } else {
   console.log('---- develop ----')
   // baseUrl = 'http://kongtest.fandow.com/oa/'
@@ -29,9 +31,11 @@ if (ENV === 'production') {
   fileUrl = 'http://apibeta.fandow.com/oa/file'
   UAC_URL = 'http://kongtest.fandow.com/oa/uac'
   userUrl = 'http://kongtest.fandow.com/oa/uac'
+  iframeSrc = 'http://kongtest.fandow.com/userMenu/admin'
 }
 
 export const SERVER_UAC_URL = UAC_URL
 export const SERVER_BASE_URL = baseUrl
 export const FILE_BASE_URL = fileUrl
 export const USER_URL = userUrl
+export const IFRAM_SRC = iframeSrc;
