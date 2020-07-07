@@ -699,7 +699,6 @@ export default {
   mounted() {
     this.userInfo = JSON.parse(window.localStorage.getItem('userInfo'));
     this.getList();
-    this.supplyInstance();
   },
   methods: {
     // 搜索
@@ -715,7 +714,6 @@ export default {
       params.page = this.pageProps.page;
       params.perPage = this.pageProps.perPage;
       this.$API.inventoryRecordsList(params).then(res => {
-        console.log(res);
         this.recordationList.iventorydata = res.data.list;
         this.pageProps = res.data;
       });
@@ -749,36 +747,18 @@ export default {
         let params = {};
         params.type = 2;
         params.supplier = query;
-        this.getSupplyInfo(params).then(res => {
-           if(res.code === 200){
-            this.objList = res.data
-           }
-
-        }).finally(() => {
-              this.loadingObj = false;
-          })
+        this.$supplyAPI.getSupplyInfo(params).then(res => {
+          if(res.code === 200) {
+            this.objList = res.data;
+          }
+        }).finally(()=>{
+          this.loadingObj = false;
+        })
       }
       else{
         this.objList = [];
       }
     },
-    // 盘点对象-采购系统api
-    supplyInstance() {
-        const BASE_URL = ENV === 'production' ? '//apisupply.fandow.com' : '//apisupplytest.fandow.com'
-        this.instance = axios.create({
-          baseURL: BASE_URL,
-          timeout: 20000,
-          headers: {'Authorization': 'Bearer nTYEm7oNMGChXer3AhIy4cBkTYcQfdUOdJJVuQ3X'}
-        });
-      },
-    getSupplyInfo(params) {
-        return this.instance.get('/v1/search/search-supplier', {params})
-          .then(res => {
-            return res.data
-          }).catch(err => {
-            if (err) return console.log(err.message)
-          })
-      },
     // 页
     changePage(e) {
       this.pageProps.page = e;

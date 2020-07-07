@@ -1,6 +1,7 @@
 import fetch from './fetch'
 import ENV from './env'
-
+import {APISUPPLY} from './config'
+let baseURL = APISUPPLY;
 
 // 生产批次 - 列表
 const getProductionBatch = (params) => {
@@ -34,7 +35,7 @@ const getOrderPacking = (params) => {
   return fetch({
     url: `v1/search/search-order-packing`,
     method: 'GET',
-    baseURL: ENV === 'production' ?  '//apisupply.fandow.com' : '//apisupplytest.fandow.com',
+    baseURL: baseURL,
     params: params
   })
 };
