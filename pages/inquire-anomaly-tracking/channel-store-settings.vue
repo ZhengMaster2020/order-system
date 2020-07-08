@@ -145,7 +145,7 @@
         this.getList();
       },
 
-      getList() {
+      getList(type) {
         if (type === 'search') {
           this.pageProps.page = 1;
           this.pageProps.perPage = 10;
