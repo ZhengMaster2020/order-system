@@ -108,9 +108,9 @@
               <FormItem label="请输入损耗数量" prop="lossNumber">
                  <Input number v-model="addform.form.lossNumber" placeholder="请输入"></Input>
               </FormItem>
-              <FormItem label="下级经办人" prop="nextpeople">
+              <!-- <FormItem label="下级经办人" prop="nextpeople">
                  <Input v-model="addform.form.nextpeople" placeholder="请输入"></Input>
-              </FormItem>
+              </FormItem> -->
             </Col>
           </Row>
           <Row v-if="addform.form.hasOutboundApply === 'yes'">
@@ -299,9 +299,9 @@
               placeholder="请输入"
             ></Input>
           </FormItem>
-          <FormItem label="下级经办人">
+          <!-- <FormItem label="下级经办人">
             <Input v-model="firstModal.form.nextpeople"  placeholder="请输入"></Input>
-          </FormItem>
+          </FormItem> -->
         </Row>
       </Form>
        <div class="modal-footer" slot="footer">
@@ -409,9 +409,9 @@
               placeholder="请输入"
             ></Input>
           </FormItem>
-          <FormItem label="下级经办人">
+          <!-- <FormItem label="下级经办人">
             <Input   placeholder="请输入"></Input>
-          </FormItem>
+          </FormItem> -->
         </Row>
       </Form>
        <div class="modal-footer" slot="footer">
@@ -599,7 +599,7 @@ export default {
            createdBy:'', //损耗记录人
            hasOutboundApply:'', //是否有出库单
            lossNumber:'', //s损耗数量
-           nextpeople:'', //下级经办人
+          //  nextpeople:'', //下级经办人
            brand:'', //品牌
            supplier:'', //OEM供应商
            markType:'', //标类型
@@ -642,7 +642,7 @@ export default {
           loss_reason:'', //损耗原因
           lossFileItems:[],
           people:'', //经办人
-          nextpeople:'', //下级经办人
+          // nextpeople:'', //下级经办人
           isPass:'', //是否通过
           opinion:'', //审核意见
         }

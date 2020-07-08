@@ -187,9 +187,9 @@
           <div class="title-text">关闭计划</div>
           <span class="line"></span>
         </div>
-        <FormItem label="经办人">
+        <!-- <FormItem label="经办人">
           <Input class="width-180" v-model="finishedModal.data.nextBy" readonly/>
-        </FormItem>
+        </FormItem> -->
         <FormItem label="实际执行数量">
           <Input class="width-180" v-model="finishedModal.form.realNum" readonly/>
         </FormItem>
@@ -466,7 +466,7 @@
             isFillPlan: '',
             planName: '',
             fileItems: '',
-            nextBy: '',
+            // nextBy: '',
             realNum: '',
           },
           form: {
@@ -617,7 +617,7 @@
                 }
               }
             }
-            this.finishedModal.data.nextBy = this.userInfo.realName
+            // this.finishedModal.data.nextBy = this.userInfo.realName
             this.finishedModal.data.isFillPlan = data.isFillPlan === 'yes' ? '是' : '否'
             this.finishedModal.form.id = id
             this.finishedModal.form.realNum = data.realNum

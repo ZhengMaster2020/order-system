@@ -71,9 +71,9 @@
           <FormItem label="损耗数量" prop="lossNumber">
             <Input class="width-200" v-model="form.lossNumber" disabled/>
           </FormItem>
-          <FormItem label="下级经办人" prop="nextBy">
+          <!-- <FormItem label="下级经办人" prop="nextBy">
             <Input class="width-200" v-model="form.nextBy" disabled/>
-          </FormItem>
+          </FormItem> -->
         </Row>
 
         <Row>
@@ -126,7 +126,7 @@
           expectedOutboundNumber: null,
           outboundReason: '',
           brand: 'WIS',
-          nextBy: '产品供应部-经理',
+          // nextBy: '产品供应部-经理',
           applicant: '',
         },
         rules: {
@@ -134,7 +134,7 @@
           urgency: [{required: true, message: '必填项', trigger: 'blur'}],
           reissueType: [{required: true, message: '必填项', trigger: 'change'}],
           lossSn: [{required: true, message: '必填项', trigger: 'change'}],
-          nextBy: [{required: true, message: '必填项', trigger: 'blur'}],
+          // nextBy: [{required: true, message: '必填项', trigger: 'blur'}],
           outboundReason: [{required: true, message: '必填项', trigger: 'blur'}],
           lossNumber: [{required: true, message: '必填项', trigger: 'change'}],
           isReissue: [{required: true, type: 'number', message: '必填项', trigger: 'change'}],
@@ -281,7 +281,7 @@
           let apiKey = 'addOutboundLsit'
           let params = JSON.parse(JSON.stringify(this.form))
 
-          delete params.nextBy
+          // delete params.nextBy
           delete params.applicant
           // 补发类型 损耗记录单 ('-' 则删除) --- 删除
           for(let key in params) {

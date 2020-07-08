@@ -108,9 +108,9 @@
               <FormItem label="请输入回收数量" prop="recoveryNumber">
                  <Input number v-model="addform.form.recoveryNumber" placeholder="请输入"></Input>
               </FormItem>
-              <FormItem label="下级经办人" prop="nextpeople">
+              <!-- <FormItem label="下级经办人" prop="nextpeople">
                  <Input v-model="addform.form.nextpeople" placeholder="请输入"></Input>
-              </FormItem>
+              </FormItem> -->
             </Col>
           </Row>
           <!-- 当是否有出库单选择是的时候 -->
@@ -305,9 +305,9 @@
               placeholder="请输入"
             ></Input>
           </FormItem>
-          <FormItem label="下级经办人" prop="nextpeople">
+          <!-- <FormItem label="下级经办人" prop="nextpeople">
             <Input v-model="firstModal.form.nextpeople"  placeholder="请输入"></Input>
-          </FormItem>
+          </FormItem> -->
         </Row>
       </Form>
       <div class="modal-footer" slot="footer">
@@ -415,9 +415,9 @@
               placeholder="请输入"
             ></Input>
           </FormItem>
-          <FormItem label="下级经办人">
+          <!-- <FormItem label="下级经办人">
             <Input   placeholder="请输入"></Input>
-          </FormItem>
+          </FormItem> -->
         </Row>
       </Form>
        <div class="modal-footer" slot="footer">
@@ -603,7 +603,7 @@ export default {
            createdBy:'', //损耗记录人
            hasOutboundApply:'', //是否有出库单
            recoveryNumber:'', //回收数量
-           nextpeople:'', //下级经办人
+          //  nextpeople:'', //下级经办人
            brand:'', //品牌
            supplier:'', //OEM供应商
            markType:'', //标类型
@@ -657,7 +657,7 @@ export default {
           recovery_reason:'', //回收原因
           recoveryFileItems:[], //回收凭证
           people:'', //经办人
-          nextpeople:'', //下级经办人
+          // nextpeople:'', //下级经办人
           isPass:'', //是否通过
           opinion:'', //审核意见
         }

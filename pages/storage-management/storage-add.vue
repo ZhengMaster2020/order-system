@@ -74,9 +74,9 @@
             </FormItem>
           </Col>
           <Col span="4">
-            <FormItem label="下级经办人" style="width: 100%">
+            <!-- <FormItem label="下级经办人" style="width: 100%">
               <Input value="IT开发部主管" disabled/>
-            </FormItem>
+            </FormItem> -->
           </Col>
         </Row>
         <div style="position: relative">

@@ -159,9 +159,9 @@
               </FormItem>
             </Col>
             <Col :xs="4">
-              <FormItem label="下级经办人" prop="nextpeople">
+              <!-- <FormItem label="下级经办人" prop="nextpeople">
                 <Input v-model="addform.form.nextpeople" clearable placeholder="下级经办人"></Input>
-              </FormItem>
+              </FormItem> -->
             </Col>
           </Row>
           <Row style="padding:0 11px">
@@ -274,9 +274,9 @@
               placeholder="请输入"
             ></Input>
           </FormItem>
-          <FormItem label="下级经办人">
+          <!-- <FormItem label="下级经办人">
             <Input readonly v-model="firstModal.form.nextpeople"  placeholder="请输入"></Input>
-          </FormItem>
+          </FormItem> -->
         </Row>
       </Form>
        <div class="modal-footer" slot="footer">
@@ -451,7 +451,7 @@ export default {
           inventoryProject: "", //盘点项目
           inventoryNumber: "", //盘点数量
           remark: "", //备注
-          nextpeople: "", //下级经办人
+          // nextpeople: "", //下级经办人
           fileItems: [] //盘点凭证
         }
       },
@@ -562,7 +562,7 @@ export default {
           people: "", //经办人
           throughReject: 'yes',//通过或驳回
           opinion: "", //审核意见
-          nextpeople: "" //下级经办人
+          // nextpeople: "" //下级经办人
         }
       },
       // 复审
@@ -584,7 +584,7 @@ export default {
           opinion: "", //初审审核意见
           throughReject: 'yes',//通过或驳回
           reopinion:'', //复审审核意见
-          nextpeople: "" //下级经办人
+          // nextpeople: "" //下级经办人
         }
       },
       // 作废
@@ -848,7 +848,7 @@ export default {
       this.$API.inventoryRecordsDetail(id).then(res => {
         this.firstModal.form = res.data;
         this.firstModal.form.people = res.data.createdBy;
-        this.firstModal.form.nextpeople = res.data.createdBy;
+        // this.firstModal.form.nextpeople = res.data.createdBy;
         
       })
     },
