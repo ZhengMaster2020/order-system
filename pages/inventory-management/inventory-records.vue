@@ -33,6 +33,7 @@
             <Button type="primary" @click="invalidRecords">作废</Button>
           </Row>
         </Form>
+      </Row>
         <Tabs>
           <TabPane label="盘点记录" name>
             <Table border ref="selection" @on-selection-change="selection => { selectionChange(selection) }" :columns="recordationList.inventoryList" :data="recordationList.iventorydata">
@@ -57,7 +58,6 @@
             </Table>
           </TabPane>
         </Tabs>
-      </Row>
       <div style="margin:20px 0;overflow: hidden;padding: 2px">
         <div style="float:left">共 {{pageProps.count}} 条</div>
         <div style="float:right">

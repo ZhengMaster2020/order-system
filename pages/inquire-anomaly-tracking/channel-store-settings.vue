@@ -2,6 +2,7 @@
   <div>
     <Card>
       <!--      Form-->
+     <Row slot="title">
       <Form ref="searchForm" :model="searchForm" inline>
         <Row type="flex" justify="space-between">
           <Col>
@@ -38,7 +39,7 @@
           </Col>
         </Row>
       </Form>
-
+     </Row>
       <!--      Tabs-->
       <Tabs v-model="currentTab">
         <TabPane label="渠道/店铺" name="channelAndStore">

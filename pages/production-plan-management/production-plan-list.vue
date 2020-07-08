@@ -1,9 +1,11 @@
 <template>
   <div>
     <Card>
+     <Row slot="title">
       <!--      Form-->
       <Form ref="searchForm" :model="searchForm" inline>
-        <Row>
+       
+         <Row>
           <Input v-model="searchForm.createdBy" placeholder="申请人" class="width-120"/>
           <Input v-model="searchForm.planNumber" placeholder="计划编号" class="width-120"/>
           <Select v-model="searchForm.brand" clearable placeholder="品牌" class="width-120">
@@ -18,15 +20,15 @@
             <Option value="no">否</Option>
           </Select>
           <Button type="primary" @click="search">搜索</Button>
-        </Row>
-        <Row class="margin-top-10">
+         </Row>
+         <Row class="margin-top-10">
           <Button type="primary" @click="addPlan">添加计划</Button>
           <Button type="primary" @click="reviewPlan">审核</Button>
           <Button type="primary" @click="executePlan">执行计划</Button>
           <Button type="primary" @click="finishedPlan">执行完毕</Button>
-        </Row>
+         </Row>
       </Form>
-
+     </Row>
       <!--      Tabs-->
       <Tabs v-model="currentTab">
         <TabPane label="计划列表" name="planList">
