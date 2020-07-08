@@ -63,6 +63,7 @@
           <div class="foot-page">
             共{{prenatalBatch.pageProps.total}}条
             <Page transfer
+                  :current="prenatalBatch.pageProps.page"
                   :total="prenatalBatch.pageProps.total"
                   :page-size="prenatalBatch.pageProps.perPage"
                   size="small"
@@ -391,6 +392,7 @@
     methods: {
       // Form 操作
       search() {
+        this.prenatalBatch.pageProps.page = 1
         this.getProductionBatch('search')
       },
       // cancelProduction() {

@@ -55,6 +55,7 @@
           <div class="foot-page">
             共{{planList.pageProps.total}}条
             <Page transfer
+                  :current="planList.pageProps.page"
                   :total="planList.pageProps.total"
                   :page-size="planList.pageProps.perPage"
                   size="small"
@@ -522,6 +523,7 @@
     methods: {
       // Form 操作
       search() {
+        this.planList.pageProps.page = 1
         this.getPlanList()
       },
       delPlan(row) {

@@ -56,7 +56,9 @@
               <!-- @on-selection-change="(list) => { changeSelect(list, 'selectNewList') }" -->
             <div class="foot-page">
               共{{newPageProps.count}}条
-              <Page transfer
+              <Page
+                transfer
+                :current="newPageProps.page"
                 :total="newPageProps.count"
                 :page-size="newPageProps.perPage"
                 size="small"
@@ -78,6 +80,7 @@
             <div class="foot-page">
               共{{oldPageProps.count}}条
               <Page transfer
+                :current="oldPageProps.page"
                 :total="oldPageProps.count"
                 :page-size="oldPageProps.perPage"
                 size="small"
@@ -131,7 +134,9 @@
         </Form>
         <div class="foot-page">
           共{{exportListPageProps.count}}条
-          <Page transfer
+          <Page
+            transfer
+            :current="exportListPageProps.page"
             :total="exportListPageProps.count"
             :page-size="exportListPageProps.perPage"
             :page-size-opts="[5,10,15,20]"

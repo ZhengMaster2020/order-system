@@ -2,37 +2,24 @@
   <div>
     <Card>
       <Row slot="title">
-      <!--      Form-->
-      <Form ref="searchForm" :model="searchForm" inline>
         <Row type="flex" justify="space-between">
           <Col>
-            <FormItem>
-              <Input v-model="searchForm.createdBy" placeholder="创建人" class="width-120"/>
-            </FormItem>
-            <FormItem>
-              <Select clearable placeholder="状态" class="width-120" v-model="searchForm.status">
-                <Option value="enable">启用</Option>
-                <Option value="disable">停用</Option>
-              </Select>
-            </FormItem>
+            <Input v-model="searchForm.createdBy" placeholder="创建人" class="width-120"/>
+            <Select clearable placeholder="状态" class="width-120" v-model="searchForm.status">
+              <Option value="enable">启用</Option>
+              <Option value="disable">停用</Option>
+            </Select>
           </Col>
           <Col>
-            <FormItem>
-              <Button type="primary" @click="getList">搜索</Button>
-            </FormItem>
+            <Button type="primary" @click="getList('search')">搜索</Button>
           </Col>
         </Row>
-        <Row>
+        <Row class="margin-top-10">
           <Col>
-            <FormItem>
-              <Button type="primary" @click="addPlan">新增</Button>
-            </FormItem>
-            <FormItem>
-              <Button type="primary" @click="enAbleSetting">启用/停用</Button>
-            </FormItem>
+            <Button type="primary" @click="addPlan">新增</Button>
+            <Button type="primary" @click="enAbleSetting">启用/停用</Button>
           </Col>
         </Row>
-      </Form>
     </Row>
       <!--          Table-->
       <Table border
@@ -53,6 +40,7 @@
       <div class="foot-page">
         共{{pageProps.total}}条
         <Page transfer
+              :current="pageProps.page"
               :total="pageProps.total"
               :page-size="pageProps.perPage"
               size="small"
@@ -145,7 +133,11 @@
         this.getList();
       },
 
-      getList() {
+      getList(type) {
+        if (type === 'search') {
+          this.pageProps.page = 1;
+          this.pageProps.perPage = 10;
+        }
         this.tableLoading = true
         let params = {}
         for (let key in this.searchForm) {

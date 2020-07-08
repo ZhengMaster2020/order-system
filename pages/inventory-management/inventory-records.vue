@@ -2,37 +2,27 @@
   <div id="records">
     <Card>
       <Row slot="title">
-        <Form :model="iventoryform" inline>
-          <Row type="flex" justify="space-between">
-            <Col :xs="20">
-              <FormItem prop="inventoryObject">
-                <Input v-model="iventoryform.inventoryObject" clearable placeholder="盘点对象"></Input>
-              </FormItem>
-              <FormItem prop="inventoryTime">
-                <DatePicker
-                  type="month"
-                  v-model="iventoryform.inventoryTime"
-                  clearable
-                  placeholder="盘点年月"
-                ></DatePicker>
-              </FormItem>
-              <FormItem prop="inventoryProject">
-                <Input v-model="iventoryform.inventoryProject" clearable placeholder="盘点项目"></Input>
-              </FormItem>
-              <FormItem prop="createdBy">
-                <Input v-model="iventoryform.createdBy" clearable placeholder="盘点人"></Input>
-              </FormItem>
-            </Col>
-            <Button type="primary" @click="searchSubmit">搜索</Button>
-          </Row>
-          <Row>
-            <Button type="primary" @click="exportdata">导出数据</Button>
-            <Button type="primary" @click="addInventory">添加盘点</Button>
-            <Button type="primary" @click="firstTrail">初审</Button>
-            <Button type="primary" @click="reviewCheck">复审</Button>
-            <Button type="primary" @click="invalidRecords">作废</Button>
-          </Row>
-        </Form>
+        <Row type="flex" justify="space-between">
+          <Col :xs="20">
+            <Input v-model="iventoryform.inventoryObject" clearable placeholder="盘点对象"></Input>
+            <DatePicker
+              type="month"
+              v-model="iventoryform.inventoryTime"
+              clearable
+              placeholder="盘点年月"
+            ></DatePicker>
+            <Input v-model="iventoryform.inventoryProject" clearable placeholder="盘点项目"></Input>
+            <Input v-model="iventoryform.createdBy" clearable placeholder="盘点人"></Input>
+          </Col>
+          <Button type="primary" @click="searchSubmit">搜索</Button>
+        </Row>
+        <Row class="margin-top-10">
+          <Button type="primary" @click="exportdata">导出数据</Button>
+          <Button type="primary" @click="addInventory">添加盘点</Button>
+          <Button type="primary" @click="firstTrail">初审</Button>
+          <Button type="primary" @click="reviewCheck">复审</Button>
+          <Button type="primary" @click="invalidRecords">作废</Button>
+        </Row>
       </Row>
         <Tabs>
           <TabPane label="盘点记录" name>

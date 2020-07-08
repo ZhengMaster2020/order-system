@@ -100,6 +100,7 @@
           <div class="foot-page">
             共{{outboundList.pageProps.total}}条
             <Page transfer
+                  :current="outboundList.pageProps.page"
                   :total="outboundList.pageProps.total"
                   :page-size="outboundList.pageProps.perPage"
                   size="small"
@@ -125,6 +126,7 @@
             共{{outboundRecord.pageProps.total}}条
             <Page transfer
                   :total="outboundRecord.pageProps.total"
+                  :current="outboundRecord.pageProps.page"
                   :page-size="outboundRecord.pageProps.perPage"
                   size="small"
                   show-elevator

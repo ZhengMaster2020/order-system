@@ -2,43 +2,29 @@
   <div id="recycling">
     <Card>
       <Row slot="title">
-        <Form :model="iventoryform" inline>
-            <Row type="flex" justify="space-between">
-              <Col :xs="20">
-                <FormItem prop="recoveryOrderSn">
-                  <Input v-model="iventoryform.recoveryOrderSn" clearable placeholder="回收单号"></Input>
-                </FormItem>
-                 <FormItem prop="createdBy">
-                  <Input v-model="iventoryform.createdBy" clearable placeholder="回收记录人"></Input>
-                </FormItem>
-                <FormItem prop="createdTime">
-                  <Input v-model="iventoryform.createdTime" clearable placeholder="记录时间"></Input>
-                </FormItem>
-                <FormItem prop="supplier">
-                  <Input v-model="iventoryform.supplier" clearable placeholder="供应商"></Input>
-                </FormItem>
-                <FormItem prop="recoveryStatus">
-                  <Select clearable v-model="iventoryform.recoveryStatus" placeholder="状态">
-                      <Option v-for="item in statuList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                  </Select>
-                </FormItem>
-                <FormItem prop="outboundOrderSn">
-                  <Input v-model="iventoryform.outboundOrderSn" clearable placeholder="出库单号"></Input>
-                </FormItem>
-              </Col>
-              <Button type="primary" @click="searchedSubmit">搜索</Button>
-            </Row>
-            <Row>
-              <Col>
-                <Button type="primary" @click="exportSubmit">导出数据</Button>
-                <Button type="primary" @click="addRecycling">添加回收</Button>
-                <Button type="primary" @click="firstSubmit">初审</Button>
-                <Button type="primary" @click="reviewSubmit">复审</Button>
-                <Button type="primary" @click="recoverySubmit">回收入库</Button>
-                <Button type="primary" @click="invalidSubmit">作废</Button>
-              </Col>
-            </Row>
-        </Form>
+          <Row type="flex" justify="space-between">
+            <Col :xs="20">
+              <Input v-model="iventoryform.recoveryOrderSn" clearable placeholder="回收单号"></Input>
+              <Input v-model="iventoryform.createdBy" clearable placeholder="回收记录人"></Input>
+              <Input v-model="iventoryform.createdTime" clearable placeholder="记录时间"></Input>
+              <Input v-model="iventoryform.supplier" clearable placeholder="供应商"></Input>
+              <Select clearable v-model="iventoryform.recoveryStatus" placeholder="状态">
+                  <Option v-for="item in statuList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
+              <Input v-model="iventoryform.outboundOrderSn" clearable placeholder="出库单号"></Input>
+            </Col>
+            <Button type="primary" @click="searchedSubmit">搜索</Button>
+          </Row>
+          <Row class="margin-top-10">
+            <Col>
+              <Button type="primary" @click="exportSubmit">导出数据</Button>
+              <Button type="primary" @click="addRecycling">添加回收</Button>
+              <Button type="primary" @click="firstSubmit">初审</Button>
+              <Button type="primary" @click="reviewSubmit">复审</Button>
+              <Button type="primary" @click="recoverySubmit">回收入库</Button>
+              <Button type="primary" @click="invalidSubmit">作废</Button>
+            </Col>
+          </Row>
       </Row>
         <Tabs>
            <TabPane label="损耗记录" name>

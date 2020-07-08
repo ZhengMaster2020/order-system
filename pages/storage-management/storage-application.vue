@@ -90,6 +90,7 @@
           <div class="foot-page">
             共{{applicationPageProps.total}}条
             <Page transfer
+                  :current="applicationPageProps.page"
                   :total="applicationPageProps.total"
                   :page-size="applicationPageProps.perPage"
                   size="small"
@@ -108,6 +109,7 @@
           <div class="foot-page">
             共{{recordPageProps.total}}条
             <Page transfer
+                  :current="recordPageProps.page"
                   :total="recordPageProps.total"
                   :page-size="recordPageProps.perPage"
                   size="small"

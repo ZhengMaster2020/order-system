@@ -2,44 +2,30 @@
   <div id="destruction">
     <Card>
       <Row slot="title">
-        <Form :model="iventoryform" inline>
-            <Row type="flex" justify="space-between">
-              <Col :xs="20">
-                <FormItem prop="lossOrderSn">
-                  <Input v-model="iventoryform.lossOrderSn" clearable placeholder="请输入损失单号"></Input>
-                </FormItem>
-                 <FormItem prop="createdBy">
-                  <Input v-model="iventoryform.createdBy" clearable placeholder="请输入损耗记录人"></Input>
-                </FormItem>
-                <FormItem prop="createdTime">
-                  <DatePicker v-model="iventoryform.createdTime" clearable type="date" placeholder="请选择记录时间"></DatePicker>
-                </FormItem>
-                <FormItem prop="supplier">
-                  <Input v-model="iventoryform.supplier" clearable placeholder="请输入供应商"></Input>
-                </FormItem>
-                <FormItem prop="destructionStatus">
-                  <Select clearable v-model="iventoryform.destructionStatus" placeholder="状态">
-                      <Option v-for="item in statuList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                  </Select>
-                </FormItem>
-                <FormItem prop="outboundOrderSn">
-                  <Input v-model="iventoryform.outboundOrderSn" clearable placeholder="出库单号"></Input>
-                </FormItem>
-              </Col>
-              <Button type="primary" @click="searchedSubmit">搜索</Button>
-            </Row>
-            <Row>
-              <Col>
-                <Button type="primary" @click="exportSubmit">导出数据</Button>
-                <Button type="primary" @click="addDesturction">添加损耗</Button>
-                <Button type="primary" @click="firstSubmit">初审</Button>
-                <Button type="primary" @click="reviewSubmit">复审</Button>
-                <Button type="primary" @click="cancelSubmit">核销处理</Button>
-                <Button type="primary" @click="reissueSubmit">灌包补发申请</Button>
-                <Button type="primary" @click="invalidSubmit">作废</Button>
-              </Col>
-            </Row>
-        </Form>
+        <Row type="flex" justify="space-between">
+          <Col :xs="20">
+            <Input v-model="iventoryform.lossOrderSn" clearable placeholder="请输入损失单号"></Input>
+            <Input v-model="iventoryform.createdBy" clearable placeholder="请输入损耗记录人"></Input>
+            <DatePicker v-model="iventoryform.createdTime" clearable type="date" placeholder="请选择记录时间"></DatePicker>
+            <Input v-model="iventoryform.supplier" clearable placeholder="请输入供应商"></Input>
+            <Select clearable v-model="iventoryform.destructionStatus" placeholder="状态">
+                <Option v-for="item in statuList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
+            <Input v-model="iventoryform.outboundOrderSn" clearable placeholder="出库单号"></Input>
+          </Col>
+          <Button type="primary" @click="searchedSubmit">搜索</Button>
+        </Row>
+        <Row class="margin-top-10">
+          <Col>
+            <Button type="primary" @click="exportSubmit">导出数据</Button>
+            <Button type="primary" @click="addDesturction">添加损耗</Button>
+            <Button type="primary" @click="firstSubmit">初审</Button>
+            <Button type="primary" @click="reviewSubmit">复审</Button>
+            <Button type="primary" @click="cancelSubmit">核销处理</Button>
+            <Button type="primary" @click="reissueSubmit">灌包补发申请</Button>
+            <Button type="primary" @click="invalidSubmit">作废</Button>
+          </Col>
+        </Row>
       </Row>
         <Tabs>
            <TabPane label="损耗记录" name>
