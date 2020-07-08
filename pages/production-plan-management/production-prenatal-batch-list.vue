@@ -1,26 +1,45 @@
 <template>
   <div>
     <Card>
+     <Row slot="title">
       <!--      Form-->
       <Form ref="searchForm" :model="searchForm" inline>
-        <Row>
-          <Input v-model="searchForm.createdBy" placeholder="创建人" class="width-120"/>
-          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="创建时间" class="width-120" @on-change="dateChange"/>
-          <Input v-model="searchForm.planNumber" placeholder="下单编号" class="width-120"/>
+        <Row type="flex">
+          <Col>
+            <Input v-model="searchForm.createdBy" placeholder="创建人" class="width-120"/>
+          </Col>
+          <Col>
+            <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="创建时间"   @on-change="dateChange"/>
+          </Col>
+          <Col>
+            <Input v-model="searchForm.planNumber" placeholder="下单编号" class="width-120" />
+          </Col>
+          <Col>
           <Input v-model="searchForm.batchNumber" placeholder="生产批次号" class="width-120"/>
+          </Col>
+          <Col>
             <Select v-model="searchForm.brand" clearable placeholder="品牌" class="width-120">
               <Option v-for="brand in brandList" :key="brand.label" :value="brand.label">{{brand.value}}</Option>
             </Select>
-          <Input v-model="searchForm.planName" placeholder="所属计划名称" class="width-120"/>
-          <Input v-model="searchForm.supplier" placeholder="生成供应商" class="width-120"/>
-          <Select clearable placeholder="是否导出" style="width: 100px" v-model="searchForm.processStatus">
-            <Option value="notExported">未导出</Option>
-            <Option value="exported">已导出</Option>
-          </Select>
-          <Select clearable placeholder="是否撤销" style="width: 100px" v-model="searchForm.produceStatus">
-            <Option value="unrevoked">未撤销</Option>
-            <Option value="revoked">已撤销</Option>
-          </Select>
+          </Col>
+          <Col>
+            <Input v-model="searchForm.planName" placeholder="所属计划名称" class="width-120"/>
+          </Col>
+          <Col>
+            <Input v-model="searchForm.supplier" placeholder="生成供应商" class="width-120"/>
+          </Col>
+          <Col>
+            <Select clearable placeholder="是否导出" style="width: 100px" v-model="searchForm.processStatus">
+              <Option value="notExported">未导出</Option>
+              <Option value="exported">已导出</Option>
+            </Select>
+          </Col>
+          <Col>
+            <Select clearable placeholder="是否撤销" style="width: 100px" v-model="searchForm.produceStatus">
+              <Option value="unrevoked">未撤销</Option>
+              <Option value="revoked">已撤销</Option>
+            </Select>
+          </Col>
           <Button type="primary" @click="search">搜索</Button>
         </Row>
         <Row class="margin-top-10">
@@ -28,7 +47,7 @@
           <!-- <Button type="primary" @click="cancelProduction">撤销生产</Button>-->
         </Row>
       </Form>
-
+     </Row>
       <!--      Tabs-->
       <Tabs v-model="currentTab">
         <TabPane label="生产批次列表" name="prenatalBatch">

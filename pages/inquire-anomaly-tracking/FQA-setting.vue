@@ -1,6 +1,7 @@
 <template>
   <div>
     <Card>
+      <Row slot="title">
       <!--      Form-->
       <Form ref="searchForm" :model="searchForm" inline>
         <Row type="flex" justify="space-between">
@@ -32,7 +33,7 @@
           </Col>
         </Row>
       </Form>
-
+    </Row>
       <!--          Table-->
       <Table border
              :columns="columns"
