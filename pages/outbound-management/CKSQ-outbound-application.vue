@@ -205,7 +205,7 @@
           <span class="line"></span>
         </div>
         <FormItem label="经办人">
-          <Input class="width-170" v-model="detailData.createdBy" readonly/>
+          <Input class="width-170" v-model="detailData.people" readonly/>
         </FormItem>
         <FormItem label="审核" prop="isPass" v-show="reviewModal.title === '出库单审核'">
           <RadioGroup v-model="reviewModal.form.isPass" class="width-120">
@@ -483,7 +483,7 @@
           <span class="line"></span>
         </div>
         <FormItem label="经办人">
-          <Input class="width-170" v-model="detailData.handleBy" readonly/>
+          <Input class="width-170" v-model="detailData.people" readonly/>
         </FormItem>
         <FormItem label="已实际出库数量">
           <Input class="width-170" v-model="detailData.confirmedNumber" readonly/>
@@ -1168,6 +1168,8 @@
           }
           this.detailData.lossSn = this.detailData.lossSn ? this.detailData.lossSn : '-'
           this.detailData.reissueType = this.switchReiusseType(this.detailData.reissueType)
+          let userInfo = JSON.parse(window.localStorage.getItem('userInfo'));
+          this.detailData.people = userInfo ? userInfo.realName : ''
         }).then(() => {
           this.$API.getGBOrderSnNum({ gbOrderSn: this.detailData.gbOrderSn }).then(res => {
             if (res.code !== 0) return

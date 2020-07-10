@@ -837,7 +837,7 @@ export default {
       // 详情
       this.$API.inventoryRecordsDetail(id).then(res => {
         this.firstModal.form = res.data;
-        this.firstModal.form.people = res.data.createdBy;
+        this.firstModal.form.people = this.userInfo.realName;
         // this.firstModal.form.nextpeople = res.data.createdBy;
         
       })
@@ -875,7 +875,7 @@ export default {
        // 详情
       this.$API.inventoryRecordsDetail(id).then(res => {
         this.reviewModal.form = res.data;
-        this.reviewModal.form.people = res.data.auditPendingLog.createdBy;
+        this.reviewModal.form.people = this.userInfo.realName;
         this.reviewModal.form.firstReviewdate = res.data.createdAt;
         this.reviewModal.form.opinion = res.data.auditPendingLog.ext.opinion;
       })

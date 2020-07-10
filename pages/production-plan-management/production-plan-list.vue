@@ -119,7 +119,7 @@
           <span class="line"></span>
         </div>
         <FormItem label="经办人">
-          <Input class="width-180" v-model="reviewModal.reivewer" readonly/>
+          <Input class="width-180" v-model="userInfo.realName" readonly/>
         </FormItem>
         <FormItem label="审核" prop="planStatus">
           <RadioGroup v-model="reviewModal.form.planStatus" class="width-120">
@@ -260,7 +260,7 @@
           <span class="line"></span>
         </div>
         <FormItem label="经办人">
-          <Input class="width-180" v-model="statusDetailModal.form.managerReview.createdBy" readonly/>
+          <Input class="width-180" v-model="userInfo.realName" readonly/>
         </FormItem>
         <FormItem label="审核">
           <Input class="width-180" v-model="statusDetailModal.form.managerReview.planStatus" readonly/>

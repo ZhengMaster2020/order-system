@@ -1009,7 +1009,7 @@ export default {
           this.reviewModal.form = res.data;
           this.reviewModal.form.has_outbound_apply = res.data.has_outbound_apply === 'yes'?'是':res.data.has_outbound_apply === 'no'?'否':'';
           this.reviewModal.form.mark_type = res.data.mark_type === 'J'?'卷标':res.data.mark_type === 'P'?'平标':'';
-          this.reviewModal.form.people = res.data.auditPendingLog.createdBy;
+          this.reviewModal.form.people = this.userInfo.realName;
           this.reviewModal.form.createdAt = this.formatDays(res.data.auditPendingLog.createdAt);
           this.reviewModal.form.created_at = this.formatDays(this.reviewModal.form.created_at);
           this.reviewModal.form.firstopinion = res.data.auditPendingLog.ext.opinion;
