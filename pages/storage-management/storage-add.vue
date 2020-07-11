@@ -9,7 +9,7 @@
         <Row>
           <Col span="4">
             <FormItem label="申请人" style="width: 100%">
-              <Input v-model="applicant" readonly/>
+              <Input v-model="form.created_by" readonly/>
             </FormItem>
           </Col>
           <Col span="4">
@@ -279,10 +279,10 @@
       getDetail(id) {
         this.spinShow = true
         this.$API.getStorageDetail(id).then(res => {
-          // console.log(res)
             if(res.code !== 0) return
               let data = res.data
               this.form =  {
+                created_by: data.created_by,
                 supplierOrderNumber: data.supplier_order_number,
                 mkCode: data.mk_code,
                 expectedQuantity: data.expected_quantity,
