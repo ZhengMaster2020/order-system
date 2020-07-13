@@ -1,44 +1,30 @@
 <template>
   <div>
     <Card>
-      <!--      Form-->
-      <Form ref="searchForm" :model="searchForm" inline>
-        <Row type="flex" justify="space-between">
-          <Col>
-            <FormItem>
-              <Select clearable filterable placeholder="请选择渠道" class="width-120" v-model="searchForm.channelId">
-                <Option v-for="channel in channelList" :value="channel.id" :key="channel.id">{{channel.channel}}
-                </Option>
-              </Select>
-            </FormItem>
-            <FormItem>
-              <Input clearable placeholder="请输入店铺名称" class="width-120" v-model="searchForm.shop"/>
-            </FormItem>
-            <FormItem>
-              <Select clearable placeholder="是否显示" class="width-120" v-model="searchForm.isShow">
-                <Option value="yes">是</Option>
-                <Option value="no">否</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col>
-            <FormItem>
-              <Button type="primary" @click="getList">搜索</Button>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <FormItem>
-              <Button type="primary" @click="linkTo('channel')">添加渠道</Button>
-            </FormItem>
-            <FormItem>
-              <Button type="primary" @click="linkTo('store')">添加店铺</Button>
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-
+     <Row slot="title">
+      <Row type="flex" justify="space-between">
+        <Col>
+          <Select clearable filterable placeholder="请选择渠道" class="width-120" v-model="searchForm.channelId">
+            <Option v-for="channel in channelList" :value="channel.id" :key="channel.id">{{channel.channel}}
+            </Option>
+          </Select>
+          <Input clearable placeholder="请输入店铺名称" class="width-120" v-model="searchForm.shop"/>
+          <Select clearable placeholder="是否显示" class="width-120" v-model="searchForm.isShow">
+            <Option value="yes">是</Option>
+            <Option value="no">否</Option>
+          </Select>
+        </Col>
+        <Col>
+          <Button type="primary" @click="getList('search')">搜索</Button>
+        </Col>
+      </Row>
+      <Row class="margin-top-10">
+        <Col>
+          <Button type="primary" @click="linkTo('channel')">添加渠道</Button>
+          <Button type="primary" @click="linkTo('store')">添加店铺</Button>
+        </Col>
+      </Row>
+     </Row>
       <!--      Tabs-->
       <Tabs v-model="currentTab">
         <TabPane label="渠道/店铺" name="channelAndStore">
@@ -58,6 +44,7 @@
           <div class="foot-page">
             共{{channelAndStore.pageProps.total}}条
             <Page transfer
+                  :current="channelAndStore.pageProps.page"
                   :total="channelAndStore.pageProps.total"
                   :page-size="channelAndStore.pageProps.perPage"
                   size="small"
@@ -158,7 +145,11 @@
         this.getList();
       },
 
-      getList() {
+      getList(type) {
+        if (type === 'search') {
+          this.pageProps.page = 1;
+          this.pageProps.perPage = 10;
+        }
         let currentTab = this.currentTab
         let params = {}
         for (let key in this.searchForm) {

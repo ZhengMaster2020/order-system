@@ -1,31 +1,32 @@
 <template>
   <div>
     <Card>
+     <Row slot="title">
       <!--      Form-->
       <Form v-show="currentTab === 'application'" inline>
-        <Row>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+        <Row type="flex">
+          <Col>
             <Input placeholder="入库单号" v-model="searchForm[currentTab].storageNumber" clearable></Input>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input placeholder="下单编号" v-model="searchForm[currentTab].supplierOrderNumber" clearable></Input>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input placeholder="生成供应商" v-model="searchForm[currentTab].supplier" clearable></Input>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input placeholder="申请人" v-model="searchForm[currentTab].createdBy" clearable></Input>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
 <!--            <Input placeholder="申请状态" v-model="searchForm[currentTab].applyStatus" clearable></Input>-->
             <Select placeholder="申请状态" v-model="searchForm[currentTab].applyStatus" clearable>
               <Option v-for="(status, index) in applyStatusList" :key="index" :value="status.value" :label="status.label"/>
             </Select>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input placeholder="慕可代码" v-model="searchForm[currentTab].mkCode" clearable></Input>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input placeholder="包材名称" v-model="searchForm[currentTab].packing" clearable></Input>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="2">
@@ -44,26 +45,26 @@
         </Row>
       </Form>
       <Form v-show="currentTab === 'record'" inline>
-        <Row>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+        <Row type="flex">
+          <Col>
             <Input placeholder="生产批次号" v-model="searchForm[currentTab].batchNumber" clearable></Input>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input placeholder="入库记录员" v-model="searchForm[currentTab].createdBy" clearable></Input>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <DatePicker  v-model="storageDate" clearable type="date" placeholder="入库时间" @on-change="dateChange"/>
           </Col>
 
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input placeholder="入库单号" v-model="searchForm[currentTab].storageNumber" clearable></Input>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Select placeholder="入库类型" v-model="searchForm[currentTab].storageType" clearable>
               <Option v-for="(type, index) in storageType" :key="index" :value="type.value" :label="type.label"/>
             </Select>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input placeholder="下单编号" v-model="searchForm[currentTab].supplierOrderNumber" clearable></Input>
           </Col>
           <Col :xs="24" :sm="12" :md="6" :lg="2">
@@ -79,7 +80,7 @@
           </Col>
         </Row>
       </Form>
-
+     </Row>
       <!--      Tabs-->
       <Tabs v-model="currentTab">
         <TabPane label="入库申请单" name="application">
@@ -89,6 +90,7 @@
           <div class="foot-page">
             共{{applicationPageProps.total}}条
             <Page transfer
+                  :current="applicationPageProps.page"
                   :total="applicationPageProps.total"
                   :page-size="applicationPageProps.perPage"
                   size="small"
@@ -107,6 +109,7 @@
           <div class="foot-page">
             共{{recordPageProps.total}}条
             <Page transfer
+                  :current="recordPageProps.page"
                   :total="recordPageProps.total"
                   :page-size="recordPageProps.perPage"
                   size="small"

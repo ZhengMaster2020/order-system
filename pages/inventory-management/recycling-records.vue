@@ -2,43 +2,30 @@
   <div id="recycling">
     <Card>
       <Row slot="title">
-        <Form :model="iventoryform" inline>
-            <Row type="flex" justify="space-between">
-              <Col :xs="20">
-                <FormItem prop="recoveryOrderSn">
-                  <Input v-model="iventoryform.recoveryOrderSn" clearable placeholder="回收单号"></Input>
-                </FormItem>
-                 <FormItem prop="createdBy">
-                  <Input v-model="iventoryform.createdBy" clearable placeholder="回收记录人"></Input>
-                </FormItem>
-                <FormItem prop="createdTime">
-                  <Input v-model="iventoryform.createdTime" clearable placeholder="记录时间"></Input>
-                </FormItem>
-                <FormItem prop="supplier">
-                  <Input v-model="iventoryform.supplier" clearable placeholder="供应商"></Input>
-                </FormItem>
-                <FormItem prop="recoveryStatus">
-                  <Select clearable v-model="iventoryform.recoveryStatus" placeholder="状态">
-                      <Option v-for="item in statuList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                  </Select>
-                </FormItem>
-                <FormItem prop="outboundOrderSn">
-                  <Input v-model="iventoryform.outboundOrderSn" clearable placeholder="出库单号"></Input>
-                </FormItem>
-              </Col>
-              <Button type="primary" @click="searchedSubmit">搜索</Button>
-            </Row>
-            <Row>
-              <Col>
-                <Button type="primary" @click="exportSubmit">导出数据</Button>
-                <Button type="primary" @click="addRecycling">添加回收</Button>
-                <Button type="primary" @click="firstSubmit">初审</Button>
-                <Button type="primary" @click="reviewSubmit">复审</Button>
-                <Button type="primary" @click="recoverySubmit">回收入库</Button>
-                <Button type="primary" @click="invalidSubmit">作废</Button>
-              </Col>
-            </Row>
-        </Form>
+          <Row type="flex" justify="space-between">
+            <Col :xs="20">
+              <Input v-model="iventoryform.recoveryOrderSn" clearable placeholder="回收单号"></Input>
+              <Input v-model="iventoryform.createdBy" clearable placeholder="回收记录人"></Input>
+              <Input v-model="iventoryform.createdTime" clearable placeholder="记录时间"></Input>
+              <Input v-model="iventoryform.supplier" clearable placeholder="供应商"></Input>
+              <Select clearable v-model="iventoryform.recoveryStatus" placeholder="状态">
+                  <Option v-for="item in statuList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
+              <Input v-model="iventoryform.outboundOrderSn" clearable placeholder="出库单号"></Input>
+            </Col>
+            <Button type="primary" @click="searchedSubmit">搜索</Button>
+          </Row>
+          <Row class="margin-top-10">
+            <Col>
+              <Button type="primary" @click="exportSubmit">导出数据</Button>
+              <Button type="primary" @click="addRecycling">添加回收</Button>
+              <Button type="primary" @click="firstSubmit">初审</Button>
+              <Button type="primary" @click="reviewSubmit">复审</Button>
+              <Button type="primary" @click="recoverySubmit">回收入库</Button>
+              <Button type="primary" @click="invalidSubmit">作废</Button>
+            </Col>
+          </Row>
+      </Row>
         <Tabs>
            <TabPane label="损耗记录" name>
               <Table border ref="selection" 
@@ -70,7 +57,6 @@
               </Table>
            </TabPane>
         </Tabs>
-      </Row>
        <div style="margin:20px 0;overflow: hidden;padding: 2px">
         <div style="float:left">共 {{pageProps.count}} 条</div>
         <div style="float:right">
@@ -108,9 +94,9 @@
               <FormItem label="请输入回收数量" prop="recoveryNumber">
                  <Input number v-model="addform.form.recoveryNumber" placeholder="请输入"></Input>
               </FormItem>
-              <FormItem label="下级经办人" prop="nextpeople">
+              <!-- <FormItem label="下级经办人" prop="nextpeople">
                  <Input v-model="addform.form.nextpeople" placeholder="请输入"></Input>
-              </FormItem>
+              </FormItem> -->
             </Col>
           </Row>
           <!-- 当是否有出库单选择是的时候 -->
@@ -305,9 +291,9 @@
               placeholder="请输入"
             ></Input>
           </FormItem>
-          <FormItem label="下级经办人" prop="nextpeople">
+          <!-- <FormItem label="下级经办人" prop="nextpeople">
             <Input v-model="firstModal.form.nextpeople"  placeholder="请输入"></Input>
-          </FormItem>
+          </FormItem> -->
         </Row>
       </Form>
       <div class="modal-footer" slot="footer">
@@ -415,9 +401,9 @@
               placeholder="请输入"
             ></Input>
           </FormItem>
-          <FormItem label="下级经办人">
+          <!-- <FormItem label="下级经办人">
             <Input   placeholder="请输入"></Input>
-          </FormItem>
+          </FormItem> -->
         </Row>
       </Form>
        <div class="modal-footer" slot="footer">
@@ -603,7 +589,7 @@ export default {
            createdBy:'', //损耗记录人
            hasOutboundApply:'', //是否有出库单
            recoveryNumber:'', //回收数量
-           nextpeople:'', //下级经办人
+          //  nextpeople:'', //下级经办人
            brand:'', //品牌
            supplier:'', //OEM供应商
            markType:'', //标类型
@@ -657,7 +643,7 @@ export default {
           recovery_reason:'', //回收原因
           recoveryFileItems:[], //回收凭证
           people:'', //经办人
-          nextpeople:'', //下级经办人
+          // nextpeople:'', //下级经办人
           isPass:'', //是否通过
           opinion:'', //审核意见
         }
@@ -1023,7 +1009,7 @@ export default {
           this.reviewModal.form = res.data;
           this.reviewModal.form.has_outbound_apply = res.data.has_outbound_apply === 'yes'?'是':res.data.has_outbound_apply === 'no'?'否':'';
           this.reviewModal.form.mark_type = res.data.mark_type === 'J'?'卷标':res.data.mark_type === 'P'?'平标':'';
-          this.reviewModal.form.people = res.data.auditPendingLog.createdBy;
+          this.reviewModal.form.people = this.userInfo.realName;
           this.reviewModal.form.createdAt = this.formatDays(res.data.auditPendingLog.createdAt);
           this.reviewModal.form.created_at = this.formatDays(this.reviewModal.form.created_at);
           this.reviewModal.form.firstopinion = res.data.auditPendingLog.ext.opinion;

@@ -1,8 +1,7 @@
 /* 渠道店铺设置 */
-import ENV from './env'
 import fetch from './fetch'
-
-let baseURL = ENV ==='production' ?  '//api.fandow.com/' : '//kongtest.fandow.com/'
+import {SKIP_ACCESS_URL} from './config'
+let baseURL = SKIP_ACCESS_URL;
 
 // 列表
 const getChannelStorelist = (params) => {
@@ -36,9 +35,8 @@ const addChannelLists = ({data}) => {
 // 渠道 详情
 const getChannelListsDetail = ({id}) => {
   return fetch({
-    url: `channelStore/channel/${id}`,
+    url: `traceability/channelStore/channel/${id}`,
     method: 'GET',
-    baseURL
   })
 }
 

@@ -412,15 +412,6 @@ const inventoryRecordsExport = params => {
     responseType:'blob'
   })
 }
-// 盘点管理-盘点记录-盘点对象模糊搜索
-const inventoryRecordsSearch = params => {
-  return fetch({
-    url:'/v1/search/search-supplier',
-    method:'GET',
-    baseURL: ENV === 'production' ?  'http://apisupply.fandow.com' : 'http://apisupplytest.fandow.com',
-    params:params
-  })
-}
 
 // 盘点管理-销毁记录-列表数据
 const inventoryConsumptionList = params => {
@@ -567,7 +558,6 @@ export default {
   inventoryRecordsDetail,
   inventoryRecordsInvalid,
   inventoryRecordsAudit,
-  inventoryRecordsSearch,
   // 盘点管理-销毁记录
   inventoryConsumptionList,
   inventoryConsumptionAdd,
