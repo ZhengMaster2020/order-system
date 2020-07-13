@@ -2,37 +2,28 @@
   <div id="records">
     <Card>
       <Row slot="title">
-        <Form :model="iventoryform" inline>
-          <Row type="flex" justify="space-between">
-            <Col :xs="20">
-              <FormItem prop="inventoryObject">
-                <Input v-model="iventoryform.inventoryObject" clearable placeholder="盘点对象"></Input>
-              </FormItem>
-              <FormItem prop="inventoryTime">
-                <DatePicker
-                  type="month"
-                  v-model="iventoryform.inventoryTime"
-                  clearable
-                  placeholder="盘点年月"
-                ></DatePicker>
-              </FormItem>
-              <FormItem prop="inventoryProject">
-                <Input v-model="iventoryform.inventoryProject" clearable placeholder="盘点项目"></Input>
-              </FormItem>
-              <FormItem prop="createdBy">
-                <Input v-model="iventoryform.createdBy" clearable placeholder="盘点人"></Input>
-              </FormItem>
-            </Col>
-            <Button type="primary" @click="searchSubmit">搜索</Button>
-          </Row>
-          <Row>
-            <Button type="primary" @click="exportdata">导出数据</Button>
-            <Button type="primary" @click="addInventory">添加盘点</Button>
-            <Button type="primary" @click="firstTrail">初审</Button>
-            <Button type="primary" @click="reviewCheck">复审</Button>
-            <Button type="primary" @click="invalidRecords">作废</Button>
-          </Row>
-        </Form>
+        <Row type="flex" justify="space-between">
+          <Col :xs="20">
+            <Input v-model="iventoryform.inventoryObject" clearable placeholder="盘点对象"></Input>
+            <DatePicker
+              type="month"
+              v-model="iventoryform.inventoryTime"
+              clearable
+              placeholder="盘点年月"
+            ></DatePicker>
+            <Input v-model="iventoryform.inventoryProject" clearable placeholder="盘点项目"></Input>
+            <Input v-model="iventoryform.createdBy" clearable placeholder="盘点人"></Input>
+          </Col>
+          <Button type="primary" @click="searchSubmit">搜索</Button>
+        </Row>
+        <Row class="margin-top-10">
+          <Button type="primary" @click="exportdata">导出数据</Button>
+          <Button type="primary" @click="addInventory">添加盘点</Button>
+          <Button type="primary" @click="firstTrail">初审</Button>
+          <Button type="primary" @click="reviewCheck">复审</Button>
+          <Button type="primary" @click="invalidRecords">作废</Button>
+        </Row>
+      </Row>
         <Tabs>
           <TabPane label="盘点记录" name>
             <Table border ref="selection" @on-selection-change="selection => { selectionChange(selection) }" :columns="recordationList.inventoryList" :data="recordationList.iventorydata">
@@ -57,7 +48,6 @@
             </Table>
           </TabPane>
         </Tabs>
-      </Row>
       <div style="margin:20px 0;overflow: hidden;padding: 2px">
         <div style="float:left">共 {{pageProps.count}} 条</div>
         <div style="float:right">
@@ -159,9 +149,9 @@
               </FormItem>
             </Col>
             <Col :xs="4">
-              <FormItem label="下级经办人" prop="nextpeople">
+              <!-- <FormItem label="下级经办人" prop="nextpeople">
                 <Input v-model="addform.form.nextpeople" clearable placeholder="下级经办人"></Input>
-              </FormItem>
+              </FormItem> -->
             </Col>
           </Row>
           <Row style="padding:0 11px">
@@ -274,9 +264,9 @@
               placeholder="请输入"
             ></Input>
           </FormItem>
-          <FormItem label="下级经办人">
+          <!-- <FormItem label="下级经办人">
             <Input readonly v-model="firstModal.form.nextpeople"  placeholder="请输入"></Input>
-          </FormItem>
+          </FormItem> -->
         </Row>
       </Form>
        <div class="modal-footer" slot="footer">
@@ -451,7 +441,7 @@ export default {
           inventoryProject: "", //盘点项目
           inventoryNumber: "", //盘点数量
           remark: "", //备注
-          nextpeople: "", //下级经办人
+          // nextpeople: "", //下级经办人
           fileItems: [] //盘点凭证
         }
       },
@@ -562,7 +552,7 @@ export default {
           people: "", //经办人
           throughReject: 'yes',//通过或驳回
           opinion: "", //审核意见
-          nextpeople: "" //下级经办人
+          // nextpeople: "" //下级经办人
         }
       },
       // 复审
@@ -584,7 +574,7 @@ export default {
           opinion: "", //初审审核意见
           throughReject: 'yes',//通过或驳回
           reopinion:'', //复审审核意见
-          nextpeople: "" //下级经办人
+          // nextpeople: "" //下级经办人
         }
       },
       // 作废
@@ -847,8 +837,8 @@ export default {
       // 详情
       this.$API.inventoryRecordsDetail(id).then(res => {
         this.firstModal.form = res.data;
-        this.firstModal.form.people = res.data.createdBy;
-        this.firstModal.form.nextpeople = res.data.createdBy;
+        this.firstModal.form.people = this.userInfo.realName;
+        // this.firstModal.form.nextpeople = res.data.createdBy;
         
       })
     },
@@ -885,7 +875,7 @@ export default {
        // 详情
       this.$API.inventoryRecordsDetail(id).then(res => {
         this.reviewModal.form = res.data;
-        this.reviewModal.form.people = res.data.auditPendingLog.createdBy;
+        this.reviewModal.form.people = this.userInfo.realName;
         this.reviewModal.form.firstReviewdate = res.data.createdAt;
         this.reviewModal.form.opinion = res.data.auditPendingLog.ext.opinion;
       })

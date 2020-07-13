@@ -98,8 +98,8 @@
           generationCount: 1,
           year: '',
           planName: '',
-          nextId: '',
-          nextBy: '李时达',
+          // nextId: '',
+          // nextBy: '李时达',
           remark: '',
           fileItems: [],
           brand: '',
@@ -210,16 +210,16 @@
           })
         }
       },
-      // 获取下级经办人
-      getNextByUser() {
-        // 先默认 李时达
-        this.$API.searchUSers({name: this.form.nextBy}).then(res => {
-          if (res.code === 0) {
-            this.form.nextId = res.data.list.filter(users => users.realName === this.form.nextBy)[0].id
-          }
-        }).finally(() => {
-        })
-      },
+      // // 获取下级经办人
+      // getNextByUser() {
+      //   // 先默认 李时达
+      //   this.$API.searchUSers({name: this.form.nextBy}).then(res => {
+      //     if (res.code === 0) {
+      //       this.form.nextId = res.data.list.filter(users => users.realName === this.form.nextBy)[0].id
+      //     }
+      //   }).finally(() => {
+      //   })
+      // },
       // 获取计划详情
       getProductionPlanDetail(id) {
         this.spinShow = true
@@ -244,7 +244,7 @@
       let userInfo = JSON.parse(window.localStorage.getItem('userInfo'))
       this.id = this.$route.query.id
       this.applicant = userInfo.realName
-      this.getNextByUser()
+      // this.getNextByUser()
       this.getLastFiveYear()
       if (this.id) {
         this.getProductionPlanDetail(this.id)

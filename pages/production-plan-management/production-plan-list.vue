@@ -1,9 +1,11 @@
 <template>
   <div>
     <Card>
+     <Row slot="title">
       <!--      Form-->
       <Form ref="searchForm" :model="searchForm" inline>
-        <Row>
+       
+         <Row>
           <Input v-model="searchForm.createdBy" placeholder="申请人" class="width-120"/>
           <Input v-model="searchForm.planNumber" placeholder="计划编号" class="width-120"/>
           <Select v-model="searchForm.brand" clearable placeholder="品牌" class="width-120">
@@ -18,15 +20,15 @@
             <Option value="no">否</Option>
           </Select>
           <Button type="primary" @click="search">搜索</Button>
-        </Row>
-        <Row class="margin-top-10">
+         </Row>
+         <Row class="margin-top-10">
           <Button type="primary" @click="addPlan">添加计划</Button>
           <Button type="primary" @click="reviewPlan">审核</Button>
           <Button type="primary" @click="executePlan">执行计划</Button>
           <Button type="primary" @click="finishedPlan">执行完毕</Button>
-        </Row>
+         </Row>
       </Form>
-
+     </Row>
       <!--      Tabs-->
       <Tabs v-model="currentTab">
         <TabPane label="计划列表" name="planList">
@@ -53,6 +55,7 @@
           <div class="foot-page">
             共{{planList.pageProps.total}}条
             <Page transfer
+                  :current="planList.pageProps.page"
                   :total="planList.pageProps.total"
                   :page-size="planList.pageProps.perPage"
                   size="small"
@@ -116,7 +119,7 @@
           <span class="line"></span>
         </div>
         <FormItem label="经办人">
-          <Input class="width-180" v-model="reviewModal.reivewer" readonly/>
+          <Input class="width-180" v-model="userInfo.realName" readonly/>
         </FormItem>
         <FormItem label="审核" prop="planStatus">
           <RadioGroup v-model="reviewModal.form.planStatus" class="width-120">
@@ -187,9 +190,9 @@
           <div class="title-text">关闭计划</div>
           <span class="line"></span>
         </div>
-        <FormItem label="经办人">
+        <!-- <FormItem label="经办人">
           <Input class="width-180" v-model="finishedModal.data.nextBy" readonly/>
-        </FormItem>
+        </FormItem> -->
         <FormItem label="实际执行数量">
           <Input class="width-180" v-model="finishedModal.form.realNum" readonly/>
         </FormItem>
@@ -257,7 +260,7 @@
           <span class="line"></span>
         </div>
         <FormItem label="经办人">
-          <Input class="width-180" v-model="statusDetailModal.form.managerReview.createdBy" readonly/>
+          <Input class="width-180" v-model="userInfo.realName" readonly/>
         </FormItem>
         <FormItem label="审核">
           <Input class="width-180" v-model="statusDetailModal.form.managerReview.planStatus" readonly/>
@@ -466,7 +469,7 @@
             isFillPlan: '',
             planName: '',
             fileItems: '',
-            nextBy: '',
+            // nextBy: '',
             realNum: '',
           },
           form: {
@@ -520,6 +523,7 @@
     methods: {
       // Form 操作
       search() {
+        this.planList.pageProps.page = 1
         this.getPlanList()
       },
       delPlan(row) {
@@ -617,7 +621,7 @@
                 }
               }
             }
-            this.finishedModal.data.nextBy = this.userInfo.realName
+            // this.finishedModal.data.nextBy = this.userInfo.realName
             this.finishedModal.data.isFillPlan = data.isFillPlan === 'yes' ? '是' : '否'
             this.finishedModal.form.id = id
             this.finishedModal.form.realNum = data.realNum

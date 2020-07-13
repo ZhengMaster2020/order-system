@@ -1,30 +1,31 @@
 <template>
   <div>
     <Card>
+     <Row slot="title">
       <!--      Form-->
       <Form ref="listSearchForm" :model="listSearchForm" inline v-show="currentTab === 'outboundList'">
-        <Row>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+        <Row type="flex">
+          <Col>
             <Select  v-model="listSearchForm.brand" clearable placeholder="品牌">
               <Option v-for="(brand, index) in brandList" :key="index" :value="brand.value" :label="brand.label"/>
             </Select>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input v-model="listSearchForm.gbOrderSn" clearable placeholder="灌包订单号"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input v-model="listSearchForm.mkCode" clearable placeholder="慕可代码"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input v-model="listSearchForm.productName" clearable placeholder="产品名称"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input v-model="listSearchForm.createdBy" clearable placeholder="申请人"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input v-model="listSearchForm.outboundOrderSn" clearable placeholder="出库单号"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Button type="primary" @click="search">搜索</Button>
           </Col>
 
@@ -39,41 +40,40 @@
           <Button type="primary" @click="editApply">修改</Button>
         </Row>
       </Form>
-
       <Form ref="recordSearchForm" :model="recordSearchForm" inline v-show="currentTab === 'outboundRecord'">
-        <Row>
-          <Col :xs="24" :sm="12" :md="6" :lg="2">
+        <Row type="flex">
+          <Col>
             <Input v-model="recordSearchForm.brand" clearable placeholder="品牌"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input v-model="recordSearchForm.gbOrderSn" clearable placeholder="灌包订单号"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="2">
+          <Col>
             <Input v-model="recordSearchForm.mkCode" clearable placeholder="慕可代码"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="2">
+          <Col>
             <Input v-model="recordSearchForm.productName" clearable placeholder="产品名称"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="2">
+          <Col>
             <Input v-model="recordSearchForm.createdBy" clearable placeholder="出库记录人"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <DatePicker  v-model="outboundDate"
                          clearable
                          type="date"
                          placeholder="出库时间"
                          @on-change="dateChange"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input v-model="recordSearchForm.outboundOrderSn" clearable placeholder="出库单号"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="3">
+          <Col>
             <Input v-model="recordSearchForm.supplier" clearable placeholder="供应商"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="2">
+          <Col>
             <Input v-model="recordSearchForm.serialCode" clearable placeholder="序列号"/>
           </Col>
-          <Col :xs="24" :sm="12" :md="6" :lg="2">
+          <Col>
             <Button type="primary" @click="search">搜索</Button>
           </Col>
         </Row>
@@ -84,8 +84,7 @@
           <Button type="primary" @click="editOutboundConfirm">修改</Button>
         </Row>
       </Form>
-
-
+     </Row>
       <!--      Tabs-->
       <Tabs v-model="currentTab">
         <TabPane label="出库申请单" name="outboundList">
@@ -101,6 +100,7 @@
           <div class="foot-page">
             共{{outboundList.pageProps.total}}条
             <Page transfer
+                  :current="outboundList.pageProps.page"
                   :total="outboundList.pageProps.total"
                   :page-size="outboundList.pageProps.perPage"
                   size="small"
@@ -126,6 +126,7 @@
             共{{outboundRecord.pageProps.total}}条
             <Page transfer
                   :total="outboundRecord.pageProps.total"
+                  :current="outboundRecord.pageProps.page"
                   :page-size="outboundRecord.pageProps.perPage"
                   size="small"
                   show-elevator
@@ -204,7 +205,7 @@
           <span class="line"></span>
         </div>
         <FormItem label="经办人">
-          <Input class="width-170" v-model="detailData.createdBy" readonly/>
+          <Input class="width-170" v-model="detailData.people" readonly/>
         </FormItem>
         <FormItem label="审核" prop="isPass" v-show="reviewModal.title === '出库单审核'">
           <RadioGroup v-model="reviewModal.form.isPass" class="width-120">
@@ -482,7 +483,7 @@
           <span class="line"></span>
         </div>
         <FormItem label="经办人">
-          <Input class="width-170" v-model="detailData.handleBy" readonly/>
+          <Input class="width-170" v-model="detailData.people" readonly/>
         </FormItem>
         <FormItem label="已实际出库数量">
           <Input class="width-170" v-model="detailData.confirmedNumber" readonly/>
@@ -1167,6 +1168,8 @@
           }
           this.detailData.lossSn = this.detailData.lossSn ? this.detailData.lossSn : '-'
           this.detailData.reissueType = this.switchReiusseType(this.detailData.reissueType)
+          let userInfo = JSON.parse(window.localStorage.getItem('userInfo'));
+          this.detailData.people = userInfo ? userInfo.realName : ''
         }).then(() => {
           this.$API.getGBOrderSnNum({ gbOrderSn: this.detailData.gbOrderSn }).then(res => {
             if (res.code !== 0) return

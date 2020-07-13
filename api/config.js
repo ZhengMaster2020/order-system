@@ -5,7 +5,7 @@
  * baseUrl: 域名地址
  * routerMode: 路由模式
  * imgbaseUrl: 图片所在域名地址
- *ENV === 'production' ?  '//apisupply.fandow.com' : '//apisupplytest.fandow.com',
+ *
  */
 import ENV from './env'
 
