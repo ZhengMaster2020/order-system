@@ -82,6 +82,15 @@ const getOutboundLog = (params) => {
   })
 }
 
+// 链接反查
+const getSearchLink = params =>{
+  return fetch({
+    url: `traceability/securityCodeQuery/LookUp`,
+    method: 'GET',
+    params
+  })
+}
+
 export default {
   getSecurityHistoryNewList,
   getSecurityHistoryOldList,
@@ -91,5 +100,6 @@ export default {
   exportOldSecurityList,
   getNewSecurityCodeLog,
   getOldSecurityCodeLog,
-  getOutboundLog
+  getOutboundLog,
+  getSearchLink
 }
