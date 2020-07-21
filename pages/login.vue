@@ -34,7 +34,7 @@
             </FormItem>
             <FormItem prop="captcha" style="display: flex; height: 30px;" v-if="showCaptcha">
               <Input v-model="form.captcha" placeholder="验证码" prop="captcha" style="width: 50%; border: 1px solid #dddee1"/>
-              <Button type="primary" style="flex: 1" @click="getCAptcha">获取验证码</Button>
+              <Button type="primary" style="flex: 1" @click="getCaptcha" :disabled="!canGetCaptcha">获取验证码</Button>
             </FormItem>
             <FormItem>
               <Button
@@ -81,6 +81,7 @@ export default {
     return {
       loading: false,
       showCaptcha: false,
+      canGetCaptcha: true,
       form: {},
       rules: {
         username: [{ required: true, message: '账号不能为空', trigger: 'blur' }],
@@ -101,7 +102,16 @@ export default {
     }
   },
   methods: {
-    getCAptcha() {
+    getCaptcha() {
+      this.canGetCaptcha = false
+      let firstTime = Date.now()
+      this.timer = setInterval(() => {
+        let diff = Date.now() - firstTime
+        if(diff >= 300000) { // 验证码5分钟失效
+          this.canGetCaptcha = true
+          clearInterval(this.timer)
+        }
+      }, 1000)
       this.$API.getCaptcha({username: this.form.username}).then(res => {
         if(res.code !== 0) return
         this.$Message.success(res.msg)
@@ -111,7 +121,7 @@ export default {
       // console.log(123)
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          // this.loading = true
+          this.loading = true
           // window.localStorage.removeItem('menus')
           // setTimeout(() => {
           //   this.loading = false
@@ -156,6 +166,8 @@ export default {
           }).catch(err => {
             console.log(err);
             err.response.data.code === 40000 && (this.showCaptcha = true)
+          }).finally(() => {
+            this.loading = false
           })
         }
       })
