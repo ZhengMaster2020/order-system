@@ -90,7 +90,7 @@
                 @on-page-size-change="(size) => { changePageSize(size, 'oldPageProps') }" />
             </div>
           </TabPane>
-        </Tabs> 
+        </Tabs>
       </Row>
     </Card>
     <Modal
@@ -808,6 +808,12 @@
       }
     },
     watch: {
+      ['logModal.show'](cur) {
+        if(!cur) {
+          this.logModal.list = []
+          this.logModal.traceData = {}
+        }
+      },
       isShowExportModal(cur) {
         if(!cur){
           this.$refs.exportForm.resetFields()
@@ -815,14 +821,6 @@
             verifyCode: null,
             remark: ''
           }
-        }
-      }
-    },
-    watch: {
-      ['logModal.show'](cur) {
-        if(!cur) {
-          this.logModal.list = []
-          this.logModal.traceData = {}
         }
       }
     }
