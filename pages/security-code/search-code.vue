@@ -39,6 +39,7 @@
         <Row class="margin-top-10">
           <Col span="24">
             <Button type="primary" @click="showExportModal">导出查询数据</Button>
+            <Button type="primary" @click="showSearchLinkModal">链接反查</Button>
           </Col>
         </Row>
       </Row>
@@ -329,6 +330,25 @@
       </div>
       <Spin fix v-if="spinShow"></Spin>
     </Modal>
+    <Modal
+      width="650"
+      v-model="isShowSearchLinkModal"
+      footer-hide
+      title="链接反查">
+      <Form :label-width="80" style="padding: 20px 0">
+        <Row>
+          <FormItem label="链接">
+            <Input type="textarea" :autosize="{minRows: 3}" style="width: 75%;" placeholder="请输入链接" v-model="searchLink" @keydown.native.enter.prevent @on-enter="searchLinkResult" @on-change="resetResult"></Input>
+            <Button type="primary" class="margin-left-10" @click="searchLinkResult">查询</Button>
+          </FormItem>
+        </Row>
+        <Row>
+          <FormItem label="查询结果">
+            <Input style="width: 75%;" class="search-link-result" readonly :value="searchResult"></Input>
+          </FormItem>
+        </Row>
+      </Form>
+    </Modal>
   </div>
 </template>
 
@@ -459,6 +479,9 @@
           traceData: {}
         },
         rangeList: [],
+        isShowSearchLinkModal: false,
+        searchLink: '',
+        searchResult: ''
       }
     },
     methods: {
@@ -805,6 +828,76 @@
             this.isExportLoading = false;
           })
         })
+      },
+      // 显示链接反查弹窗
+      showSearchLinkModal () {
+        this.isShowSearchLinkModal = true
+      },
+      // 重置结果
+      resetResult () {
+        this.searchResult = ''
+      },
+      // 搜索链接结果
+      searchLinkResult (e) {
+        e.preventDefault()
+        if (!this.searchLink) return this.$Message.warning('链接不能为空')
+        try {
+          let serialCode
+          let uniqueCode
+          let masterId
+          // 斜杠截取
+          try {
+            let link = this.searchLink.replace('.html', '')
+            let hrefList = link.split('/')
+            hrefList.forEach((item, index) => {
+              if (item === 'serialCode') {
+                serialCode = hrefList[index + 1];
+              }
+              if (item === 'uniqueCode') {
+                uniqueCode = hrefList[index + 1];
+              }
+              if (item === 'masterId') {
+                masterId = hrefList[index + 1];
+              }
+            })
+          } catch (err) {}
+          try {
+            // 问号截取
+            if (!serialCode || !uniqueCode || !masterId) {
+              const getQueryVariable = (variable) => {
+                var query = this.searchLink.split('?')[1]
+                var vars = query.split("&");
+                for (var i=0; i < vars.length; i++) {
+                  var pair = vars[i].split("=");
+                  if(pair[0] == variable){return pair[1];}
+                }
+                return(false);
+              }
+              serialCode = getQueryVariable('serialCode')
+              uniqueCode = getQueryVariable('uniqueCode')
+              masterId = getQueryVariable('masterId')
+            }
+          } catch (err) {}
+          if (!serialCode || !uniqueCode || !masterId) {
+            throw 1
+          }
+          this.$API.getSearchLink({
+            serialCode,
+            uniqueCode,
+            masterId
+          }).then(res => {
+            if (res.code === 0) {
+              if (!res.data.securityCode) {
+                this.$Message.warning('没有查询到结果，请检查链接')
+              } else {
+                this.searchResult = res.data.securityCode
+                this.$Message.success('查询成功')
+              }
+            }
+          })
+        } catch (err) {
+          this.$Message.warning('请输入正确链接')
+        }
       }
     },
     watch: {
@@ -891,5 +984,11 @@
       width: 100%;
       border-top: 1px dashed #000;
     }
+  }
+  /deep/ textarea{
+    resize: none;
+  }
+  .search-link-result /deep/ input{
+    text-align: center;
   }
 </style>
