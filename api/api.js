@@ -11,6 +11,16 @@ const login = (params) => {
   })
 }
 
+// 获取验证码
+const getCaptcha = (data) => {
+  return fetch({
+    baseURL: USER_URL,
+    url: 'authentication/captcha',
+    method: 'POST',
+    data
+  })
+}
+
 // 获取用户信息
 const getUserInfo = () => {
   return fetch({
@@ -496,7 +506,7 @@ const inventoryConsumptionExport = params => {
   return fetch({
     url:`/traceability/inventory-management/export/${params.type}`,
     method:'GET',
-    responseType: 'blob' 
+    responseType: 'blob'
   })
 }
 // 盘点管理-销毁记录-模糊搜索
@@ -509,6 +519,7 @@ const inventoryConsumptionFuzzysearch = params => {
 }
 export default {
   login,
+  getCaptcha,
   getUserInfo,
   /* 防伪码 */
   securityCodeList,

@@ -36,19 +36,11 @@ export default function fetch(options) {
             reader.readAsText(data, 'utf-8');
             reader.onload = function () {
               data = JSON.parse(reader.result)
-              Notice.error({
-                title: '错误代码：' + data.code,
-                desc: data.subMsg || data.msg || data.message,
-                duration: 3
-              })
+              alertError(data)
               reject(data);
             }
           } else {
-            Notice.error({
-              title: '错误代码：' + data.code,
-              desc: data.subMsg || data.msg || data.message,
-              duration: 3
-            })
+            alertError(data)
             reject(data);
           }
           return;
@@ -67,11 +59,7 @@ export default function fetch(options) {
           reader.readAsText(data, 'utf-8');
           reader.onload = function () {
             data = JSON.parse(reader.result);
-            Notice.error({
-              title: '错误代码：' + data.code,
-              desc: data.subMsg || data.msg || data.message,
-              duration: 1.5
-            })
+            alertError(data)
             reject(error)
           }
           return;
@@ -102,12 +90,26 @@ export default function fetch(options) {
           return false
         }
 
-        Notice.error({
-          title: '错误代码：' + data.code,
-          desc: data.subMsg || data.msg || data.message,
-          duration: 1.5
-        })
+        alertError(data)
         reject(error)
       })
   })
+}
+
+function alertError (data) {
+  if (data.data && data.data.length) {
+    data.data.forEach(item => {
+      Notice.error({
+        title: '错误代码：' + data.code,
+        desc: item,
+        duration: 3
+      })
+    })
+  } else {
+    Notice.error({
+      title: '错误代码：' + data.code,
+      desc: data.subMsg || data.msg || data.message,
+      duration: 3
+    })
+  }
 }
