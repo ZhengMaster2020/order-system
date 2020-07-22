@@ -101,6 +101,9 @@ export default {
       }
     }
   },
+  destroyed() {
+    this.timer && clearInterval(this.timer)
+  },
   methods: {
     getCaptcha() {
       this.canGetCaptcha = false
