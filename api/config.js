@@ -23,7 +23,7 @@ if (ENV === 'production') {
   baseUrl = 'http://kongtest.fandow.com/oa/'
   fileUrl = 'http://apibeta.fandow.com/oa/file'
   UAC_URL = 'http://kongtest.fandow.com/oa/uac'
-  userUrl = 'http://kongtest.fandow.com/oa/uac'
+  userUrl = 'http://kongtest.fandow.com/'
   skipAccessUrl = '//kongtest.fandow.com/'
   API_SUPPLY = '//apisupplytest.fandow.com'
 } else {
@@ -32,7 +32,7 @@ if (ENV === 'production') {
   baseUrl = 'http://kongtest.fandow.com/oa/'
   fileUrl = 'http://apibeta.fandow.com/oa/file'
   UAC_URL = 'http://kongtest.fandow.com/oa/uac'
-  userUrl = 'http://kongtest.fandow.com/oa/uac'
+  userUrl = 'http://kongtest.fandow.com/'
   skipAccessUrl = '//kongtest.fandow.com/'
   API_SUPPLY = '//apisupplytest.fandow.com'
 }

@@ -32,6 +32,10 @@
               </span>
               </Input>
             </FormItem>
+            <FormItem prop="captcha" style="display: flex; height: 30px;" v-if="showCaptcha">
+              <Input v-model="form.captcha" placeholder="验证码" prop="captcha" style="width: 50%; border: 1px solid #dddee1"/>
+              <Button type="primary" style="flex: 1" @click="getCaptcha" :disabled="!canGetCaptcha">获取验证码</Button>
+            </FormItem>
             <FormItem>
               <Button
                 type="primary"
@@ -76,24 +80,48 @@ export default {
   data() {
     return {
       loading: false,
+      showCaptcha: false,
+      canGetCaptcha: true,
       form: {},
       rules: {
-        username: [
-          { required: true, message: '账号不能为空', trigger: 'blur' }
-        ],
-        password: [{ required: true, message: '密码不能为空', trigger: 'blur' }]
+        username: [{ required: true, message: '账号不能为空', trigger: 'blur' }],
+        password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
+        captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
       },
       client_id: 'af9fc0a207c018fb244e8d3b5c7d815c', // 应用ID
       client_secret: '1cfdb85d6ca1595dfa72fee59e7e9c67', // 应用Secret
       grant_type: 'password'
     }
   },
+  watch: {
+    ['form.username']() {
+      if(this.showCaptcha) {
+        this.showCaptcha = false
+        this.form.captcha = ''
+      }
+    }
+  },
   methods: {
+    getCaptcha() {
+      this.canGetCaptcha = false
+      let firstTime = Date.now()
+      this.timer = setInterval(() => {
+        let diff = Date.now() - firstTime
+        if(diff >= 300000) { // 验证码5分钟失效
+          this.canGetCaptcha = true
+          clearInterval(this.timer)
+        }
+      }, 1000)
+      this.$API.getCaptcha({username: this.form.username}).then(res => {
+        if(res.code !== 0) return
+        this.$Message.success(res.msg)
+      })
+    },
     handleSubmit() {
       // console.log(123)
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          // this.loading = true
+          this.loading = true
           // window.localStorage.removeItem('menus')
           // setTimeout(() => {
           //   this.loading = false
@@ -104,8 +132,9 @@ export default {
           //     Cookies.set('access', 1);
           // }
           const LoginForm = {}
-          LoginForm.username	 = this.form.username
+          LoginForm.username = this.form.username
           LoginForm.password = this.form.password
+          LoginForm.captcha = this.form.captcha
           LoginForm.client_id = this.client_id
           LoginForm.client_secret = this.client_secret
           LoginForm.grant_type = this.grant_type
@@ -136,6 +165,9 @@ export default {
             }
           }).catch(err => {
             console.log(err);
+            err.response.data.code === 40000 && (this.showCaptcha = true)
+          }).finally(() => {
+            this.loading = false
           })
         }
       })
