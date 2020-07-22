@@ -91,7 +91,7 @@
                 @on-page-size-change="(size) => { changePageSize(size, 'oldPageProps') }" />
             </div>
           </TabPane>
-        </Tabs> 
+        </Tabs>
       </Row>
     </Card>
     <Modal
@@ -673,6 +673,7 @@
             })
           }
         })
+        console.log(exportSelectIdList.length, 'exportSelectIdList.length')
         if (!exportSelectIdList.length) {
           let isCanExport = true;
           for (let key in this.search[this.selectTab]) {
@@ -684,6 +685,7 @@
             this.$Message.warning('请筛选条件后导出')
             return;
           }
+          console.log(this[this.selectTab + 'PageProps'].count, "this[this.selectTab + 'PageProps'].count")
           if (this[this.selectTab + 'PageProps'].count > EXPORT_MAX) {
             this.$Message.warning('数据量过大，请联系管理员')
             return;
@@ -899,6 +901,12 @@
       }
     },
     watch: {
+      ['logModal.show'](cur) {
+        if(!cur) {
+          this.logModal.list = []
+          this.logModal.traceData = {}
+        }
+      },
       isShowExportModal(cur) {
         if(!cur){
           this.$refs.exportForm.resetFields()
@@ -906,14 +914,6 @@
             verifyCode: null,
             remark: ''
           }
-        }
-      }
-    },
-    watch: {
-      ['logModal.show'](cur) {
-        if(!cur) {
-          this.logModal.list = []
-          this.logModal.traceData = {}
         }
       }
     }
