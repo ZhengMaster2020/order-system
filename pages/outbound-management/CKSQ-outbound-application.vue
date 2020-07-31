@@ -1045,7 +1045,7 @@
           if (res.code !== 0) return
           this.$Message.success(res.msg)
           this.printModal.show = false
-          this.init('search')
+          this.init()
         })
       },
 
@@ -1076,7 +1076,7 @@
             this[modal].show = false
             this.$refs[form].resetFields()
             this[modal + 'ResetFields']()
-            this.init('search')
+            this.init()
           })
         })
       },
