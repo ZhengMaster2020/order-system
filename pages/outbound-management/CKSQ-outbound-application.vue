@@ -355,6 +355,124 @@
             打印日期：{{$format(Date.now()/1000, 'yyyy-MM-dd')}}
           </Col>
         </Row>
+        <h3 style="text-align: center">防伪标出库申请单</h3>
+        <div class="sub-title">一、申请出库明细</div>
+        <div class="table-wrap">
+          <table border cellpadding="0" cellspacing="0" class="table-style margin-bottom-10">
+            <tbody>
+            <tr class="td-title">
+              <td>申请时间</td>
+              <td>供应商</td>
+              <td>灌包订单号</td>
+              <td>品牌</td>
+              <td>慕可代码</td>
+              <td>产品名称</td>
+              <td>要求货期</td>
+              <td width="60">紧急程度</td>
+              <td width="60">产品类型</td>
+              <td width="60">下单数量</td>
+            </tr>
+            <tr>
+              <td width="100">{{detailData.createdAt}}</td>
+              <td width="125">{{detailData.supplier}}</td>
+              <td width="100">{{detailData.gbOrderSn}}</td>
+              <td width="100">{{detailData.brand}}</td>
+              <td width="90">{{detailData.mkCode}}</td>
+              <td width="125">{{detailData.productName}}</td>
+              <td width="100">{{detailData.requireDeliveryTime}}</td>
+              <td width="60">{{detailData.urgency == '' ? '-' : detailData.urgency}}</td>
+              <td width="60">{{detailData.productType}}</td>
+              <td width="60">{{detailData.orderNumber}}</td>
+            </tr>
+            <tr class="td-title">
+              <td>剩余可出库量</td>
+              <td>是否补发</td>
+              <td>补发类型</td>
+              <td>损耗记录单</td>
+              <td>损耗数量</td>
+              <td>预计本次出库量</td>
+              <td colspan="4">出库理由</td>
+            </tr>
+            <tr>
+              <!--            TODO:  剩余可出库量-->
+              <td>{{detailData.remainNum}}</td>
+              <td>{{detailData.isReissue}}</td>
+              <td>{{(!detailData.reissueType || detailData.reissueType === '-') ? '无' : detailData.reissueType}}</td>
+              <td>{{(!detailData.lossSn || detailData.lossSn === '-') ? '无' : detailData.lossSn}}</td>
+              <td>{{(!detailData.lossNumber || detailData.lossNumber === '-') ? '无' : detailData.lossNumber}}</td>
+              <td>{{detailData.expectedOutboundNumber}}</td>
+              <td colspan="4">{{detailData.outboundReason}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <Row>
+          <Col span="8">
+            <h3 class="margin-top-10">实际出库数量：</h3>
+            <div class="fillin"></div>
+          </Col>
+          <Col span="8">
+            <h3 class="margin-top-10">送货员签名：</h3>
+            <div class="fillin"></div>
+          </Col>
+          <Col span="8">
+            <h3 class="margin-top-10">预计送达时间：</h3>
+            <div class="fillin"></div>
+          </Col>
+        </Row>
+        <Row class="font-size-10 margin-top-10 margin-bottom-10">
+          <Col span="8">
+            打印流水：{{detailData.flowingWater}}
+          </Col>
+          <Col span="8" offset="8">
+            打印日期：{{$format(Date.now()/1000, 'yyyy-MM-dd')}}
+          </Col>
+        </Row>
+
+        <div class="dashed-line"></div>
+
+        <div style="text-align: center" class="font-size-12">撕下上联随标附送给供应商，下联IT开发部留底</div>
+
+        <Row type="flex" justify="space-between">
+          <Col>
+            <div class="sub-title">二、出库执行人：</div>
+            <div class="sub-title">三、手动出库或打开钉钉，扫出库二维码</div>
+            <div class="sub-title">四、拣货人员签名回传，提交出库数据</div>
+          </Col>
+          <Col>
+            <div class="qrcode">
+              <img style="width: 100%; height: 100%"
+                   :src="detailData.qrCodeUrl"
+                   alt="qrcode">
+            </div>
+            <div style="font-size: 12px; text-align: center">{{detailData.gbOrderSn}}</div>
+          </Col>
+        </Row>
+
+
+        <Row>
+          <Col span="8">
+            <h3 class="margin-top-10">执行人：</h3>
+            <div class="fillin"></div>
+          </Col>
+          <Col span="8">
+            <h3 class="margin-top-10">实际执行数量：</h3>
+            <div class="fillin"></div>
+          </Col>
+          <Col span="8">
+            <h3 class="margin-top-10">执行日期：</h3>
+            <div class="fillin"></div>
+          </Col>
+        </Row>
+        <Row class="font-size-10 margin-top-10">
+          <Col span="8">
+            打印流水：{{detailData.flowingWater}}
+          </Col>
+          <Col span="8" offset="8">
+            打印日期：{{$format(Date.now()/1000, 'yyyy-MM-dd')}}
+          </Col>
+        </Row>
       </div>
       <div style="text-align: right">
         <Button @click="printModal.show = false">取消</Button>
@@ -1045,7 +1163,7 @@
           if (res.code !== 0) return
           this.$Message.success(res.msg)
           this.printModal.show = false
-          this.init('search')
+          this.init()
         })
       },
 
@@ -1076,7 +1194,7 @@
             this[modal].show = false
             this.$refs[form].resetFields()
             this[modal + 'ResetFields']()
-            this.init('search')
+            this.init()
           })
         })
       },
